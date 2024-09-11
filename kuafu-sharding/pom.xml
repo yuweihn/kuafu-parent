@@ -77,7 +77,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/yuweihn/kuafu-parent.git</connection>
 		<developerConnection>scm:git:https://github.com/yuweihn/kuafu-parent.git</developerConnection>
-		<url>https://github.com/yuweihn/kuafu</url>
+		<url>https://github.com/yuweihn/kuafu-parent</url>
 	</scm>
 	<developers>
 		<developer>
