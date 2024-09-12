@@ -1,19 +1,19 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.yuweix.kuafu.boot.DefaultAutoConfiguration,\
-  core.com.yuweix.kuafu.boot.JsonAutoConfiguration,\
-  core.com.yuweix.kuafu.boot.RabbitAutoConfiguration,\
-  sequence.com.yuweix.kuafu.boot.SequenceAutoConfiguration,\
-  dao.com.yuweix.kuafu.boot.HibernateAutoConfiguration,\
-  dao.com.yuweix.kuafu.boot.MybatisAutoConfiguration,\
-  redis.com.yuweix.kuafu.boot.JedisAutoConfiguration,\
-  redis.com.yuweix.kuafu.boot.JedisMsAutoConfiguration,\
-  redis.com.yuweix.kuafu.boot.JedisClusterAutoConfiguration,\
-  redis.com.yuweix.kuafu.boot.LettuceAutoConfiguration,\
-  redis.com.yuweix.kuafu.boot.LettuceMsAutoConfiguration,\
-  redis.com.yuweix.kuafu.boot.LettuceClusterAutoConfiguration,\
-  web.com.yuweix.kuafu.boot.I18nAutoConfiguration,\
-  web.com.yuweix.kuafu.boot.FreeMarkerAutoConfiguration,\
-  exception.com.yuweix.kuafu.boot.ExceptionAutoConfiguration,\
-  sharding.com.yuweix.kuafu.boot.ShardingAutoConfiguration,\
-  schedule.com.yuweix.kuafu.boot.ScheduleAutoConfiguration,\
-  permission.com.yuweix.kuafu.boot.PermissionAutoConfiguration
+  com.yuweix.kuafu.boot.JsonAutoConfiguration,\
+  com.yuweix.kuafu.boot.RabbitAutoConfiguration,\
+  com.yuweix.kuafu.boot.SequenceAutoConfiguration,\
+  com.yuweix.kuafu.boot.HibernateAutoConfiguration,\
+  com.yuweix.kuafu.boot.MybatisAutoConfiguration,\
+  com.yuweix.kuafu.boot.JedisAutoConfiguration,\
+  com.yuweix.kuafu.boot.JedisMsAutoConfiguration,\
+  com.yuweix.kuafu.boot.JedisClusterAutoConfiguration,\
+  com.yuweix.kuafu.boot.LettuceAutoConfiguration,\
+  com.yuweix.kuafu.boot.LettuceMsAutoConfiguration,\
+  com.yuweix.kuafu.boot.LettuceClusterAutoConfiguration,\
+  com.yuweix.kuafu.boot.I18nAutoConfiguration,\
+  com.yuweix.kuafu.boot.FreeMarkerAutoConfiguration,\
+  com.yuweix.kuafu.boot.ExceptionAutoConfiguration,\
+  com.yuweix.kuafu.boot.ShardingAutoConfiguration,\
+  com.yuweix.kuafu.boot.ScheduleAutoConfiguration,\
+  com.yuweix.kuafu.boot.PermissionAutoConfiguration
