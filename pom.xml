@@ -13,6 +13,7 @@
     <url>https://www.yuweix.com</url>
 
     <properties>
+        <jdk.version>17</jdk.version>
         <activemq.core.version>5.7.0</activemq.core.version>
         <activemq.pool.version>5.15.0</activemq.pool.version>
         <aliyun.oss.version>3.12.0</aliyun.oss.version>
@@ -30,7 +31,6 @@
         <persistence.version>3.1.0</persistence.version>
         <jakarta.jms.api.version>3.1.0</jakarta.jms.api.version>
         <jedis.version>2.9.0</jedis.version>
-        <jdk.version>17</jdk.version>
         <lettuce.version>6.1.10.RELEASE</lettuce.version>
         <maven.compiler.encoding>utf-8</maven.compiler.encoding>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
@@ -54,8 +54,6 @@
         <spring.version>6.0.8</spring.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <zxing.version>3.3.0</zxing.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <modules>
