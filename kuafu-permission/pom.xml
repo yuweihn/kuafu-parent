@@ -3,9 +3,6 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<properties>
-	</properties>
-
 	<parent>
 		<groupId>com.yuweix</groupId>
 		<artifactId>kuafu-parent</artifactId>
@@ -19,6 +16,12 @@
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>Kuafu</description>
 	<url>https://www.yuweix.com</url>
+
+	<properties>
+		<jdk.version>17</jdk.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+	</properties>
 
 	<dependencies>
 		<dependency>

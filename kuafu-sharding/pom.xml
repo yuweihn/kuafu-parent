@@ -17,6 +17,12 @@
 	<description>Kuafu</description>
 	<url>https://www.yuweix.com</url>
 
+	<properties>
+		<jdk.version>17</jdk.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
