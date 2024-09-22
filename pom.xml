@@ -13,6 +13,7 @@
     <url>https://www.yuweix.com</url>
 
     <properties>
+        <jdk.version>1.8</jdk.version>
         <activemq.core.version>5.7.0</activemq.core.version>
         <activemq.pool.version>5.15.0</activemq.pool.version>
         <aliyun.oss.version>3.12.0</aliyun.oss.version>
@@ -29,7 +30,6 @@
         <javax.annotation.api.version>1.3.2</javax.annotation.api.version>
         <persistence.version>1.0.2</persistence.version>
         <jedis.version>2.9.0</jedis.version>
-        <jdk.version>1.8</jdk.version>
         <jms.spec.version>1.1.1</jms.spec.version>
         <lettuce.version>6.1.10.RELEASE</lettuce.version>
         <maven.compiler.encoding>utf-8</maven.compiler.encoding>
