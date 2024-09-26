@@ -211,6 +211,9 @@ public abstract class PoiExcel {
 
 	private static List<String> getImportHeadList(Row row) {
 		List<String> list = new ArrayList<>();
+		if (row == null) {
+			return list;
+		}
 		for (Cell cell: row) {
 			String head = cell.toString();
 			if (head == null || "".equals(head.trim())) {
