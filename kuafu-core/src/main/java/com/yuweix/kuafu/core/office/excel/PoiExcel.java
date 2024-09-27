@@ -72,7 +72,7 @@ public abstract class PoiExcel {
 				try {
 					is.close();
 				} catch (IOException e) {
-					log.error("Error: {}", new Object[] {e});
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 		}
@@ -97,7 +97,7 @@ public abstract class PoiExcel {
 				try {
 					is.close();
 				} catch (IOException e) {
-					log.error("Error: {}", new Object[] {e});
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 		}
@@ -134,7 +134,7 @@ public abstract class PoiExcel {
 				try {
 					is.close();
 				} catch (IOException e) {
-					log.error("Error: {}", new Object[] {e});
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 		}
@@ -159,7 +159,7 @@ public abstract class PoiExcel {
 				try {
 					is.close();
 				} catch (IOException e) {
-					log.error("Error: {}", new Object[] {e});
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 		}
@@ -203,7 +203,7 @@ public abstract class PoiExcel {
 				try {
 					is.close();
 				} catch (IOException e) {
-					log.error("Error: {}", new Object[] {e});
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 		}
@@ -316,7 +316,7 @@ public abstract class PoiExcel {
 		try {
 			out.close();
 		} catch (IOException e) {
-			log.error("", e);
+			log.error("Error: {}", e.getMessage(), e);
 		}
 		return data;
 	}
@@ -393,13 +393,13 @@ public abstract class PoiExcel {
 
 			workbook.write(out);
 		} catch (Exception e) {
-			log.error("", e);
+			log.error("Error: {}", e.getMessage(), e);
 		} finally {
 			if (workbook != null) {
 				try {
 					workbook.close();
 				} catch (IOException e) {
-					log.error("", e);
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 		}
@@ -496,7 +496,7 @@ public abstract class PoiExcel {
 					Object o = getMethod.invoke(t);
 					list.add(o);
 				} catch (Exception e) {
-					log.error("", e);
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 		}
