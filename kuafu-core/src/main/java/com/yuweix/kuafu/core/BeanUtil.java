@@ -55,7 +55,7 @@ public abstract class BeanUtil {
 		}
 
 		Set<String> keys = map.keySet();
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (String k: keys) {
 			Object v = map.get(k);
 			if (v == null) {
