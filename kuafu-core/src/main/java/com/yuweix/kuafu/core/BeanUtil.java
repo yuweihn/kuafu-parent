@@ -403,7 +403,7 @@ public abstract class BeanUtil {
 		}
 		return false;
 	}
-	public static boolean exists(List<? extends Number> list, Number num){
+	public static boolean exists(List<? extends Number> list, Number num) {
 		for (Number anum: list) {
 			if (anum.equals(num)) {
 				return true;
