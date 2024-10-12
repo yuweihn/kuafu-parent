@@ -286,7 +286,7 @@ public abstract class BeanUtil {
 		set.addAll(list2);
 
 		List<T> list = new ArrayList<>(list1);
-		set.removeAll(list2);
+		list2.forEach(set::remove);
 		list.removeAll(set);
 		return list;
 	}
