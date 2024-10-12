@@ -281,7 +281,7 @@ public abstract class BeanUtil {
 			return new ArrayList<T>();
 		}
 
-		Set<T> set = new HashSet<T>();
+		Set<T> set = new HashSet<>();
 		set.addAll(list1);
 		set.addAll(list2);
 
