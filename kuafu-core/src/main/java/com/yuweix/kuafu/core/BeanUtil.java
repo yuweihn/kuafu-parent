@@ -295,7 +295,7 @@ public abstract class BeanUtil {
 	 * Gets all fields of the given class and its parents (if any).
 	 * @return
 	 */
-	public static List<Field> getAllFieldsList(Class<?> clz) {
+	public static List<Field> getFieldList(Class<?> clz) {
 		final List<Field> allFields = new ArrayList<>();
 		Class<?> currentClass = clz;
 		while (currentClass != null) {
