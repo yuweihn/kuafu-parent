@@ -278,7 +278,7 @@ public abstract class BeanUtil {
 	public static<T> List<T> intersect(List<T> list1, List<T> list2) {
 		if (list1 == null || list1.size() <= 0
 				|| list2 == null || list2.size() <= 0) {
-			return new ArrayList<T>();
+			return new ArrayList<>();
 		}
 
 		Set<T> set = new HashSet<>();
