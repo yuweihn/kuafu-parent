@@ -11,6 +11,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
@@ -19,6 +21,9 @@ import org.springframework.util.Assert;
  * @author yuwei
  */
 public abstract class BeanUtil {
+	private static final Logger log = LoggerFactory.getLogger(BeanUtil.class);
+
+
 	private static final String[] CHAR_ARRAY = {"A", "B", "C", "D", "E", "F", "G"
 											, "H", "I", "J", "K", "L", "M", "N"
 											, "O", "P", "Q", "R", "S", "T"
@@ -410,5 +415,25 @@ public abstract class BeanUtil {
 			}
 		}
 		return false;
+	}
+
+	public static void setVal(Object obj, Field field, Object val) {
+		try {
+			field.setAccessible(true);
+			field.set(obj, val);
+		} catch (Exception e) {
+			log.error("Error: {}", e.getMessage());
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static Object getVal(Object obj, Field field) {
+		try {
+			field.setAccessible(true);
+			return field.get(obj);
+		} catch (Exception e) {
+			log.error("Error: {}", e.getMessage());
+			throw new RuntimeException(e);
+		}
 	}
 }
