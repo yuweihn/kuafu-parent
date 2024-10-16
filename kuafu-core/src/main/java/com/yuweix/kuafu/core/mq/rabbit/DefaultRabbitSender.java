@@ -38,7 +38,7 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
             rabbitTemplate.convertAndSend(exchange, routeKey, msg, new ConfirmData(exchange, routeKey, msg, this));
         } catch (Exception e) {
             log.error("发送消息异常, Error: {}", e.getMessage(), e);
-            throw new RuntimeException("发送消息异常");
+            throw new RuntimeException("发送消息异常" + e.getMessage());
         }
     }
 
