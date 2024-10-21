@@ -29,7 +29,7 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
     }
 
 
-    public void sendMessage(String exchange, String routeKey, Object message) {
+    public void send(String exchange, String routeKey, Object message) {
         try {
             MessageProperties properties = new MessageProperties();
             properties.setMessageId(UUID.randomUUID().toString().replace("-", ""));
@@ -43,7 +43,7 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
     }
 
     @Override
-    public void resend(ConfirmData confirmData) {
+    public void confirm(ConfirmData confirmData) {
         rabbitTemplate.convertAndSend(confirmData.getExchange(), confirmData.getRouteKey(), confirmData.getMessage(), confirmData);
     }
 }

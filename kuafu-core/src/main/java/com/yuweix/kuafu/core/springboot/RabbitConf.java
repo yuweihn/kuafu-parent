@@ -114,7 +114,7 @@ public class RabbitConf {
                 }
                 log.info("重试第{}次", times);
                 confirmData.setRetryTimes(times);
-                confirmable.resend(confirmData);
+                confirmable.confirm(confirmData);
             }
         };
     }

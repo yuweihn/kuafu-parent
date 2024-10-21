@@ -9,6 +9,10 @@ public interface BindingSetting {
 
     class Item {
         private String queue;
+        /**
+         * 逗号(,)隔开交换机名称和交换机类型，也有可能没有逗号，那就不含有交换机类型，使用默认类型direct。
+         * 交换机类型可取值有三种：direct、fanout和topic
+         */
         private String exchange;
         private String routeKey;
 
