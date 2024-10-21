@@ -57,11 +57,29 @@ public class RabbitConf {
             Queue queue = new Queue(item.getQueue(), true);
             SpringContext.register(queue.getName(), queue);
 
-            Exchange exchange = new DirectExchange(item.getExchange(), true, false);
-            SpringContext.register(exchange.getName(), exchange);
+            String exchangeType = item.getExchangeType();
+            exchangeType = exchangeType == null ? null : exchangeType.trim();
+            if (exchangeType == null || "".equals(exchangeType) || ExchangeTypes.DIRECT.equals(exchangeType)) {
+                Exchange exchange = new DirectExchange(item.getExchange(), true, false);
+                SpringContext.register(exchange.getName(), exchange);
 
-            Binding bd = BindingBuilder.bind(queue).to(exchange).with(item.getRouteKey()).noargs();
-            SpringContext.register("rabbitBinding" + i, bd);
+                Binding bd = BindingBuilder.bind(queue).to(exchange).with(item.getRouteKey()).noargs();
+                SpringContext.register("rabbitBinding" + i, bd);
+            } else if (ExchangeTypes.FANOUT.equals(exchangeType)) {
+                FanoutExchange exchange = new FanoutExchange(item.getExchange(), true, false);
+                SpringContext.register(exchange.getName(), exchange);
+
+                Binding bd = BindingBuilder.bind(queue).to(exchange);
+                SpringContext.register("rabbitBinding" + i, bd);
+            } else if (ExchangeTypes.TOPIC.equals(exchangeType)) {
+                Exchange exchange = new TopicExchange(item.getExchange(), true, false);
+                SpringContext.register(exchange.getName(), exchange);
+
+                Binding bd = BindingBuilder.bind(queue).to(exchange).with(item.getRouteKey()).noargs();
+                SpringContext.register("rabbitBinding" + i, bd);
+            } else {
+                throw new RuntimeException("[exchangeType: " + exchangeType + "]不正确！");
+            }
         }
         return obj;
     }

@@ -29,6 +29,11 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
     }
 
 
+    @Override
+    public void send(String exchange, Object message) {
+        send(exchange, null, message);
+    }
+
     public void send(String exchange, String routeKey, Object message) {
         try {
             MessageProperties properties = new MessageProperties();
