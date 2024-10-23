@@ -239,7 +239,17 @@ public abstract class PoiExcel {
 					continue;
 				}
 				String key = fieldMap == null ? null : fieldMap.get(keyList.get(idx));
-				map.put(key, getCellValue(cell));
+				if (key == null) {
+					continue;
+				}
+				Object val = getCellValue(cell);
+				if (val == null) {
+					continue;
+				}
+				map.put(key, val);
+			}
+			if (map.isEmpty()) {
+				continue;
 			}
 			list.add(JsonUtil.parseObject(JsonUtil.toJSONString(map), clz));
 		}
