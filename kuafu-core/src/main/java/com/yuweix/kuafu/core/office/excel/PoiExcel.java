@@ -227,7 +227,7 @@ public abstract class PoiExcel {
 	private static<T> List<T> getImportDataList(Sheet sheet, List<String> keyList, Class<T> clz, Map<String, String> fieldMap) {
 		List<T> list = new ArrayList<>();
 		for (Row row: sheet) {
-			if (row.getRowNum() <= 0) {
+			if (row.getPhysicalNumberOfCells() <= 0) {
 				continue;
 			}
 
