@@ -13,7 +13,7 @@ import java.lang.reflect.Constructor;
  */
 public class DefaultConf {
     @ConditionalOnMissingBean(SpringContext.class)
-    @Bean(name = "springContext")
+    @Bean
     public SpringContext springContext() {
         try {
             Class<?> clz = Class.forName(SpringContext.class.getName());
