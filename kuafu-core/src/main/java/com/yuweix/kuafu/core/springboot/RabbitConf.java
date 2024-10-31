@@ -144,7 +144,9 @@ public class RabbitConf {
             , @Qualifier("rabbitJsonMessageConverter") MessageConverter rabbitJsonMessageConverter
             , RabbitTemplate.ConfirmCallback confirmCallback) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(rabbitJsonMessageConverter);
+        if (rabbitJsonMessageConverter != null) {
+            template.setMessageConverter(rabbitJsonMessageConverter);
+        }
         template.setRetryTemplate(retryTemplate);
         template.setConfirmCallback(confirmCallback);
         return template;
