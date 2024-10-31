@@ -141,11 +141,11 @@ public class RabbitConf {
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory
             , @Qualifier("rabbitRetryTemplate") RetryTemplate retryTemplate
-            , @Qualifier("rabbitJsonMessageConverter") MessageConverter rabbitJsonMessageConverter
+            , @Qualifier("rabbitJsonMessageConverter") MessageConverter messageConverter
             , RabbitTemplate.ConfirmCallback confirmCallback) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        if (rabbitJsonMessageConverter != null) {
-            template.setMessageConverter(rabbitJsonMessageConverter);
+        if (messageConverter != null) {
+            template.setMessageConverter(messageConverter);
         }
         template.setRetryTemplate(retryTemplate);
         template.setConfirmCallback(confirmCallback);
