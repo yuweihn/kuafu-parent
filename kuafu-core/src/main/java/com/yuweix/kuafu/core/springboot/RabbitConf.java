@@ -9,8 +9,8 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -87,7 +87,7 @@ public class RabbitConf {
     @ConditionalOnMissingBean(name = "rabbitJsonMessageConverter")
     @Bean("rabbitJsonMessageConverter")
     public MessageConverter rabbitJsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+        return new SimpleMessageConverter();
     }
 
     @ConditionalOnMissingBean(name = "rabbitRetryTemplate")
