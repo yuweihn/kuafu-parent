@@ -11,6 +11,7 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -141,7 +142,7 @@ public class RabbitConf {
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory
             , @Qualifier("rabbitRetryTemplate") RetryTemplate retryTemplate
-            , @Qualifier("rabbitJsonMessageConverter") MessageConverter messageConverter
+            , @Autowired(required = false) @Qualifier("rabbitJsonMessageConverter") MessageConverter messageConverter
             , RabbitTemplate.ConfirmCallback confirmCallback) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         if (messageConverter != null) {
