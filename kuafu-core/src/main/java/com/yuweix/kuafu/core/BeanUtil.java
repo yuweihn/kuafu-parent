@@ -363,6 +363,9 @@ public abstract class BeanUtil {
 			return targets;
 		}
 		for (String src: sources) {
+			if (src == null) {
+				continue;
+			}
 			if (src.contains(regex)) {
 				String[] arr = src.split(regex);
 				for (String s: arr) {
