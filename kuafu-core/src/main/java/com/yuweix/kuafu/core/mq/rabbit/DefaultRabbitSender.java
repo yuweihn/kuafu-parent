@@ -36,7 +36,7 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
 
     public void send(String exchange, String routeKey, Object message) {
         try {
-            String messageId = UUID.randomUUID().toString().replace("-", "");
+            String messageId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
             MessageProperties properties = new MessageProperties();
             properties.setMessageId(messageId);
             Message msg = MessageBuilder.withBody(objectMapper.writeValueAsString(message).getBytes(StandardCharsets.UTF_8))
