@@ -49,9 +49,9 @@ public abstract class AbstractRabbitReceiver<T> {
             log.info("body: {}", body);
             beforeProcess(message, channel);
             T t = JsonUtil.parseObject(body, clz);
-            process(t);
+            Object result = process(t);
             channel.basicAck(deliveryTag, false);
-            log.info("消费完成");
+            log.info("消费完成, Result: {}", JsonUtil.toJSONString(result));
             afterProcess(message, channel);
         } catch (Exception e) {
             log.error("消费异常message: {}, Error: {}", body, e.getMessage());
@@ -59,7 +59,7 @@ public abstract class AbstractRabbitReceiver<T> {
         }
     }
 
-    protected abstract void process(T t);
+    protected abstract Object process(T t);
 
     protected void beforeProcess(Message message, Channel channel) {
 
