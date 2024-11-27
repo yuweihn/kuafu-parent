@@ -102,7 +102,6 @@ public abstract class BeanUtil {
 		return builder.toString();
 	}
 
-
 	/**
 	 * 是否是Email
 	 * @param email
