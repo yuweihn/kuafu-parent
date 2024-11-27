@@ -1,6 +1,11 @@
 package com.yuweix.kuafu.core;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.Assert;
+
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -10,11 +15,6 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
 
 
 /**
@@ -59,10 +59,10 @@ public abstract class BeanUtil {
 			return "";
 		}
 
-		Set<String> keys = map.keySet();
 		List<String> list = new ArrayList<>();
-		for (String k: keys) {
-			Object v = map.get(k);
+		for (Map.Entry<String, ?> entry: map.entrySet()) {
+			String k = entry.getKey();
+			Object v = entry.getValue();
 			if (v == null) {
 				v = "";
 			} else if (charset != null) {
@@ -73,7 +73,6 @@ public abstract class BeanUtil {
 					throw new RuntimeException(e);
 				}
 			}
-
 			list.add(k + "=" + v);
 		}
 
@@ -88,7 +87,6 @@ public abstract class BeanUtil {
 		}
 		return builder.toString();
 	}
-
 
 	/**
 	 * 取得指定长度的随机码
