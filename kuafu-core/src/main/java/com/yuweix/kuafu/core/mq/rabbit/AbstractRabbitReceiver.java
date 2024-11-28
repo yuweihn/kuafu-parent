@@ -47,12 +47,12 @@ public abstract class AbstractRabbitReceiver<T> {
                 return;
             }
             log.info("body: {}", body);
-            beforeProcess(message, channel);
+            before(message, channel);
             T t = JsonUtil.parseObject(body, clz);
             Object result = process(t);
             channel.basicAck(deliveryTag, false);
             log.info("消费完成, Result: {}", JsonUtil.toJSONString(result));
-            afterProcess(message, channel);
+            after(message, channel);
         } catch (Exception e) {
             log.error("消费异常message: {}, Error: {}", body, e.getMessage());
             throw new RuntimeException(e);
@@ -61,11 +61,11 @@ public abstract class AbstractRabbitReceiver<T> {
 
     protected abstract Object process(T t);
 
-    protected void beforeProcess(Message message, Channel channel) {
+    protected void before(Message message, Channel channel) {
 
     }
 
-    protected void afterProcess(Message message, Channel channel) {
+    protected void after(Message message, Channel channel) {
 
     }
 }
