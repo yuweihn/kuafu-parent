@@ -32,6 +32,13 @@ public class SpringContext implements ApplicationContextAware {
 		ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
 		beanFactory.registerSingleton(beanName, obj);
 	}
+	public static void register(String beanName, Object obj, boolean check) {
+		ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
+		if (check && beanFactory.containsBean(beanName)) {
+			return;
+		}
+		beanFactory.registerSingleton(beanName, obj);
+	}
 	public static<T> void registerBean(String beanName, Class<T> clz) {
 		registerBean(beanName, clz, null);
 	}
