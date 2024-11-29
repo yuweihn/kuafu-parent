@@ -1,8 +1,6 @@
 package com.yuweix.kuafu.core;
 
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -12,6 +10,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import java.util.List;
 
 
 /**
@@ -28,13 +28,9 @@ public class SpringContext implements ApplicationContextAware {
 	}
 
 
-	public static boolean register(String beanName, Object obj) {
+	public static void register(String beanName, Object obj) {
 		ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
-		if (beanFactory.containsBean(beanName)) {
-			return false;
-		}
 		beanFactory.registerSingleton(beanName, obj);
-		return true;
 	}
 	public static<T> void registerBean(String beanName, Class<T> clz) {
 		registerBean(beanName, clz, null);
