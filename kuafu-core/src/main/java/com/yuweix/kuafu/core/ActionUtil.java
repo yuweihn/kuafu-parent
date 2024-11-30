@@ -1,17 +1,18 @@
 package com.yuweix.kuafu.core;
 
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Map;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 
 /**
@@ -36,6 +37,33 @@ public abstract class ActionUtil {
 		}
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getRemoteAddr();
+		}
+
+		if (ip == null) {
+			return null;
+		}
+		return ip.split(",")[0];
+	}
+
+	/**
+	 * 获得客户端IP
+	 * @return
+	 */
+	public static String getRequestIP(ServerHttpRequest request) {
+		HttpHeaders headers = request.getHeaders();
+
+		String ip = headers.getFirst("x-forwarded-for");
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = headers.getFirst("Proxy-Client-IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = headers.getFirst("WL-Proxy-Client-IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = headers.getFirst("X-Real-IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getRemoteAddress().toString();
 		}
 
 		if (ip == null) {
