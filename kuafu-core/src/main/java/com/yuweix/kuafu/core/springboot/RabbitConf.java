@@ -56,28 +56,28 @@ public class RabbitConf {
         for (int i = 0, sz = bindings.size(); i < sz; i++) {
             BindingSetting.Item item = bindings.get(i);
             Queue queue = new Queue(item.getQueue(), true);
-            SpringContext.register(queue.getName(), queue);
+            SpringContext.register(queue.getName(), queue, true);
 
             String exchangeType = item.getExchangeType();
             exchangeType = exchangeType == null ? null : exchangeType.trim();
             if (exchangeType == null || "".equals(exchangeType) || ExchangeTypes.DIRECT.equals(exchangeType)) {
                 Exchange exchange = new DirectExchange(item.getExchange(), true, false);
-                SpringContext.register(exchange.getName(), exchange);
+                SpringContext.register(exchange.getName(), exchange, true);
 
                 Binding bd = BindingBuilder.bind(queue).to(exchange).with(item.getRouteKey()).noargs();
-                SpringContext.register("rabbitBinding" + i, bd);
+                SpringContext.register("rabbitBinding" + i, bd, true);
             } else if (ExchangeTypes.FANOUT.equals(exchangeType)) {
                 FanoutExchange exchange = new FanoutExchange(item.getExchange(), true, false);
-                SpringContext.register(exchange.getName(), exchange);
+                SpringContext.register(exchange.getName(), exchange, true);
 
                 Binding bd = BindingBuilder.bind(queue).to(exchange);
-                SpringContext.register("rabbitBinding" + i, bd);
+                SpringContext.register("rabbitBinding" + i, bd, true);
             } else if (ExchangeTypes.TOPIC.equals(exchangeType)) {
                 Exchange exchange = new TopicExchange(item.getExchange(), true, false);
-                SpringContext.register(exchange.getName(), exchange);
+                SpringContext.register(exchange.getName(), exchange, true);
 
                 Binding bd = BindingBuilder.bind(queue).to(exchange).with(item.getRouteKey()).noargs();
-                SpringContext.register("rabbitBinding" + i, bd);
+                SpringContext.register("rabbitBinding" + i, bd, true);
             } else {
                 throw new RuntimeException("[exchangeType: " + exchangeType + "]不正确！");
             }
