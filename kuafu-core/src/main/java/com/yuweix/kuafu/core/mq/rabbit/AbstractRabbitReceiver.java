@@ -45,7 +45,7 @@ public abstract class AbstractRabbitReceiver<T> {
         }
         try {
             MdcUtil.setTraceId(traceId);
-            MdcUtil.setSpanId(traceId);
+            MdcUtil.setSpanId(spanId);
             log.info("接收消息: {}", JsonUtil.toJSONString(message));
             byte[] bytes = message.getBody();
             if (bytes == null || bytes.length <= 0) {
