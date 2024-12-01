@@ -2,14 +2,17 @@ package com.yuweix.kuafu.core.mq.rabbit;
 
 
 import com.rabbitmq.client.Channel;
+import com.yuweix.kuafu.core.MdcUtil;
 import com.yuweix.kuafu.core.json.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.UUID;
 
 
 /**
@@ -34,8 +37,16 @@ public abstract class AbstractRabbitReceiver<T> {
     public void onMessage(Message message, Channel channel) {
         log.info("接收消息: {}", JsonUtil.toJSONString(message));
         String body = null;
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        MessageProperties messageProperties = message.getMessageProperties();
+        long deliveryTag = messageProperties.getDeliveryTag();
+        String spanId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+        String traceId = messageProperties.getHeader(RabbitConstant.TRACE_ID_KEY);
+        if (traceId == null || "".equals(traceId)) {
+            traceId = spanId;
+        }
         try {
+            MdcUtil.setTraceId(traceId);
+            MdcUtil.setSpanId(traceId);
             byte[] bytes = message.getBody();
             if (bytes == null || bytes.length <= 0) {
                 channel.basicAck(deliveryTag, false);
@@ -56,6 +67,9 @@ public abstract class AbstractRabbitReceiver<T> {
         } catch (Exception e) {
             log.error("消费异常message: {}, Error: {}", body, e.getMessage());
             throw new RuntimeException(e);
+        } finally {
+            MdcUtil.removeTraceId();
+            MdcUtil.removeSpanId();
         }
     }
 

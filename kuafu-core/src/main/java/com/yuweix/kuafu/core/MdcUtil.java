@@ -19,4 +19,16 @@ public abstract class MdcUtil {
 	public static void removeTraceId() {
 		MDC.remove(Constant.TRACE_ID_KEY);
 	}
+
+	public static String getSpanId() {
+		return MDC.get(Constant.SPAN_ID_KEY);
+	}
+
+	public static void setSpanId(String traceId) {
+		MDC.put(Constant.SPAN_ID_KEY, traceId);
+	}
+
+	public static void removeSpanId() {
+		MDC.remove(Constant.SPAN_ID_KEY);
+	}
 }
