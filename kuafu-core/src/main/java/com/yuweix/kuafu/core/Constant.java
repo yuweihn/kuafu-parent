@@ -26,4 +26,7 @@ public abstract class Constant {
 	 * 静态资源地址KEY
 	 */
 	public static final String STATIC_PATH_KEY = "staticPath";
+
+	public static final String TRACE_ID_KEY = "traceId";
+	public static final String SPAN_ID_KEY = "spanId";
 }

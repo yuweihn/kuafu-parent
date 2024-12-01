@@ -2,6 +2,7 @@ package com.yuweix.kuafu.core.mq.rabbit;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yuweix.kuafu.core.MdcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -40,7 +41,7 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
             MessageProperties properties = new MessageProperties();
             properties.setMessageId(messageId);
             Message msg = MessageBuilder.withBody(objectMapper.writeValueAsString(message).getBytes(StandardCharsets.UTF_8))
-                    .andProperties(properties).build();
+                    .andProperties(properties).setHeaderIfAbsent("traceId", MdcUtil.getTraceId()).build();
             rabbitTemplate.convertAndSend(exchange, routeKey, msg, new ConfirmData(exchange, routeKey, msg, this));
         } catch (Exception e) {
             log.error("发送消息异常, Error: {}", e.getMessage(), e);
