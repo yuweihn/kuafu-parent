@@ -35,7 +35,6 @@ public abstract class AbstractRabbitReceiver<T> {
 
     @RabbitHandler(isDefault = true)
     public void onMessage(Message message, Channel channel) {
-        log.info("接收消息: {}", JsonUtil.toJSONString(message));
         String body = null;
         MessageProperties messageProperties = message.getMessageProperties();
         long deliveryTag = messageProperties.getDeliveryTag();
@@ -47,6 +46,7 @@ public abstract class AbstractRabbitReceiver<T> {
         try {
             MdcUtil.setTraceId(traceId);
             MdcUtil.setSpanId(traceId);
+            log.info("接收消息: {}", JsonUtil.toJSONString(message));
             byte[] bytes = message.getBody();
             if (bytes == null || bytes.length <= 0) {
                 channel.basicAck(deliveryTag, false);
