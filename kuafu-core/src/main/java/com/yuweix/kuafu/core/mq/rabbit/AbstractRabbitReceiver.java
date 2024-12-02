@@ -43,6 +43,7 @@ public abstract class AbstractRabbitReceiver<T> {
         if (traceId == null || "".equals(traceId)) {
             traceId = spanId;
         }
+        spanId = spanId.length() <= 32 ? spanId : spanId.substring(spanId.length() - 32);
         try {
             MdcUtil.setTraceId(traceId);
             MdcUtil.setSpanId(spanId);
