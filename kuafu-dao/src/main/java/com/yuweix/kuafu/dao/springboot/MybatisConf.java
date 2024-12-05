@@ -90,9 +90,9 @@ public class MybatisConf {
 		return dataSource;
 	}
 
-	@ConditionalOnMissingBean(name = "dataSources")
-	@Bean(name = "dataSources")
-	public Map<String, DataSource> dataSources() {
+	@ConditionalOnMissingBean(name = "targetDataSources")
+	@Bean(name = "targetDataSources")
+	public Map<String, DataSource> targetDataSources() {
 		return null;
 	}
 
@@ -107,15 +107,15 @@ public class MybatisConf {
 	@Bean(name = "dynamicDataSource")
 	public DataSource dynamicDataSource(@Autowired(required = false) @Qualifier("dataSource") DataSource defaultDataSource
 			, @Value("${kuafu.datasource.default.lenient:false}") boolean lenient
-			, @Qualifier("dataSources") Map<String, DataSource> dataSources) {
-		if (dataSources == null) {
-			dataSources = new HashMap<>();
+			, @Qualifier("targetDataSources") Map<String, DataSource> targetDataSources) {
+		if (targetDataSources == null) {
+			targetDataSources = new HashMap<>();
 		}
 
 		DynamicDataSource dds = new DynamicDataSource();
 		dds.setLenientFallback(lenient);
 		dds.setDefaultTargetDataSource(defaultDataSource);
-		dds.setTargetDataSources(new HashMap<>(dataSources));
+		dds.setTargetDataSources(new HashMap<>(targetDataSources));
 		return dds;
 	}
 
