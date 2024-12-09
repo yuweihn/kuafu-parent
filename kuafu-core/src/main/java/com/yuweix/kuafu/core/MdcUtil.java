@@ -31,4 +31,16 @@ public abstract class MdcUtil {
 	public static void removeSpanId() {
 		MDC.remove(Constant.SPAN_ID_KEY);
 	}
+
+	public static String getRequestId() {
+		return MDC.get(Constant.REQUEST_ID_KEY);
+	}
+
+	public static void setRequestId(String requestId) {
+		MDC.put(Constant.REQUEST_ID_KEY, requestId);
+	}
+
+	public static void removeRequestId() {
+		MDC.remove(Constant.REQUEST_ID_KEY);
+	}
 }

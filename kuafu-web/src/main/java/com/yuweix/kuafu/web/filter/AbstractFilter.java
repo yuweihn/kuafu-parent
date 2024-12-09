@@ -4,6 +4,7 @@ package com.yuweix.kuafu.web.filter;
 import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.Constant;
 
+import com.yuweix.kuafu.core.MdcUtil;
 import com.yuweix.kuafu.core.json.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,10 +95,16 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		}
 	}
 
-
-
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+		try {
+			initTraceProperties(request);
+			doFilterInternal0(request, response, filterChain);
+		} finally {
+			removeTraceProperties();
+		}
+	}
+	protected void doFilterInternal0(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		PathPattern exclusivePattern = InitParameter.getInstance().getExclusivePattern();
 		if (exclusivePattern != null && exclusivePattern.matches(request)) {
 			filterChain.doFilter(request, response);
@@ -137,6 +144,17 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		logInfoMap.put("status", resp.getStatus());
 		logInfoMap.put("elapsedTime", (endTimeMillis - startTimeMillis) + "ms");
 		log.info("{}", JsonUtil.toJSONString(logInfoMap));
+	}
+
+	private void initTraceProperties(HttpServletRequest request) {
+		String requestId = request.getHeader(Constant.REQUEST_HEADER_X_REQUEST_ID);
+		if (requestId == null || "".equals(requestId)) {
+			requestId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+		}
+		MdcUtil.setRequestId(requestId);
+	}
+	private void removeTraceProperties() {
+		MdcUtil.removeRequestId();
 	}
 
 
