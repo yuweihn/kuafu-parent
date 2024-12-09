@@ -43,9 +43,14 @@ public abstract class AbstractRabbitReceiver<T> {
         if (traceId == null || "".equals(traceId)) {
             traceId = spanId;
         }
+        String requestId = messageProperties.getHeader(RabbitConstant.REQUEST_ID_KEY);
+        if (requestId == null || "".equals(requestId)) {
+            requestId = spanId;
+        }
         spanId = spanId.length() <= 16 ? spanId : spanId.substring(spanId.length() - 16);
         try {
             MdcUtil.setTraceId(traceId);
+            MdcUtil.setRequestId(requestId);
             MdcUtil.setSpanId(spanId);
             log.info("接收消息: {}", JsonUtil.toJSONString(message));
             byte[] bytes = message.getBody();
@@ -70,6 +75,7 @@ public abstract class AbstractRabbitReceiver<T> {
             throw new RuntimeException(e);
         } finally {
             MdcUtil.removeTraceId();
+            MdcUtil.removeRequestId();
             MdcUtil.removeSpanId();
         }
     }

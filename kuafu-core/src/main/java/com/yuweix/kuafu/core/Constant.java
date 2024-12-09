@@ -29,4 +29,9 @@ public abstract class Constant {
 
 	public static final String TRACE_ID_KEY = "traceId";
 	public static final String SPAN_ID_KEY = "spanId";
+	/**
+	 * 因不同sleuth版本下traceId会不同，可使用requestId代替
+	 */
+	public static final String REQUEST_ID_KEY = "requestId";
+	public static final String REQUEST_HEADER_X_REQUEST_ID = "x-request-id";
 }
