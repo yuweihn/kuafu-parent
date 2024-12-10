@@ -150,6 +150,9 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	private void initTraceProperties(HttpServletRequest request) {
 		String requestId = request.getHeader(Constant.REQUEST_HEADER_X_REQUEST_ID);
 		if (requestId == null || "".equals(requestId)) {
+			requestId = MdcUtil.getTraceId();
+		}
+		if (requestId == null || "".equals(requestId)) {
 			requestId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
 		}
 		MdcUtil.setRequestId(requestId);
