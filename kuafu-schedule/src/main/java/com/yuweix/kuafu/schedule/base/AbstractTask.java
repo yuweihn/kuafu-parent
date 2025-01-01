@@ -77,9 +77,9 @@ public abstract class AbstractTask {
 				}
 			}
 			after();
-			long elapsedTime = System.currentTimeMillis() - startTime;
-			log.info("Job executed here, Job name: {}, Local node: {}, Time elapsed: {}"
-					, this.getClass().getName(), res.getLocal(), elapsedTime >= 1000 ? (elapsedTime / 1000.0) + "s" : elapsedTime + "ms");
+			long timeCost = System.currentTimeMillis() - startTime;
+			log.info("Job executed here, Job name: {}, Local node: {}, Time cost: {}"
+					, this.getClass().getName(), res.getLocal(), timeCost >= 1000 ? (timeCost / 1000.0) + "s" : timeCost + "ms");
 		} else {
 			log.warn("Not leader, job didn't execute! Job name: {}, Leader: {}", this.getClass().getName(), res.getLeader());
 		}
