@@ -51,6 +51,7 @@
         <springboot.version>2.0.4.RELEASE</springboot.version>
         <spring.rabbit.version>2.4.17</spring.rabbit.version>
         <spring.redis.version>2.0.8.RELEASE</spring.redis.version>
+        <spring.rocketmq.version>2.3.3</spring.rocketmq.version>
         <spring.version>5.3.20</spring.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <zxing.version>3.3.0</zxing.version>
@@ -338,6 +339,12 @@
                 <groupId>com.google.zxing</groupId>
                 <artifactId>javase</artifactId>
                 <version>${zxing.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${spring.rocketmq.version}</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>
