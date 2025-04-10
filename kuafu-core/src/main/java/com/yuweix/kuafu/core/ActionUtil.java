@@ -1,7 +1,9 @@
 package com.yuweix.kuafu.core;
 
 
+import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -127,6 +129,22 @@ public abstract class ActionUtil {
 	public static HttpServletRequest getRequest() {
 		ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		return sra == null ? null : sra.getRequest();
+	}
+	public static <T extends HttpServletRequestWrapper>T getRequest(Class<T> clz) {
+		HttpServletRequest req = getRequest();
+		if (req == null) {
+			return null;
+		}
+		return doGetRequest0(req, clz);
+	}
+	private static <T extends HttpServletRequestWrapper>T doGetRequest0(ServletRequest sr, Class<T> clz) {
+		if (!(sr instanceof HttpServletRequestWrapper)) {
+			return null;
+		}
+		if (clz.isAssignableFrom(sr.getClass())) {
+			return (T) sr;
+		}
+		return doGetRequest0(((HttpServletRequestWrapper) sr).getRequest(), clz);
 	}
 
 	/**
