@@ -6,7 +6,9 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.*;
@@ -127,6 +129,22 @@ public abstract class ActionUtil {
 	public static HttpServletRequest getRequest() {
 		ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		return sra == null ? null : sra.getRequest();
+	}
+	public static <T extends HttpServletRequestWrapper>T getRequest(Class<T> clz) {
+		HttpServletRequest req = getRequest();
+		if (req == null) {
+			return null;
+		}
+		return doGetRequest0(req, clz);
+	}
+	private static <T extends HttpServletRequestWrapper>T doGetRequest0(ServletRequest sr, Class<T> clz) {
+		if (!(sr instanceof HttpServletRequestWrapper)) {
+			return null;
+		}
+		if (clz.isAssignableFrom(sr.getClass())) {
+			return (T) sr;
+		}
+		return doGetRequest0(((HttpServletRequestWrapper) sr).getRequest(), clz);
 	}
 
 	/**

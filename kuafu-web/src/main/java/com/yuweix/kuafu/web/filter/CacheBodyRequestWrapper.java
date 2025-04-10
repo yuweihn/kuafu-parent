@@ -14,6 +14,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 
+/**
+ * @author yuwei
+ */
 public class CacheBodyRequestWrapper extends HttpServletRequestWrapper {
     private final Map<String, String[]> parameters = new LinkedHashMap<>();
     private byte[] requestBody;
