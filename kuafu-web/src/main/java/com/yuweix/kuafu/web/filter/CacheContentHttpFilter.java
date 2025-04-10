@@ -2,7 +2,6 @@ package com.yuweix.kuafu.web.filter;
 
 
 import com.yuweix.kuafu.core.json.JsonUtil;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +16,7 @@ import java.util.Map;
 /**
  * @author yuwei
  */
-public class CacheContentHttpFilter extends AbstractFilter<ContentCachingRequestWrapper, ContentCachingResponseWrapper> {
+public class CacheContentHttpFilter extends AbstractFilter<CacheBodyRequestWrapper, ContentCachingResponseWrapper> {
 	private Integer maxRequestSize = null;
 	private Integer maxResponseSize = null;
 
@@ -31,8 +30,8 @@ public class CacheContentHttpFilter extends AbstractFilter<ContentCachingRequest
 
 
 	@Override
-	protected ContentCachingRequestWrapper wrap(HttpServletRequest request) {
-		return new ContentCachingRequestWrapper(request);
+	protected CacheBodyRequestWrapper wrap(HttpServletRequest request) {
+		return new CacheBodyRequestWrapper(request);
 	}
 
 	@Override
@@ -41,7 +40,7 @@ public class CacheContentHttpFilter extends AbstractFilter<ContentCachingRequest
 	}
 
 	@Override
-	protected Map<String, Object> logRequest(ContentCachingRequestWrapper request) {
+	protected Map<String, Object> logRequest(CacheBodyRequestWrapper request) {
 		Map<String, Object> logInfoMap = super.logRequest(request);
 		Object bodyInfo = getRequestBody(request);
 		
@@ -56,8 +55,8 @@ public class CacheContentHttpFilter extends AbstractFilter<ContentCachingRequest
 		return logInfoMap;
 	}
 
-	private Object getRequestBody(ContentCachingRequestWrapper request) {
-		byte[] bytes = request.getContentAsByteArray();
+	private Object getRequestBody(CacheBodyRequestWrapper request) {
+		byte[] bytes = request.getRequestBody();
 		if (bytes.length <= 0) {
 			return null;
 		}
@@ -100,7 +99,7 @@ public class CacheContentHttpFilter extends AbstractFilter<ContentCachingRequest
 	}
 
 	@Override
-	protected void afterFilter(ContentCachingRequestWrapper request, ContentCachingResponseWrapper response) {
+	protected void afterFilter(CacheBodyRequestWrapper request, ContentCachingResponseWrapper response) {
 		try {
 			response.copyBodyToResponse();
 		} catch (IOException e) {
