@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.core.mq.rabbit;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuweix.kuafu.core.MdcUtil;
 import org.slf4j.Logger;
@@ -40,12 +41,20 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
             String messageId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
             MessageProperties properties = new MessageProperties();
             properties.setMessageId(messageId);
-            Message msg = MessageBuilder.withBody(objectMapper.writeValueAsString(message).getBytes(StandardCharsets.UTF_8))
+            Message msg = MessageBuilder.withBody(serialize(message).getBytes(StandardCharsets.UTF_8))
                     .andProperties(properties).setHeaderIfAbsent(RabbitConstant.TRACE_ID_KEY, MdcUtil.getTraceId()).build();
             rabbitTemplate.convertAndSend(exchange, routeKey, msg, new ConfirmData(exchange, routeKey, msg, this));
         } catch (Exception e) {
             log.error("发送消息异常, Error: {}", e.getMessage(), e);
             throw new RuntimeException("发送消息异常" + e.getMessage());
+        }
+    }
+
+    protected String serialize(Object obj) {
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
