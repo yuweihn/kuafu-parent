@@ -47,9 +47,9 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
             MdcUtil.setTraceId(traceId);
             MdcUtil.setRequestId(requestId);
             MdcUtil.setSpanId(spanId);
+            before(message);
             String body = new String(message.getBody());
             log.info("body: {}", body);
-            before(message);
             T t = deserialize(body);
             Object result = process(t);
             log.info("消费完成, Result: {}", JsonUtil.toJSONString(result));
