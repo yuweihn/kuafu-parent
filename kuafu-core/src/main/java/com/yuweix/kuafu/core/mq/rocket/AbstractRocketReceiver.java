@@ -49,11 +49,11 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
             MdcUtil.setSpanId(spanId);
             String body = new String(message.getBody());
             log.info("body: {}", body);
+            before(message);
             T t = deserialize(body);
-            before(t);
             Object result = process(t);
             log.info("消费完成, Result: {}", JsonUtil.toJSONString(result));
-            after(t);
+            after(message);
         } catch (Exception e) {
             log.error("消费异常message: {}, Error: {}", JsonUtil.toJSONString(message), e.getMessage());
             throw new RuntimeException(e);
@@ -70,11 +70,11 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
 
     protected abstract Object process(T t);
 
-    protected void before(T t) {
+    protected void before(MessageExt message) {
 
     }
 
-    protected void after(T t) {
+    protected void after(MessageExt message) {
 
     }
 }
