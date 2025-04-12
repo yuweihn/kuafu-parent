@@ -26,7 +26,11 @@ public class DefaultRocketSender implements RocketSender {
         headers.put(RocketConstant.TRACE_ID_KEY, MdcUtil.getTraceId());
         headers.put(RocketConstant.REQUEST_ID_KEY, MdcUtil.getRequestId());
 
-        String msg = JsonUtil.toJSONString(payload);
+        String msg = serialize(payload);
         rocketMQTemplate.convertAndSend(topic, msg, headers);
+    }
+
+    protected String serialize(Object obj) {
+        return JsonUtil.toJSONString(obj);
     }
 }
