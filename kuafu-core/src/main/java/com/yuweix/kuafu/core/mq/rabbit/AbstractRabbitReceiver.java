@@ -56,6 +56,7 @@ public abstract class AbstractRabbitReceiver<T> {
             MdcUtil.setRequestId(requestId);
             MdcUtil.setSpanId(spanId);
             log.info("接收消息: {}", JsonUtil.toJSONString(message));
+            before(message, channel);
             byte[] bytes = message.getBody();
             if (bytes == null || bytes.length <= 0) {
                 channel.basicAck(deliveryTag, false);
@@ -67,7 +68,6 @@ public abstract class AbstractRabbitReceiver<T> {
                 return;
             }
             log.info("body: {}", body);
-            before(message, channel);
             T t = deserialize(body);
             Object result = process(t);
             channel.basicAck(deliveryTag, false);
