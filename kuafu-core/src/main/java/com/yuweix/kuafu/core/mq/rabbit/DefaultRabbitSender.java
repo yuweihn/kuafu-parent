@@ -43,7 +43,7 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
             properties.setMessageId(messageId);
             properties.setHeader(RabbitConstant.TRACE_ID_KEY, MdcUtil.getTraceId());
             properties.setHeader(RabbitConstant.REQUEST_ID_KEY, MdcUtil.getRequestId());
-            preHandleMessage(properties);
+            preHandle(properties);
             Message msg = MessageBuilder.withBody(serialize(message).getBytes(StandardCharsets.UTF_8))
                     .andProperties(properties).build();
             rabbitTemplate.convertAndSend(exchange, routeKey, msg, new ConfirmData(exchange, routeKey, msg, this));
@@ -53,7 +53,7 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
         }
     }
 
-    protected void preHandleMessage(MessageProperties properties) {
+    protected void preHandle(MessageProperties properties) {
 
     }
 
