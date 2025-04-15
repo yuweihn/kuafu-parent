@@ -41,8 +41,10 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
             String messageId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
             MessageProperties properties = new MessageProperties();
             properties.setMessageId(messageId);
+            properties.setHeader(RabbitConstant.TRACE_ID_KEY, MdcUtil.getTraceId());
+            properties.setHeader(RabbitConstant.REQUEST_ID_KEY, MdcUtil.getRequestId());
             Message msg = MessageBuilder.withBody(serialize(message).getBytes(StandardCharsets.UTF_8))
-                    .andProperties(properties).setHeaderIfAbsent(RabbitConstant.TRACE_ID_KEY, MdcUtil.getTraceId()).build();
+                    .andProperties(properties).build();
             rabbitTemplate.convertAndSend(exchange, routeKey, msg, new ConfirmData(exchange, routeKey, msg, this));
         } catch (Exception e) {
             log.error("发送消息异常, Error: {}", e.getMessage(), e);
