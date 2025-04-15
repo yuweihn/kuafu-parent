@@ -14,6 +14,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
@@ -62,7 +63,7 @@ public abstract class AbstractRabbitReceiver<T> {
                 channel.basicAck(deliveryTag, false);
                 return;
             }
-            body = new String(bytes);
+            body = new String(bytes, StandardCharsets.UTF_8);
             if (body.isEmpty()) {
                 channel.basicAck(deliveryTag, false);
                 return;
