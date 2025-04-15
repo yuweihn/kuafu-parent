@@ -55,8 +55,8 @@ public abstract class AbstractRabbitReceiver<T> {
             MdcUtil.setTraceId(traceId);
             MdcUtil.setRequestId(requestId);
             MdcUtil.setSpanId(spanId);
-            log.info("接收消息: {}", JsonUtil.toJSONString(message));
             before(message, channel);
+            log.info("接收消息: {}", JsonUtil.toJSONString(message));
             byte[] bytes = message.getBody();
             if (bytes == null || bytes.length <= 0) {
                 channel.basicAck(deliveryTag, false);
@@ -72,7 +72,6 @@ public abstract class AbstractRabbitReceiver<T> {
             Object result = process(t);
             channel.basicAck(deliveryTag, false);
             log.info("消费完成, Result: {}", JsonUtil.toJSONString(result));
-            after(message, channel);
         } catch (Exception e) {
             log.error("消费异常message: {}, Error: {}", body, e.getMessage());
             throw new RuntimeException(e);
@@ -80,6 +79,7 @@ public abstract class AbstractRabbitReceiver<T> {
             MdcUtil.removeTraceId();
             MdcUtil.removeRequestId();
             MdcUtil.removeSpanId();
+            after(message, channel);
         }
     }
 
