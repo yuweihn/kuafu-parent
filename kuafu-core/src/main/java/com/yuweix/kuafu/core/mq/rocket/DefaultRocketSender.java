@@ -25,9 +25,14 @@ public class DefaultRocketSender implements RocketSender {
         Map<String, Object> headers = new HashMap<>();
         headers.put(RocketConstant.TRACE_ID_KEY, MdcUtil.getTraceId());
         headers.put(RocketConstant.REQUEST_ID_KEY, MdcUtil.getRequestId());
+        preHandleMessage(headers);
 
         String msg = serialize(payload);
         rocketMQTemplate.convertAndSend(topic, msg, headers);
+    }
+
+    protected void preHandleMessage(Map<String, Object> headers) {
+
     }
 
     protected String serialize(Object obj) {
