@@ -3,8 +3,7 @@ package com.yuweix.kuafu.data.springboot.jedis;
 
 import com.yuweix.kuafu.core.json.Json;
 import com.yuweix.kuafu.data.cache.redis.jedis.JedisCache;
-import com.yuweix.kuafu.data.serializer.JsonSerializer;
-import com.yuweix.kuafu.data.serializer.Serializer;
+import com.yuweix.kuafu.data.serializer.CacheSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -91,16 +90,26 @@ public class JedisMsConf {
 		return container;
 	}
 
-	@ConditionalOnMissingBean(Serializer.class)
+	@ConditionalOnMissingBean(CacheSerializer.class)
 	@Bean
-	public Serializer cacheSerializer(Json json) {
-		return new JsonSerializer(json);
+	public CacheSerializer cacheSerializer(Json json) {
+		return new CacheSerializer() {
+			@Override
+			public <T> String serialize(T t) {
+				return json.serialize(t);
+			}
+
+			@Override
+			public <T> T deserialize(String str) {
+				return json.deserialize(str);
+			}
+		};
 	}
 
 	@ConditionalOnMissingBean(name = "redisCache")
 	@Bean(name = "redisCache")
 	public JedisCache redisCache(@Qualifier("redisTemplate") RedisTemplate<String, Object> template
-			, Serializer serializer
+			, CacheSerializer serializer
 			, RedisMessageListenerContainer messageContainer) {
 		JedisCache cache = new JedisCache(template, serializer);
 		cache.setMessageContainer(messageContainer);

@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.data.serializer;
+package com.yuweix.kuafu.core;
 
 
 import org.slf4j.Logger;
@@ -8,11 +8,11 @@ import java.io.*;
 
 
 /**
- * 序列化工具
+ * 十六进制序列化工具
  * @author yuwei
  */
-public class HexSerializer implements Serializer {
-	private static final Logger log = LoggerFactory.getLogger(HexSerializer.class);
+public class HexSerializeUtil {
+	private static final Logger log = LoggerFactory.getLogger(HexSerializeUtil.class);
 
 
 	/**

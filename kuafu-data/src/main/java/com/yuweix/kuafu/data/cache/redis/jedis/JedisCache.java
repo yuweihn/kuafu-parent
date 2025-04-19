@@ -4,7 +4,7 @@ package com.yuweix.kuafu.data.cache.redis.jedis;
 import com.yuweix.kuafu.data.cache.AbstractCache;
 import com.yuweix.kuafu.data.cache.MessageHandler;
 import com.yuweix.kuafu.data.cache.redis.RedisCache;
-import com.yuweix.kuafu.data.serializer.Serializer;
+import com.yuweix.kuafu.data.serializer.CacheSerializer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.Message;
@@ -28,11 +28,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class JedisCache extends AbstractCache implements RedisCache {
 	protected RedisTemplate<String, Object> redisTemplate;
-	protected Serializer serializer;
+	protected CacheSerializer serializer;
 	protected RedisMessageListenerContainer messageContainer;
 
 
-	public JedisCache(RedisTemplate<String, Object> redisTemplate, Serializer serializer) {
+	public JedisCache(RedisTemplate<String, Object> redisTemplate, CacheSerializer serializer) {
 		this.redisTemplate = redisTemplate;
 		this.serializer = serializer;
 	}
@@ -42,7 +42,7 @@ public class JedisCache extends AbstractCache implements RedisCache {
 		this.redisTemplate = redisTemplate;
 	}
 
-	public void setSerializer(Serializer serializer) {
+	public void setSerializer(CacheSerializer serializer) {
 		this.serializer = serializer;
 	}
 

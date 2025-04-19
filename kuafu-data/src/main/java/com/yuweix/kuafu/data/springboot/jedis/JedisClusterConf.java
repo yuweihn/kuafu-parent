@@ -4,8 +4,7 @@ package com.yuweix.kuafu.data.springboot.jedis;
 import com.yuweix.kuafu.core.json.Json;
 import com.yuweix.kuafu.data.cache.redis.jedis.JedisClusterCache;
 import com.yuweix.kuafu.data.cache.redis.jedis.JedisClusterFactory;
-import com.yuweix.kuafu.data.serializer.JsonSerializer;
-import com.yuweix.kuafu.data.serializer.Serializer;
+import com.yuweix.kuafu.data.serializer.CacheSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -51,16 +50,26 @@ public class JedisClusterConf {
 		return factory;
 	}
 
-	@ConditionalOnMissingBean(Serializer.class)
+	@ConditionalOnMissingBean(CacheSerializer.class)
 	@Bean
-	public Serializer cacheSerializer(Json json) {
-		return new JsonSerializer(json);
+	public CacheSerializer cacheSerializer(Json json) {
+		return new CacheSerializer() {
+			@Override
+			public <T> String serialize(T t) {
+				return json.serialize(t);
+			}
+
+			@Override
+			public <T> T deserialize(String str) {
+				return json.deserialize(str);
+			}
+		};
 	}
 
 	@ConditionalOnMissingBean(name = "redisCache")
 	@Bean(name = "redisCache")
 	public JedisClusterCache redisClusterCache(@Qualifier("jedisCluster") JedisCluster jedisCluster
-			, Serializer serializer) {
+			, CacheSerializer serializer) {
 		JedisClusterCache cache = new JedisClusterCache(serializer);
 		cache.setJedisCluster(jedisCluster);
 		return cache;

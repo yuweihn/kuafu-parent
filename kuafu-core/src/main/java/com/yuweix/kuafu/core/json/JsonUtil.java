@@ -8,9 +8,9 @@ import com.alibaba.fastjson2.TypeReference;
  * @author yuwei
  */
 public class JsonUtil {
-	private static Json json = new Fastjson();
+	private static Fastjson json = new Fastjson();
 
-	private JsonUtil(Json json) {
+	private JsonUtil(Fastjson json) {
 		JsonUtil.json = json;
 	}
 
