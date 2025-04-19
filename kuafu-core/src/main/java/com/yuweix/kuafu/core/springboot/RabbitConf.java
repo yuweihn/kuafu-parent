@@ -1,6 +1,8 @@
 package com.yuweix.kuafu.core.springboot;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuweix.kuafu.core.SpringContext;
 import com.yuweix.kuafu.core.mq.rabbit.*;
 import org.slf4j.Logger;
@@ -153,10 +155,35 @@ public class RabbitConf {
         return template;
     }
 
+    @ConditionalOnMissingBean(RabbitSerializer.class)
+    @Bean
+    public RabbitSerializer rabbitSerializer() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return new RabbitSerializer() {
+            @Override
+            public <T> String serialize(T t) {
+                try {
+                    return objectMapper.writeValueAsString(t);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public <T> T deserialize(String str, Class<T> clz) {
+                try {
+                    return objectMapper.readValue(str, clz);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+    }
+
     @ConditionalOnMissingBean(RabbitSender.class)
     @Bean
-    public RabbitSender rabbitSender(RabbitTemplate rabbitTemplate) {
-        DefaultRabbitSender sender = new DefaultRabbitSender(rabbitTemplate);
+    public RabbitSender rabbitSender(RabbitTemplate rabbitTemplate, RabbitSerializer rabbitSerializer) {
+        DefaultRabbitSender sender = new DefaultRabbitSender(rabbitTemplate, rabbitSerializer);
         return sender;
     }
 }

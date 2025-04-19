@@ -3,8 +3,7 @@ package com.yuweix.kuafu.data.springboot.lettuce;
 
 import com.yuweix.kuafu.core.json.Json;
 import com.yuweix.kuafu.data.cache.redis.lettuce.LettuceCache;
-import com.yuweix.kuafu.data.serializer.JsonSerializer;
-import com.yuweix.kuafu.data.serializer.Serializer;
+import com.yuweix.kuafu.data.serializer.CacheSerializer;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -103,16 +102,26 @@ public class LettuceMsConf {
 		return container;
 	}
 
-	@ConditionalOnMissingBean(Serializer.class)
+	@ConditionalOnMissingBean(CacheSerializer.class)
 	@Bean
-	public Serializer cacheSerializer(Json json) {
-		return new JsonSerializer(json);
+	public CacheSerializer cacheSerializer(Json json) {
+		return new CacheSerializer() {
+			@Override
+			public <T> String serialize(T t) {
+				return json.serialize(t);
+			}
+
+			@Override
+			public <T> T deserialize(String str) {
+				return json.deserialize(str);
+			}
+		};
 	}
 
 	@ConditionalOnMissingBean(name = "redisCache")
 	@Bean(name = "redisCache")
 	public LettuceCache redisCache(@Qualifier("redisTemplate") RedisTemplate<String, Object> template
-			, Serializer serializer
+			, CacheSerializer serializer
 			, RedisMessageListenerContainer messageContainer) {
 		LettuceCache cache = new LettuceCache(template, serializer);
 		cache.setMessageContainer(messageContainer);

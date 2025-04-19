@@ -3,7 +3,7 @@ package com.yuweix.kuafu.permission.web;
 
 import com.yuweix.kuafu.core.DateUtil;
 import com.yuweix.kuafu.core.Response;
-import com.yuweix.kuafu.core.json.JsonUtil;
+import com.yuweix.kuafu.core.json.Json;
 import com.yuweix.kuafu.permission.annotations.Permission;
 import com.yuweix.kuafu.permission.common.PermissionUtil;
 import com.yuweix.kuafu.permission.common.Properties;
@@ -46,6 +46,8 @@ public class SysPermissionController {
 	private SysPermissionService sysPermissionService;
 	@Resource
 	private Properties properties;
+	@Resource
+	private Json json;
 
 
 	/**
@@ -156,7 +158,7 @@ public class SysPermissionController {
 		OutputStreamWriter osw = null;
 		BufferedWriter bw = null;
 		try {
-			String str = exportDto == null ? "" : JsonUtil.toJSONString(exportDto);
+			String str = exportDto == null ? "" : json.toJSONString(exportDto);
 			osw = new OutputStreamWriter(out, StandardCharsets.UTF_8);
 			bw = new BufferedWriter(osw);
 			bw.append(str);
@@ -190,7 +192,7 @@ public class SysPermissionController {
 		String str = new String(file.getBytes(), StandardCharsets.UTF_8);
 		PermissionExportDto dto = "".equals(str)
 				? null
-				: JsonUtil.parseObject(str, PermissionExportDto.class);
+				: json.parseObject(str, PermissionExportDto.class);
 		if (dto == null || !dto.verify()) {
 			return new Response<>(properties.getFailureCode(), "验签失败！");
 		}

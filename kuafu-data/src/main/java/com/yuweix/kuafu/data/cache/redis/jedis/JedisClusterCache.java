@@ -7,7 +7,7 @@ import com.yuweix.kuafu.data.cache.AbstractCache;
 import com.yuweix.kuafu.data.cache.MessageHandler;
 import com.yuweix.kuafu.data.cache.redis.RedisCache;
 
-import com.yuweix.kuafu.data.serializer.Serializer;
+import com.yuweix.kuafu.data.serializer.CacheSerializer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
@@ -20,10 +20,10 @@ import redis.clients.jedis.JedisPubSub;
  */
 public class JedisClusterCache extends AbstractCache implements RedisCache {
 	protected JedisCluster jedisCluster;
-	protected Serializer serializer;
+	protected CacheSerializer serializer;
 
 
-	public JedisClusterCache(Serializer serializer) {
+	public JedisClusterCache(CacheSerializer serializer) {
 		this.serializer = serializer;
 	}
 
@@ -32,7 +32,7 @@ public class JedisClusterCache extends AbstractCache implements RedisCache {
 		this.jedisCluster = jedisCluster;
 	}
 
-	public void setSerializer(Serializer serializer) {
+	public void setSerializer(CacheSerializer serializer) {
 		this.serializer = serializer;
 	}
 

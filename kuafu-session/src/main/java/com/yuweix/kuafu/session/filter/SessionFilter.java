@@ -4,13 +4,14 @@ package com.yuweix.kuafu.session.filter;
 import com.yuweix.kuafu.core.json.Fastjson;
 import com.yuweix.kuafu.core.json.Json;
 import com.yuweix.kuafu.session.CacheHttpServletRequest;
+import com.yuweix.kuafu.session.SessionAttribute;
 import com.yuweix.kuafu.session.cache.SessionCache;
 import com.yuweix.kuafu.session.conf.PathPattern;
 import com.yuweix.kuafu.session.conf.SessionConf;
-
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 
@@ -32,7 +33,9 @@ public abstract class SessionFilter implements Filter {
 	 */
 	public SessionFilter(SessionCache cache) {
 		setCache(cache);
-		setJson(new Fastjson());
+		Fastjson json = new Fastjson();
+		json.addAccept(SessionAttribute.class.getName());
+		setJson(json);
 	}
 
 	public void setCache(SessionCache cache) {
