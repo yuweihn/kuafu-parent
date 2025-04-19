@@ -2,6 +2,7 @@ package com.yuweix.kuafu.core.mq.rocket;
 
 
 import com.yuweix.kuafu.core.MdcUtil;
+import com.yuweix.kuafu.core.json.JsonUtil;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 
 import java.util.HashMap;
@@ -13,11 +14,9 @@ import java.util.Map;
  **/
 public class DefaultRocketSender implements RocketSender {
     private RocketMQTemplate rocketMQTemplate;
-    private RocketSerializer rocketSerializer;
 
-    public DefaultRocketSender(RocketMQTemplate rocketMQTemplate, RocketSerializer rocketSerializer) {
+    public void setRocketMQTemplate(RocketMQTemplate rocketMQTemplate) {
         this.rocketMQTemplate = rocketMQTemplate;
-        this.rocketSerializer = rocketSerializer;
     }
 
 
@@ -37,6 +36,6 @@ public class DefaultRocketSender implements RocketSender {
     }
 
     protected String serialize(Object obj) {
-        return rocketSerializer.serialize(obj);
+        return JsonUtil.toJSONString(obj);
     }
 }
