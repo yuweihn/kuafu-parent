@@ -98,4 +98,8 @@ public abstract class AbstractRabbitReceiver<T> {
     protected void after(Message message, Channel channel) {
 
     }
+
+    public void setRabbitSerializer(RabbitSerializer rabbitSerializer) {
+        this.rabbitSerializer = rabbitSerializer;
+    }
 }
