@@ -1,6 +1,8 @@
 package com.yuweix.kuafu.core.mq.rabbit;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuweix.kuafu.core.MdcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +22,12 @@ import java.util.UUID;
 public class DefaultRabbitSender implements RabbitSender, Confirmable {
     private static final Logger log = LoggerFactory.getLogger(DefaultRabbitSender.class);
 
-    private RabbitTemplate rabbitTemplate;
-    private RabbitSerializer rabbitSerializer;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public DefaultRabbitSender(RabbitTemplate rabbitTemplate, RabbitSerializer rabbitSerializer) {
+    private RabbitTemplate rabbitTemplate;
+
+    public DefaultRabbitSender(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
-        this.rabbitSerializer = rabbitSerializer;
     }
 
 
@@ -56,7 +58,11 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
     }
 
     protected String serialize(Object obj) {
-        return rabbitSerializer.serialize(obj);
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

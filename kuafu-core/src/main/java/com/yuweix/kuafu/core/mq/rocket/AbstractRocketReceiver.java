@@ -20,16 +20,14 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
     private static final Logger log = LoggerFactory.getLogger(AbstractRocketReceiver.class);
 
     protected Class<T> clz;
-    protected RocketSerializer rocketSerializer;
 
     @SuppressWarnings("unchecked")
-    public AbstractRocketReceiver(RocketSerializer rocketSerializer) {
+    public AbstractRocketReceiver() {
         this.clz = null;
         Type t = getClass().getGenericSuperclass();
         if (t instanceof ParameterizedType) {
             this.clz = (Class<T>) ((ParameterizedType) t).getActualTypeArguments()[0];
         }
-        this.rocketSerializer = rocketSerializer;
     }
 
     @Override
@@ -67,7 +65,7 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
     }
 
     protected T deserialize(String str) {
-        return rocketSerializer.deserialize(str, clz);
+        return JsonUtil.parseObject(str, clz);
     }
 
     protected abstract Object process(T t);

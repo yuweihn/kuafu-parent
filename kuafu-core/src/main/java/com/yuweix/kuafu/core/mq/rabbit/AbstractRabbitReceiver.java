@@ -1,6 +1,8 @@
 package com.yuweix.kuafu.core.mq.rabbit;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.yuweix.kuafu.core.MdcUtil;
 import com.yuweix.kuafu.core.json.JsonUtil;
@@ -23,17 +25,16 @@ import java.util.UUID;
 public abstract class AbstractRabbitReceiver<T> {
     private static final Logger log = LoggerFactory.getLogger(AbstractRabbitReceiver.class);
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     protected Class<T> clz;
-    protected RabbitSerializer rabbitSerializer;
 
     @SuppressWarnings("unchecked")
-    public AbstractRabbitReceiver(RabbitSerializer rabbitSerializer) {
+    public AbstractRabbitReceiver() {
         this.clz = null;
         Type t = getClass().getGenericSuperclass();
         if (t instanceof ParameterizedType) {
             this.clz = (Class<T>) ((ParameterizedType) t).getActualTypeArguments()[0];
         }
-        this.rabbitSerializer = rabbitSerializer;
     }
 
     @RabbitHandler(isDefault = true)
@@ -84,7 +85,11 @@ public abstract class AbstractRabbitReceiver<T> {
     }
 
     protected T deserialize(String str) {
-        return rabbitSerializer.deserialize(str, clz);
+        try {
+            return objectMapper.readValue(str, clz);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected abstract Object process(T t);
