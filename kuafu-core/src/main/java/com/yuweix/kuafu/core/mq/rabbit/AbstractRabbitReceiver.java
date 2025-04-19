@@ -1,8 +1,6 @@
 package com.yuweix.kuafu.core.mq.rabbit;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.yuweix.kuafu.core.MdcUtil;
 import com.yuweix.kuafu.core.json.JsonUtil;
@@ -12,6 +10,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 
+import javax.annotation.Resource;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -25,8 +24,10 @@ import java.util.UUID;
 public abstract class AbstractRabbitReceiver<T> {
     private static final Logger log = LoggerFactory.getLogger(AbstractRabbitReceiver.class);
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
     protected Class<T> clz;
+
+    @Resource
+    protected RabbitSerializer rabbitSerializer;
 
     @SuppressWarnings("unchecked")
     public AbstractRabbitReceiver() {
@@ -85,11 +86,7 @@ public abstract class AbstractRabbitReceiver<T> {
     }
 
     protected T deserialize(String str) {
-        try {
-            return objectMapper.readValue(str, clz);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return rabbitSerializer.deserialize(str, clz);
     }
 
     protected abstract Object process(T t);
