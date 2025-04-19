@@ -81,4 +81,8 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
     protected void after(Message message) {
 
     }
+
+    public void setRocketSerializer(RocketSerializer rocketSerializer) {
+        this.rocketSerializer = rocketSerializer;
+    }
 }
