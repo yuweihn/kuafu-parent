@@ -3,6 +3,7 @@ package com.yuweix.kuafu.core.mq.rocket;
 
 import com.yuweix.kuafu.core.MdcUtil;
 import com.yuweix.kuafu.core.json.JsonUtil;
+import jakarta.annotation.Resource;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.slf4j.Logger;
@@ -20,6 +21,9 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
     private static final Logger log = LoggerFactory.getLogger(AbstractRocketReceiver.class);
 
     protected Class<T> clz;
+
+    @Resource
+    protected RocketSerializer rocketSerializer;
 
     @SuppressWarnings("unchecked")
     public AbstractRocketReceiver() {
@@ -65,7 +69,7 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
     }
 
     protected T deserialize(String str) {
-        return JsonUtil.parseObject(str, clz);
+        return rocketSerializer.deserialize(str, clz);
     }
 
     protected abstract Object process(T t);
