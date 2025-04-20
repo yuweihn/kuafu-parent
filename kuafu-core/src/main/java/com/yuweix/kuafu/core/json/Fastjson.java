@@ -7,15 +7,15 @@ import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.TypeReference;
 import com.alibaba.fastjson2.filter.Filter;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
  * @author yuwei
  */
 public class Fastjson implements Json {
-	private static final List<String> autoTypes = new ArrayList<>();
+	private static final List<String> autoTypes = new CopyOnWriteArrayList<>();
 	private static Filter autoTypeFilter;
 
 	public void addAccept(String name) {
