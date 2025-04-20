@@ -29,7 +29,8 @@ public class JsonConf {
         return json;
     }
 
-    @Bean("kuafu#fastjsonUtil")
+    @ConditionalOnMissingBean(JsonUtil.class)
+    @Bean
     public JsonUtil fastjsonUtil(Fastjson json) {
         try {
             Class<?> clz = Class.forName(JsonUtil.class.getName());
