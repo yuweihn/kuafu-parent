@@ -29,14 +29,8 @@ public abstract class SessionFilter implements Filter {
 		this(null);
 	}
 	public SessionFilter(SessionCache cache) {
-		setCache(cache);
-		Fastjson json = new Fastjson();
-		json.addAccept(SessionAttribute.class.getName());
-		setJson(json);
+		this(cache, new Fastjson());
 	}
-	/**
-	 * @param cache
-	 */
 	public SessionFilter(SessionCache cache, Json json) {
 		setCache(cache);
 		setJson(json);
@@ -47,7 +41,13 @@ public abstract class SessionFilter implements Filter {
 	}
 	
 	public void setJson(Json json) {
-		SessionConf.getInstance().setJson(json);
+		if (json instanceof Fastjson) {
+			Fastjson fastjson = (Fastjson) json;
+			fastjson.addAccept(SessionAttribute.class.getName());
+			SessionConf.getInstance().setJson(fastjson);
+		} else {
+			SessionConf.getInstance().setJson(json);
+		}
 	}
 	/**
 	 * 设置session失效时间(分钟)
