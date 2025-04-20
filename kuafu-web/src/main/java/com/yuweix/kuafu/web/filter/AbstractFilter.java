@@ -4,6 +4,7 @@ package com.yuweix.kuafu.web.filter;
 import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.Constant;
 import com.yuweix.kuafu.core.MdcUtil;
+import com.yuweix.kuafu.core.json.Fastjson;
 import com.yuweix.kuafu.core.json.Json;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -38,7 +39,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	private String methodParam = DEFAULT_METHOD_PARAM;
 	private String encoding = DEFAULT_ENCODING;
 	private String staticPath = DEFAULT_STATIC_PATH;
-	protected Json json;
+	protected Json json = new Fastjson();
 	/**
 	 * 跨域白名单
 	 * 如果originWhiteList为空，所有origin都可访问，否则只允许规定的origin访问
