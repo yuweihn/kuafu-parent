@@ -28,13 +28,17 @@ public abstract class SessionFilter implements Filter {
 	public SessionFilter() {
 		this(null);
 	}
-	/**
-	 * @param cache
-	 */
 	public SessionFilter(SessionCache cache) {
 		setCache(cache);
 		Fastjson json = new Fastjson();
 		json.addAccept(SessionAttribute.class.getName());
+		setJson(json);
+	}
+	/**
+	 * @param cache
+	 */
+	public SessionFilter(SessionCache cache, Json json) {
+		setCache(cache);
 		setJson(json);
 	}
 
