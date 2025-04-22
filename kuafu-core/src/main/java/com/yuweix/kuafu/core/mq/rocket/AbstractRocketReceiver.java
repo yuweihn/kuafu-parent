@@ -8,6 +8,7 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.retry.RetryException;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -57,9 +58,11 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
             T t = deserialize(body);
             Object result = process(t);
             log.info("消费完成, Result: {}", JsonUtil.toJSONString(result));
+        } catch (RetryException ex) {
+            log.error("消费异常message: {}, RetryException: {}", JsonUtil.toJSONString(message), ex.getMessage());
+            throw ex;
         } catch (Exception e) {
-            log.error("消费异常message: {}, Error: {}", JsonUtil.toJSONString(message), e.getMessage());
-            throw new RuntimeException(e);
+            log.error("消费异常message: {}, Exception: {}", JsonUtil.toJSONString(message), e.getMessage());
         } finally {
             MdcUtil.removeTraceId();
             MdcUtil.removeRequestId();
