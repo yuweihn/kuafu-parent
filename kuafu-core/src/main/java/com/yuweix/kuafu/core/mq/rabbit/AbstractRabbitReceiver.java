@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.retry.RetryException;
 
 import javax.annotation.Resource;
 import java.lang.reflect.ParameterizedType;
@@ -74,9 +75,11 @@ public abstract class AbstractRabbitReceiver<T> {
             Object result = process(t);
             channel.basicAck(deliveryTag, false);
             log.info("消费完成, Result: {}", JsonUtil.toJSONString(result));
+        } catch (RetryException ex) {
+            log.error("消费异常message: {}, RetryException: {}", body, ex.getMessage());
+            throw ex;
         } catch (Exception e) {
-            log.error("消费异常message: {}, Error: {}", body, e.getMessage());
-            throw new RuntimeException(e);
+            log.error("消费异常message: {}, Exception: {}", body, e.getMessage());
         } finally {
             MdcUtil.removeTraceId();
             MdcUtil.removeRequestId();
