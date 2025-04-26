@@ -10,7 +10,7 @@ import java.util.*;
 import jakarta.servlet.http.Cookie;
 
 import com.alibaba.fastjson2.TypeReference;
-import com.yuweix.kuafu.core.json.JsonUtil;
+import com.yuweix.kuafu.core.JsonUtil;
 import com.yuweix.kuafu.http.response.HttpResponse;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;

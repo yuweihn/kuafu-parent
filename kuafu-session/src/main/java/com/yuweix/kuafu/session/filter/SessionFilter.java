@@ -1,8 +1,8 @@
 package com.yuweix.kuafu.session.filter;
 
 
-import com.yuweix.kuafu.core.json.Fastjson;
-import com.yuweix.kuafu.core.json.Json;
+import com.yuweix.kuafu.core.serialize.FastSerializer;
+import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.session.CacheHttpServletRequest;
 import com.yuweix.kuafu.session.SessionAttribute;
 import com.yuweix.kuafu.session.cache.SessionCache;
@@ -29,24 +29,24 @@ public abstract class SessionFilter implements Filter {
 		this(null);
 	}
 	public SessionFilter(SessionCache cache) {
-		this(cache, new Fastjson());
+		this(cache, new FastSerializer());
 	}
-	public SessionFilter(SessionCache cache, Json json) {
+	public SessionFilter(SessionCache cache, Serializer serializer) {
 		setCache(cache);
-		setJson(json);
+		setSerializer(serializer);
 	}
 
 	public void setCache(SessionCache cache) {
 		SessionConf.getInstance().setCache(cache);
 	}
-	
-	public void setJson(Json json) {
-		if (json instanceof Fastjson) {
-			Fastjson fastjson = (Fastjson) json;
-			fastjson.addAccept(SessionAttribute.class.getName());
-			SessionConf.getInstance().setJson(fastjson);
+
+	public void setSerializer(Serializer serializer) {
+		if (serializer instanceof FastSerializer) {
+			FastSerializer fastSerializer = (FastSerializer) serializer;
+			fastSerializer.addAccept(SessionAttribute.class.getName());
+			SessionConf.getInstance().setSerializer(fastSerializer);
 		} else {
-			SessionConf.getInstance().setJson(json);
+			SessionConf.getInstance().setSerializer(serializer);
 		}
 	}
 	/**

@@ -1,7 +1,6 @@
 package com.yuweix.kuafu.core;
 
 
-import com.yuweix.kuafu.core.json.JsonUtil;
 import java.io.Serializable;
 
 

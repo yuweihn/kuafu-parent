@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.session.conf;
 
 
-import com.yuweix.kuafu.core.json.Json;
+import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.session.SessionConstant;
 import com.yuweix.kuafu.session.cache.SessionCache;
 import org.springframework.util.Assert;
@@ -21,7 +21,7 @@ public class SessionConf {
 	private int maxInactiveInterval;
 	private String applicationName;
 	private SessionCache cache;
-	private Json json;
+	private Serializer serializer;
 
 	private SessionConf() {
 
@@ -52,13 +52,13 @@ public class SessionConf {
 		return cache;
 	}
 
-	public void setJson(Json json) {
-		this.json = json;
+	public void setSerializer(Serializer serializer) {
+		this.serializer = serializer;
 	}
 
-	public Json getJson() {
-		Assert.notNull(json, "[json] is required.");
-		return json;
+	public Serializer getSerializer() {
+		Assert.notNull(serializer, "[serializer] is required.");
+		return serializer;
 	}
 
 	public void setMaxInactiveInterval(int maxInactiveInterval) {
@@ -87,7 +87,7 @@ public class SessionConf {
 
 	public void check() {
 		Assert.notNull(cache, "[cache] is required.");
-		Assert.notNull(json, "[json] is required.");
+		Assert.notNull(serializer, "[serializer] is required.");
 		Assert.notNull(applicationName, "[applicationName] is required.");
 	}
 }

@@ -1,8 +1,8 @@
 package com.yuweix.kuafu.permission.springboot;
 
 
-import com.yuweix.kuafu.core.json.Fastjson;
-import com.yuweix.kuafu.core.json.Json;
+import com.yuweix.kuafu.core.serialize.FastSerializer;
+import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.permission.web.interceptor.PermissionCheckInterceptor;
 import com.yuweix.kuafu.sequence.base.SequenceBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +44,15 @@ public class PermissionConf {
 	}
 
 	@Bean(name = "fastjson#advice")
-	public Object fastjsonAdvice(@Autowired(required = false) Fastjson fastjson) {
-		if (fastjson == null) {
+	public Object fastjsonAdvice(@Autowired(required = false) Serializer serializer) {
+		if (serializer == null) {
 			return null;
 		}
-
-		fastjson.addAccept("com.yuweix.kuafu.permission.dto");
-		fastjson.addAccept("com.yuweix.kuafu.permission.model");
+		if (serializer instanceof FastSerializer) {
+			FastSerializer fastSerializer = (FastSerializer) serializer;
+			fastSerializer.addAccept("com.yuweix.kuafu.permission.dto");
+			fastSerializer.addAccept("com.yuweix.kuafu.permission.model");
+		}
 		return null;
 	}
 

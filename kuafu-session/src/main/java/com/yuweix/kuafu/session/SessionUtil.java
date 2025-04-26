@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.session;
 
 
-import com.yuweix.kuafu.core.json.Json;
+import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.session.conf.SessionConf;
 
 import java.util.Date;
@@ -20,8 +20,8 @@ public abstract class SessionUtil {
 		if (sessionId == null) {
 			return null;
 		}
-		Json json = SessionConf.getInstance().getJson();
-		SessionAttribute attribute = json.deserialize(SessionConf.getInstance().getCache().get(sessionId));
+		Serializer serializer = SessionConf.getInstance().getSerializer();
+		SessionAttribute attribute = serializer.deserialize(SessionConf.getInstance().getCache().get(sessionId));
 		return attribute == null ? null : attribute.getCreateTime();
 	}
 
@@ -33,8 +33,8 @@ public abstract class SessionUtil {
 		if (sessionId == null) {
 			return null;
 		}
-		Json json = SessionConf.getInstance().getJson();
-		SessionAttribute attribute = json.deserialize(SessionConf.getInstance().getCache().get(sessionId));
+		Serializer serializer = SessionConf.getInstance().getSerializer();
+		SessionAttribute attribute = serializer.deserialize(SessionConf.getInstance().getCache().get(sessionId));
 		if (attribute == null) {
 			return null;
 		}

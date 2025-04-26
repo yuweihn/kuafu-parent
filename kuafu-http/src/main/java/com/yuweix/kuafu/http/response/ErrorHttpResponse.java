@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.http.response;
 
 
-import com.yuweix.kuafu.core.json.JsonUtil;
+import com.yuweix.kuafu.core.JsonUtil;
 import org.apache.http.Header;
 import jakarta.servlet.http.Cookie;
 import java.util.List;
