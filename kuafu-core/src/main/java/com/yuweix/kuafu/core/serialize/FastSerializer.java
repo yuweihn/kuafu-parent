@@ -15,8 +15,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author yuwei
  */
 public class FastSerializer implements Serializer {
-	private final List<String> autoTypes = new CopyOnWriteArrayList<>();
-	private Filter autoTypeFilter;
+	private static final List<String> autoTypes = new CopyOnWriteArrayList<>();
+	private static Filter autoTypeFilter;
 
 	public FastSerializer() {
 
