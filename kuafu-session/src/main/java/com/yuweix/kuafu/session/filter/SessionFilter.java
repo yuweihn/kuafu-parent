@@ -29,7 +29,10 @@ public abstract class SessionFilter implements Filter {
 		this(null);
 	}
 	public SessionFilter(SessionCache cache) {
-		this(cache, new FastSerializer());
+		Serializer serializer = new FastSerializer();
+		serializer.addAccept(SessionAttribute.class.getName());
+		setCache(cache);
+		setSerializer(serializer);
 	}
 	public SessionFilter(SessionCache cache, Serializer serializer) {
 		setCache(cache);
@@ -41,13 +44,7 @@ public abstract class SessionFilter implements Filter {
 	}
 
 	public void setSerializer(Serializer serializer) {
-		if (serializer instanceof FastSerializer) {
-			FastSerializer fastSerializer = (FastSerializer) serializer;
-			fastSerializer.addAccept(SessionAttribute.class.getName());
-			SessionConf.getInstance().setSerializer(fastSerializer);
-		} else {
-			SessionConf.getInstance().setSerializer(serializer);
-		}
+		SessionConf.getInstance().setSerializer(serializer);
 	}
 	/**
 	 * 设置session失效时间(分钟)

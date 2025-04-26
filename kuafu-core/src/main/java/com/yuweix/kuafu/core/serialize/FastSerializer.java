@@ -24,13 +24,15 @@ public class FastSerializer implements Serializer {
 	public FastSerializer(String autoType) {
 		addAccept(autoType);
 	}
-	public void addAccept(String name) {
-		if (!autoTypes.contains(name)) {
-			autoTypes.add(name);
+	@Override
+	public void addAccept(String autoType) {
+		if (!autoTypes.contains(autoType)) {
+			autoTypes.add(autoType);
 		}
 		autoTypeFilter = JSONReader.autoTypeFilter(autoTypes.toArray(new String[0]));
 	}
 
+	@Override
 	public <T>String serialize(T t) {
 		if (t == null) {
 			return null;
@@ -38,6 +40,7 @@ public class FastSerializer implements Serializer {
 		return JSON.toJSONString(t, JSONWriter.Feature.WriteClassName);
 	}
 
+	@Override
 	public <T>T deserialize(String str) {
 		if (str == null) {
 			return null;
