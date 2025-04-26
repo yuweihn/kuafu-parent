@@ -31,7 +31,7 @@ public class DefaultConf {
     @ConditionalOnMissingBean(Serializer.class)
     @Bean
     public Serializer serializer(@Value("${kuafu.json.fastjson.accept:}") String accepts) {
-        FastSerializer serializer = new FastSerializer();
+        Serializer serializer = new FastSerializer();
         if (accepts != null && !"".equals(accepts.trim())) {
             String[] arr = accepts.trim().split(",");
             for (String accept: arr) {

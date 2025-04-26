@@ -18,6 +18,7 @@ public class HexSerializer implements Serializer {
 	/**
 	 * 序列化
 	 */
+	@Override
 	public <T>String serialize(T t) {
 		if (t == null) {
 			return null;
@@ -54,6 +55,7 @@ public class HexSerializer implements Serializer {
 	 * 反序列化
 	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T>T deserialize(String str) {
 		if (str == null) {
 			return null;
