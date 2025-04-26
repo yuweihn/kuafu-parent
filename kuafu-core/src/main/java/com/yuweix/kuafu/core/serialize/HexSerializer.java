@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.core;
+package com.yuweix.kuafu.core.serialize;
 
 
 import org.slf4j.Logger;
@@ -11,8 +11,8 @@ import java.io.*;
  * 十六进制序列化工具
  * @author yuwei
  */
-public class HexSerializeUtil {
-	private static final Logger log = LoggerFactory.getLogger(HexSerializeUtil.class);
+public class HexSerializer implements Serializer {
+	private static final Logger log = LoggerFactory.getLogger(HexSerializer.class);
 
 
 	/**
@@ -30,21 +30,21 @@ public class HexSerializeUtil {
 			oos.writeObject(t);
 			return toHexString(baos.toByteArray());
 		} catch (Exception e) {
-			log.error("", e);
+			log.error("Error: {}", e.getMessage(), e);
 			return null;
 		} finally {
 			if (oos != null) {
 				try {
 					oos.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 			if (baos != null) {
 				try {
 					baos.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 		}
@@ -73,14 +73,14 @@ public class HexSerializeUtil {
 				try {
 					ois.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 			if (bais != null) {
 				try {
 					bais.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					log.error("Error: {}", e.getMessage(), e);
 				}
 			}
 		}
