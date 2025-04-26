@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.web.filter;
 
 
+import com.yuweix.kuafu.core.io.StreamUtil;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;
@@ -41,15 +42,8 @@ public class CacheBodyRequestWrapper extends HttpServletRequestWrapper {
 
     private void setRequestBody(ServletRequest request) {
         try {
-            int contentLength = Math.max(request.getContentLength(), 0);
-            this.requestBody = new byte[contentLength];
             InputStream in = request.getInputStream();
-            int index = 0;
-
-            int len;
-            for (byte[] data = new byte[1024]; (len = in.read(data)) != -1; index += len) {
-                System.arraycopy(data, 0, this.requestBody, index, len);
-            }
+            this.requestBody = StreamUtil.read(in);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
