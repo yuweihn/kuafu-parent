@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.data.springboot.jedis;
 
 
-import com.yuweix.kuafu.core.json.Json;
+import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.data.cache.redis.jedis.JedisCache;
 import com.yuweix.kuafu.data.serializer.CacheSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -92,16 +92,16 @@ public class JedisMsConf {
 
 	@ConditionalOnMissingBean(CacheSerializer.class)
 	@Bean
-	public CacheSerializer cacheSerializer(Json json) {
+	public CacheSerializer cacheSerializer(Serializer serializer) {
 		return new CacheSerializer() {
 			@Override
 			public <T> String serialize(T t) {
-				return json.serialize(t);
+				return serializer.serialize(t);
 			}
 
 			@Override
 			public <T> T deserialize(String str) {
-				return json.deserialize(str);
+				return serializer.deserialize(str);
 			}
 		};
 	}

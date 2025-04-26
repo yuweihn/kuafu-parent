@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.core.springboot;
 
 
-import com.yuweix.kuafu.core.json.Json;
+import com.yuweix.kuafu.core.JsonUtil;
 import com.yuweix.kuafu.core.mq.rocket.DefaultRocketSender;
 import com.yuweix.kuafu.core.mq.rocket.RocketSender;
 import com.yuweix.kuafu.core.mq.rocket.RocketSerializer;
@@ -16,16 +16,16 @@ import org.springframework.context.annotation.Bean;
 public class RocketConf {
     @ConditionalOnMissingBean(RocketSerializer.class)
     @Bean
-    public RocketSerializer rocketSerializer(Json json) {
+    public RocketSerializer rocketSerializer() {
         return new RocketSerializer() {
             @Override
             public <T> String serialize(T t) {
-                return json.toJSONString(t);
+                return JsonUtil.toJSONString(t);
             }
 
             @Override
             public <T> T deserialize(String str, Class<T> clz) {
-                return json.parseObject(str, clz);
+                return JsonUtil.parseObject(str, clz);
             }
         };
     }

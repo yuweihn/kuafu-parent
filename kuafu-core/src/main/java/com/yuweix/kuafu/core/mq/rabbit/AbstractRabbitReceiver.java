@@ -3,7 +3,7 @@ package com.yuweix.kuafu.core.mq.rabbit;
 
 import com.rabbitmq.client.Channel;
 import com.yuweix.kuafu.core.MdcUtil;
-import com.yuweix.kuafu.core.json.JsonUtil;
+import com.yuweix.kuafu.core.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;

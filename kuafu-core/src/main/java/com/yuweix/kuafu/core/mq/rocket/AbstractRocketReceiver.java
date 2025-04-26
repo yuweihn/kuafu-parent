@@ -2,7 +2,7 @@ package com.yuweix.kuafu.core.mq.rocket;
 
 
 import com.yuweix.kuafu.core.MdcUtil;
-import com.yuweix.kuafu.core.json.JsonUtil;
+import com.yuweix.kuafu.core.JsonUtil;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.slf4j.Logger;

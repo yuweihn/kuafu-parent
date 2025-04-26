@@ -1,10 +1,10 @@
 package com.yuweix.kuafu.boot.exception;
 
 
+import com.yuweix.kuafu.core.JsonUtil;
 import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.core.exception.ExceptionHandler;
 import com.yuweix.kuafu.core.exception.ExceptionViewResolver;
-import com.yuweix.kuafu.core.json.Json;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.AbstractView;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,9 +41,6 @@ public class ExceptionAutoConfiguration {
 
 		@Controller
 		public class ErrorController {
-			@Resource
-			private Json json;
-
 			@RequestMapping(value = { "/error", "/error/**" })
 			@ResponseBody
 			public String toErrorPage(HttpServletResponse response) {
@@ -53,13 +49,13 @@ public class ExceptionAutoConfiguration {
 
 				Response<String, Void> resp = new Response<>(errorCode == null || "".equals(errorCode) ? "" + status : errorCode
 						, httpStatus.getReasonPhrase() + "[" + status + "]");
-				return json.toJSONString(resp);
+				return JsonUtil.toJSONString(resp);
 			}
 		}
 
 		@ConditionalOnMissingBean(ExceptionViewResolver.class)
 		@Bean
-		public ExceptionViewResolver exceptionViewResolver(Json json) {
+		public ExceptionViewResolver exceptionViewResolver() {
 			return new ExceptionViewResolver() {
 				@SuppressWarnings("unchecked")
 				@Override
@@ -69,12 +65,12 @@ public class ExceptionAutoConfiguration {
 						protected void renderMergedOutputModel(Map<String, Object> map, HttpServletRequest req, HttpServletResponse resp) throws Exception {
 							resp.setContentType("application/json; charset=" + StandardCharsets.UTF_8);
 							ServletOutputStream out = resp.getOutputStream();
-							out.write(json.toJSONString(map).getBytes(StandardCharsets.UTF_8));
+							out.write(JsonUtil.toJSONString(map).getBytes(StandardCharsets.UTF_8));
 							out.flush();
 						}
 					};
-					String text = json.toJSONString(new Response<String, Void>(errorCode == null || "".equals(errorCode) ? "500" : errorCode, content));
-					Map<String, Object> attributes = json.parseObject(text, Map.class);
+					String text = JsonUtil.toJSONString(new Response<String, Void>(errorCode == null || "".equals(errorCode) ? "500" : errorCode, content));
+					Map<String, Object> attributes = JsonUtil.parseObject(text, Map.class);
 					view.setAttributesMap(attributes);
 					return new ModelAndView(view);
 				}

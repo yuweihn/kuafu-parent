@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.web.filter;
 
 
+import com.yuweix.kuafu.core.JsonUtil;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import javax.servlet.http.HttpServletRequest;
@@ -73,7 +74,7 @@ public class CacheContentHttpFilter extends AbstractFilter<CacheBodyRequestWrapp
 	private Object limit(String str, Integer maxSize) {
 		if (maxSize == null || maxSize < 0) {
 			try {
-				return json.parse(str);
+				return JsonUtil.parse(str);
 			} catch (Exception e) {
 				return str;
 			}
@@ -85,7 +86,7 @@ public class CacheContentHttpFilter extends AbstractFilter<CacheBodyRequestWrapp
 			str = str.substring(0, maxSize) + "......";
 		}
 		try {
-			return json.parse(str);
+			return JsonUtil.parse(str);
 		} catch (Exception e) {
 			return str;
 		}

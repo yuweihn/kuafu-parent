@@ -1,15 +1,15 @@
 package com.yuweix.kuafu.session;
 
 
-import java.util.*;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
-
-import com.yuweix.kuafu.core.json.Json;
+import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.session.cache.SessionCache;
 import com.yuweix.kuafu.session.conf.SessionConf;
 import org.springframework.util.CollectionUtils;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionContext;
+import java.util.*;
 
 
 /**
@@ -222,8 +222,8 @@ public class CacheHttpSession implements HttpSession {
 		SessionCache sessionCache = SessionConf.getInstance().getCache();
 		long timeSec = SessionConf.getInstance().getMaxInactiveInterval() * 60L;
 
-		Json json = SessionConf.getInstance().getJson();
-		sessionCache.put(fullSessionId, json.serialize(sessionAttribute), timeSec);
+		Serializer serializer = SessionConf.getInstance().getSerializer();
+		sessionCache.put(fullSessionId, serializer.serialize(sessionAttribute), timeSec);
 		/**
 		 * 如果sessionIdKey不为空，表明需要避免重复登录
 		 */
@@ -258,8 +258,8 @@ public class CacheHttpSession implements HttpSession {
 			return;
 		}
 
-		Json json = SessionConf.getInstance().getJson();
-		sessionAttribute = json.deserialize(SessionConf.getInstance().getCache().get(fullSessionId));
+		Serializer serializer = SessionConf.getInstance().getSerializer();
+		sessionAttribute = serializer.deserialize(SessionConf.getInstance().getCache().get(fullSessionId));
 		if (sessionAttribute == null) {
 			removeSessionFromCache();
 			sessionAttribute = new SessionAttribute();
