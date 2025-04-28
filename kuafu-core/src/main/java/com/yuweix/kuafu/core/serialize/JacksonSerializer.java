@@ -31,7 +31,6 @@ public class JacksonSerializer implements Serializer {
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
-		System.out.println(str);
 		return str;
 	}
 
