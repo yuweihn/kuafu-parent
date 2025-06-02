@@ -1,6 +1,8 @@
 package com.yuweix.kuafu.core;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
@@ -12,6 +14,9 @@ import java.net.UnknownHostException;
  * @author yuwei
  */
 public abstract class ReactiveUtil {
+	private static final Logger log = LoggerFactory.getLogger(ReactiveUtil.class);
+
+
 	/**
 	 * 获得客户端IP
 	 * @return
@@ -47,7 +52,7 @@ public abstract class ReactiveUtil {
 		try {
 			innerIp = InetAddress.getLocalHost().getHostAddress();
 		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			log.error("获取本机内网IP失败, Error: {}", e.getMessage(), e);
 		}
 		return innerIp;
 	}
