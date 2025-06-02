@@ -5,6 +5,8 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -19,6 +21,9 @@ import java.util.Map;
  * @author yuwei
  */
 public abstract class ActionUtil {
+	private static final Logger log = LoggerFactory.getLogger(ActionUtil.class);
+
+
 	/**
 	 * 获得客户端IP
 	 * @return
@@ -53,7 +58,7 @@ public abstract class ActionUtil {
 		try {
 			innerIp = InetAddress.getLocalHost().getHostAddress();
 		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			log.error("获取本机内网IP失败, Error: {}", e.getMessage(), e);
 		}
 		return innerIp;
 	}
@@ -68,7 +73,7 @@ public abstract class ActionUtil {
 		try {
 			netInterfaces = NetworkInterface.getNetworkInterfaces();
 		} catch (SocketException e) {
-			e.printStackTrace();
+			log.error("获取本机外网IP失败, Error: {}", e.getMessage(), e);
 			return null;
 		}
 		InetAddress ip = null;
@@ -144,7 +149,7 @@ public abstract class ActionUtil {
 			String contextPath = effectiveURI.toString().replaceFirst("http:", "").replaceFirst("https:", "");
 			request.getServletContext().setAttribute(Constant.CONTEXT_PATH_KEY, contextPath);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("将站点URL存入ServletContext中失败, Error: {}", e.getMessage(), e);
 		}
 	}
 
@@ -218,7 +223,6 @@ public abstract class ActionUtil {
 				response.setHeader(entry.getKey(), entry.getValue());
 			}
 		}
-
 		try {
 			response.getOutputStream().write(content);
 		} catch (IOException e) {
