@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
@@ -87,24 +87,33 @@ public class RabbitConf {
         return obj;
     }
 
-    @ConditionalOnMissingBean(name = "rabbitJsonMessageConverter")
-    @Bean("rabbitJsonMessageConverter")
-    public MessageConverter rabbitJsonMessageConverter() {
+    @ConditionalOnMissingBean(name = "rabbitMessageConverter")
+    @Bean("rabbitMessageConverter")
+    public MessageConverter rabbitMessageConverter() {
         return new SimpleMessageConverter();
     }
 
     @ConditionalOnMissingBean(name = "rabbitRetryTemplate")
     @Bean("rabbitRetryTemplate")
-    public RetryTemplate rabbitRetryTemplate(@Value("${kuafu.rabbit.retry.maxAttempts:3}") int maxAttempts
-            , @Value("${kuafu.rabbit.retry.backOffPeriod:2000}") long backOffPeriod) {
+    public RetryTemplate rabbitRetryTemplate(@Value("${kuafu.rabbit.retry.max-attempts:3}") int maxAttempts
+            , @Value("${kuafu.rabbit.retry.initial-interval:3000}") long initialInterval
+            , @Value("${kuafu.rabbit.retry.max-interval:5000}") long maxInterval
+            , @Value("${kuafu.rabbit.retry.multiplier:2}") double multiplier) {
         RetryTemplate retryTemplate = new RetryTemplate();
-        // 设置重试策略：重试3次
+        /**
+         * 设置重试策略
+         */
         SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
         retryPolicy.setMaxAttempts(maxAttempts);
         retryTemplate.setRetryPolicy(retryPolicy);
-        // 设置退避策略：每次重试间隔2秒
-        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
-        backOffPolicy.setBackOffPeriod(backOffPeriod);
+
+        /**
+         * 设置退避策略
+         */
+        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(initialInterval);
+        backOffPolicy.setMaxInterval(maxInterval);
+        backOffPolicy.setMultiplier(multiplier);
         retryTemplate.setBackOffPolicy(backOffPolicy);
         return retryTemplate;
     }
@@ -144,7 +153,7 @@ public class RabbitConf {
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory
             , @Qualifier("rabbitRetryTemplate") RetryTemplate retryTemplate
-            , @Autowired(required = false) @Qualifier("rabbitJsonMessageConverter") MessageConverter messageConverter
+            , @Autowired(required = false) @Qualifier("rabbitMessageConverter") MessageConverter messageConverter
             , RabbitTemplate.ConfirmCallback confirmCallback) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         if (messageConverter != null) {
