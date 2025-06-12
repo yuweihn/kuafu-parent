@@ -1,13 +1,12 @@
 package com.yuweix.kuafu.core.mq.rocket;
 
 
-import com.yuweix.kuafu.core.MdcUtil;
 import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.MdcUtil;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.retry.RetryException;
 
 import javax.annotation.Resource;
 import java.lang.reflect.ParameterizedType;
@@ -54,15 +53,13 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
             MdcUtil.setSpanId(spanId);
             before(message);
             String body = new String(message.getBody());
-            log.info("body: {}", body);
+            log.info("Rocket消息Body: {}", body);
             T t = deserialize(body);
             Object result = process(t);
-            log.info("消费完成, Result: {}", JsonUtil.toJSONString(result));
-        } catch (RetryException ex) {
-            log.error("消费异常message: {}, RetryException: {}", JsonUtil.toJSONString(message), ex.getMessage());
+            log.info("Rocket消费完成, Result: {}", JsonUtil.toJSONString(result));
+        } catch (Exception ex) {
+            log.error("Rocket消费异常message: {}, Exception: {}, ex: ", JsonUtil.toJSONString(message), ex.getMessage(), ex);
             throw ex;
-        } catch (Exception e) {
-            log.error("消费异常message: {}, Exception: {}", JsonUtil.toJSONString(message), e.getMessage());
         } finally {
             MdcUtil.removeTraceId();
             MdcUtil.removeRequestId();
