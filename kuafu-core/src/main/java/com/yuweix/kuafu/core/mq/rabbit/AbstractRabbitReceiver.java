@@ -78,10 +78,10 @@ public abstract class AbstractRabbitReceiver<T> {
             log.error("Rabbit消费异常message: {}, Exception: {}, ex: ", body, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } finally {
+            after(message, channel);
             MdcUtil.removeTraceId();
             MdcUtil.removeRequestId();
             MdcUtil.removeSpanId();
-            after(message, channel);
         }
     }
 

@@ -61,10 +61,10 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
             log.error("Rocket消费异常message: {}, Exception: {}, ex: ", JsonUtil.toJSONString(message), ex.getMessage(), ex);
             throw ex;
         } finally {
+            after(message);
             MdcUtil.removeTraceId();
             MdcUtil.removeRequestId();
             MdcUtil.removeSpanId();
-            after(message);
         }
     }
 
