@@ -127,7 +127,7 @@ public class RabbitConf {
                 if (ack) {
                     return;
                 }
-                log.error("CorrelationDataId: {}, Cause: {}", correlationData.getId(), cause);
+                log.error("Rabbit消息投递CorrelationDataId: {}, Cause: {}", correlationData.getId(), cause);
                 if (!(correlationData instanceof ConfirmData)) {
                     return;
                 }
@@ -139,10 +139,10 @@ public class RabbitConf {
 
                 int times = confirmData.getRetryTimes() + 1;
                 if (times > maxAttempts) {
-                    log.error("超过最大可重试次数！");
+                    log.error("Rabbit消息投递超过最大可重试次数！");
                     return;
                 }
-                log.info("重试第{}次", times);
+                log.info("Rabbit消息投递重试第{}次", times);
                 confirmData.setRetryTimes(times);
                 confirmable.confirm(confirmData);
             }
