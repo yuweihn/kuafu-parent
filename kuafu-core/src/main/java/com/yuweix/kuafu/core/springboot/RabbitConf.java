@@ -57,26 +57,48 @@ public class RabbitConf {
         }
         for (int i = 0, sz = bindings.size(); i < sz; i++) {
             BindingSetting.Item item = bindings.get(i);
-            Queue queue = new Queue(item.getQueue(), true);
-            SpringContext.register(queue.getName(), queue, true);
+            String queueName = item.getQueue();
+            String deadLetterQueueName = ("dlq_" + queueName).toLowerCase();
+
+            String exchangeName = item.getExchange();
+            String deadLetterExchangeName = ("dle_" + exchangeName).toLowerCase();
+
+            String routeKey = item.getRouteKey();
+            String deadLetterRouteKey = routeKey == null ? null :("dlk_" + routeKey).toLowerCase();
 
             String exchangeType = item.getExchangeType();
             exchangeType = exchangeType == null ? null : exchangeType.trim();
 
+            Queue deadLetterQueue = new Queue(deadLetterQueueName, true);
+            SpringContext.register(deadLetterQueueName, deadLetterQueue, true);
+            Queue queue = QueueBuilder.durable(queueName)
+                    .withArgument("x-dead-letter-exchange", deadLetterExchangeName)
+//                    .withArgument("x-message-ttl", 600000)
+                    .build();
+            SpringContext.register(queue.getName(), queue, true);
+
             Exchange exchange;
+            Exchange deadLetterExchange;
             if (exchangeType == null || ExchangeTypes.DIRECT.equals(exchangeType)) {
-                exchange = new DirectExchange(item.getExchange(), true, false);
+                exchange = new DirectExchange(exchangeName, true, false);
+                deadLetterExchange = new DirectExchange(deadLetterExchangeName, true, false);
             } else if (ExchangeTypes.FANOUT.equals(exchangeType)) {
-                exchange = new FanoutExchange(item.getExchange(), true, false);
+                exchange = new FanoutExchange(exchangeName, true, false);
+                deadLetterExchange = new FanoutExchange(deadLetterExchangeName, true, false);
             } else if (ExchangeTypes.TOPIC.equals(exchangeType)) {
-                exchange = new TopicExchange(item.getExchange(), true, false);
+                exchange = new TopicExchange(exchangeName, true, false);
+                deadLetterExchange = new TopicExchange(deadLetterExchangeName, true, false);
             } else {
                 throw new IllegalArgumentException("Invalid exchangeType: " + exchangeType);
             }
 
             SpringContext.register(exchange.getName(), exchange, true);
-            Binding bd = BindingBuilder.bind(queue).to(exchange).with(item.getRouteKey()).noargs();
+            Binding bd = BindingBuilder.bind(queue).to(exchange).with(routeKey).noargs();
             SpringContext.register("rabbitBinding" + i, bd, true);
+
+            SpringContext.register(deadLetterExchange.getName(), deadLetterExchange, true);
+            Binding bdDeadLetter = BindingBuilder.bind(deadLetterQueue).to(deadLetterExchange).with(deadLetterRouteKey).noargs();
+            SpringContext.register("rabbitBindingDeadLetter" + i, bdDeadLetter, true);
         }
         return obj;
     }
