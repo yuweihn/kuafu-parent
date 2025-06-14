@@ -8,23 +8,18 @@ import com.yuweix.kuafu.core.mq.rabbit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
@@ -50,50 +45,6 @@ public class RabbitConf {
                 return itemList;
             }
         };
-    }
-
-    @ConditionalOnMissingBean(RabbitProperties.class)
-    @Bean
-    public RabbitProperties rabbitProperties() {
-        return new RabbitProperties();
-    }
-
-    @ConditionalOnMissingBean(ConnectionFactory.class)
-    @Bean(name = "connectionFactory")
-    public ConnectionFactory connectionFactory(RabbitProperties rabbitProperties) {
-        String addresses = rabbitProperties.getAddresses();
-        String username = rabbitProperties.getUsername();
-        String password = rabbitProperties.getPassword();
-        String vhost = rabbitProperties.getVhost();
-        String publisherConfirmType = rabbitProperties.getPublisherConfirmType();
-        CachingConnectionFactory.ConfirmType pct = publisherConfirmType == null
-                ? CachingConnectionFactory.ConfirmType.CORRELATED
-                : CachingConnectionFactory.ConfirmType.valueOf(publisherConfirmType.trim().toUpperCase());
-
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-        connectionFactory.setAddresses(addresses);
-        connectionFactory.setUsername(username);
-        connectionFactory.setPassword(password);
-        connectionFactory.setVirtualHost(vhost);
-        connectionFactory.setPublisherConfirmType(pct);
-        return connectionFactory;
-    }
-
-    @ConditionalOnMissingBean(RabbitListenerContainerFactory.class)
-    @Bean
-    public SimpleRabbitListenerContainerFactory listenerContainerFactory(SimpleRabbitListenerContainerFactoryConfigurer configurer
-            , ConnectionFactory connectionFactory
-            , @Qualifier("rabbitRetryTemplate") RetryTemplate retryTemplate) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        //手动ack
-        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
-        factory.setPrefetchCount(100);
-        factory.setDefaultRequeueRejected(false);
-        factory.setAdviceChain(new RetryOperationsInterceptor());
-        factory.setRetryTemplate(retryTemplate);
-        configurer.configure(factory, connectionFactory);
-        return factory;
     }
 
     @ConditionalOnMissingBean(name = "rabbitBinding")
