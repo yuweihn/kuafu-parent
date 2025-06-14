@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 
+import java.io.IOException;
+
 
 /**
  * @author yuwei
@@ -18,5 +20,14 @@ public abstract class AbstractRabbitReceiver<T> extends AbstractBaseRabbitReceiv
     @RabbitHandler(isDefault = true)
     public void onMessage(Message message, Channel channel) {
         super.handleMessage(message, channel);
+    }
+
+    @Override
+    protected void handleException(Message message, Channel channel, Exception ex) {
+        try {
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+        } catch (IOException ioe) {
+            log.error("拒绝Rabbit消息异常, Error: {}", ioe.getMessage(), ioe);
+        }
     }
 }
