@@ -136,7 +136,7 @@ public class RabbitConf {
 
     @ConditionalOnMissingBean(RabbitTemplate.ConfirmCallback.class)
     @Bean
-    public RabbitTemplate.ConfirmCallback confirmCallback(@Value("${kuafu.rabbit.confirm.retry.maxAttempts:3}") int maxAttempts) {
+    public RabbitTemplate.ConfirmCallback confirmCallback(@Value("${kuafu.rabbit.confirm.retry.max-attempts:3}") int maxAttempts) {
         return new RabbitTemplate.ConfirmCallback() {
             @Override
             public void confirm(CorrelationData correlationData, boolean ack, String cause) {
