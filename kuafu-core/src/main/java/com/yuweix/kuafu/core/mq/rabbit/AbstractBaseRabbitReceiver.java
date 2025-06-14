@@ -74,7 +74,7 @@ public abstract class AbstractBaseRabbitReceiver<T> {
             log.info("Rabbit消费完成, Result: {}", JsonUtil.toJSONString(result));
         } catch (Exception ex) {
             log.error("Rabbit消费异常message: {}, Exception: {}, ex: ", body, ex.getMessage(), ex);
-            handleException(channel, deliveryTag, ex);
+            handleException(message, channel, ex);
         } finally {
             after(message, channel);
             MdcUtil.removeTraceId();
@@ -97,9 +97,7 @@ public abstract class AbstractBaseRabbitReceiver<T> {
 
     }
 
-    protected void handleException(Channel channel, long deliveryTag, Exception ex) {
-        throw new RuntimeException(ex);
-    }
+    abstract void handleException(Message message, Channel channel, Exception ex);
 
     public void setRabbitSerializer(RabbitSerializer rabbitSerializer) {
         this.rabbitSerializer = rabbitSerializer;

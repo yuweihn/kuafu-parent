@@ -32,6 +32,11 @@ public abstract class AbstractRetryRabbitReceiver<T> extends AbstractBaseRabbitR
         });
     }
 
+    @Override
+    protected void handleException(Message message, Channel channel, Exception ex) {
+        throw new RuntimeException(ex);
+    }
+
     public void setRetryTemplate(RetryTemplate retryTemplate) {
         this.retryTemplate = retryTemplate;
     }
