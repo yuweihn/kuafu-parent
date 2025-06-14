@@ -18,7 +18,7 @@ public abstract class AbstractRetryRabbitReceiver<T> extends AbstractBaseRabbitR
     private static final Logger log = LoggerFactory.getLogger(AbstractRetryRabbitReceiver.class);
 
     private RetryTemplate retryTemplate;
-    private static final Object LOCK = new Object();
+    private final Object LOCK = new Object();
 
 
     @RabbitHandler(isDefault = true)
