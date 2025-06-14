@@ -49,7 +49,8 @@ public class RabbitConf {
 
     @ConditionalOnMissingBean(name = "rabbitBinding")
     @Bean("rabbitBinding")
-    public Object rabbitBinding(SpringContext springContext, BindingSetting data) {
+    public Object rabbitBinding(SpringContext springContext, BindingSetting data
+            , @Value("${kuafu.rabbit.queue.message.ttl:-1}") long ttl) {
         Object obj = new Object();
         List<BindingSetting.Item> bindings = data.getBindings();
         if (bindings == null || bindings.isEmpty()) {
@@ -73,7 +74,7 @@ public class RabbitConf {
             SpringContext.register(deadLetterQueueName, deadLetterQueue, true);
             Queue queue = QueueBuilder.durable(queueName)
                     .withArgument("x-dead-letter-exchange", deadLetterExchangeName)
-//                    .withArgument("x-message-ttl", 600000)
+                    .withArgument("x-message-ttl", ttl <= 0 ? null : ttl)
                     .build();
             SpringContext.register(queue.getName(), queue, true);
 
