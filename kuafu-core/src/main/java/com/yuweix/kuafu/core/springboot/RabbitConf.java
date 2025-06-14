@@ -74,6 +74,7 @@ public class RabbitConf {
             SpringContext.register(deadLetterQueueName, deadLetterQueue, true);
             Queue queue = QueueBuilder.durable(queueName)
                     .withArgument("x-dead-letter-exchange", deadLetterExchangeName)
+                    .withArgument("x-dead-letter-routing-key", deadLetterRouteKey)
                     .withArgument("x-message-ttl", ttl <= 0 ? null : ttl)
                     .build();
             SpringContext.register(queue.getName(), queue, true);
