@@ -59,7 +59,7 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
             log.info("Rocket消费完成, Result: {}", JsonUtil.toJSONString(result));
         } catch (Exception ex) {
             log.error("Rocket消费异常message: {}, Exception: {}, ex: ", JsonUtil.toJSONString(message), ex.getMessage(), ex);
-            throw ex;
+            handleException(message, ex);
         } finally {
             after(message);
             MdcUtil.removeTraceId();
@@ -80,6 +80,10 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
 
     protected void after(Message message) {
 
+    }
+
+    protected void handleException(Message message, Exception ex) {
+        throw new RuntimeException(ex);
     }
 
     public void setRocketSerializer(RocketSerializer rocketSerializer) {
