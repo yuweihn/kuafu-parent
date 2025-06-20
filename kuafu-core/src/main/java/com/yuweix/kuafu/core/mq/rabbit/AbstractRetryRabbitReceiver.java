@@ -17,7 +17,7 @@ import org.springframework.retry.support.RetryTemplate;
 public abstract class AbstractRetryRabbitReceiver<T> extends AbstractBaseRabbitReceiver<T> {
     private static final Logger log = LoggerFactory.getLogger(AbstractRetryRabbitReceiver.class);
 
-    private RetryTemplate retryTemplate;
+    private volatile RetryTemplate retryTemplate;
     private final Object LOCK = new Object();
 
 

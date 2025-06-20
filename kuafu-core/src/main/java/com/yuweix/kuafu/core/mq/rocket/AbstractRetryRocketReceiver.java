@@ -10,7 +10,7 @@ import org.springframework.retry.support.RetryTemplate;
  * @author yuwei
  **/
 public abstract class AbstractRetryRocketReceiver<T> extends AbstractRocketReceiver<T> {
-    private RetryTemplate retryTemplate;
+    private volatile RetryTemplate retryTemplate;
     private final Object LOCK = new Object();
 
 
