@@ -21,9 +21,9 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
     private static final Logger log = LoggerFactory.getLogger(AbstractRocketReceiver.class);
 
     protected Class<T> clz;
-
     @Resource
     protected RocketSerializer rocketSerializer;
+
 
     @SuppressWarnings("unchecked")
     public AbstractRocketReceiver() {
@@ -36,6 +36,10 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
 
     @Override
     public void onMessage(Message message) {
+        handleMessage(message);
+    }
+
+    protected void handleMessage(Message message) {
         String spanId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
 
         String traceId = message.getProperty(RocketConstant.TRACE_ID_KEY);
@@ -83,7 +87,7 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
     }
 
     protected void handleException(Message message, Exception ex) {
-        throw new RuntimeException(ex);
+
     }
 
     public void setRocketSerializer(RocketSerializer rocketSerializer) {

@@ -21,7 +21,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,13 +108,13 @@ public class RabbitConf {
         return new SimpleMessageConverter();
     }
 
-    @ConditionalOnMissingBean(name = "rabbitRetryTemplate")
-    @Bean("rabbitRetryTemplate")
-    public RetryTemplate rabbitRetryTemplate(@Value("${kuafu.rabbit.retry.max-attempts:3}") int maxAttempts
+    @ConditionalOnMissingBean(RabbitRetryTemplate.class)
+    @Bean
+    public RabbitRetryTemplate rabbitRetryTemplate(@Value("${kuafu.rabbit.retry.max-attempts:3}") int maxAttempts
             , @Value("${kuafu.rabbit.retry.initial-interval:3000}") long initialInterval
             , @Value("${kuafu.rabbit.retry.max-interval:5000}") long maxInterval
             , @Value("${kuafu.rabbit.retry.multiplier:2}") double multiplier) {
-        RetryTemplate retryTemplate = new RetryTemplate();
+        RabbitRetryTemplate retryTemplate = new RabbitRetryTemplate();
         /**
          * 设置重试策略
          */
@@ -168,14 +167,14 @@ public class RabbitConf {
     @ConditionalOnMissingBean(RabbitTemplate.class)
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory
-            , @Qualifier("rabbitRetryTemplate") RetryTemplate retryTemplate
+            , RabbitRetryTemplate rabbitRetryTemplate
             , @Autowired(required = false) @Qualifier("rabbitMessageConverter") MessageConverter messageConverter
             , RabbitTemplate.ConfirmCallback confirmCallback) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         if (messageConverter != null) {
             template.setMessageConverter(messageConverter);
         }
-        template.setRetryTemplate(retryTemplate);
+        template.setRetryTemplate(rabbitRetryTemplate);
         template.setConfirmCallback(confirmCallback);
         return template;
     }
