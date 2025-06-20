@@ -47,7 +47,7 @@ public abstract class AbstractRetryRabbitReceiver<T> extends AbstractBaseRabbitR
         }
         synchronized (LOCK) {
             if (retryTemplate == null) {
-                retryTemplate = SpringContext.getBean(RetryTemplate.class);
+                retryTemplate = SpringContext.getBean(RabbitRetryTemplate.class);
             }
         }
         return retryTemplate;
