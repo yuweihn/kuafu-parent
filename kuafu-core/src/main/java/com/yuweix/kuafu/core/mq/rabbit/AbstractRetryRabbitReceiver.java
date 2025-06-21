@@ -9,6 +9,8 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.retry.support.RetryTemplate;
 
+import java.io.IOException;
+
 
 /**
  * @author yuwei
@@ -27,7 +29,7 @@ public abstract class AbstractRetryRabbitReceiver<T> extends AbstractBaseRabbitR
             super.handleMessage(message, channel);
             return null;
         }, recoveryCallback -> {
-            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+            recover(message, channel);
             return null;
         });
     }
@@ -35,6 +37,15 @@ public abstract class AbstractRetryRabbitReceiver<T> extends AbstractBaseRabbitR
     @Override
     protected void handleException(Message message, Channel channel, Exception ex) {
         throw new RuntimeException(ex);
+    }
+
+    protected void recover(Message message, Channel channel) {
+        try {
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+        } catch (IOException ioe) {
+            log.error("拒绝Rabbit消息异常, Error: {}", ioe.getMessage(), ioe);
+            throw new RuntimeException(ioe);
+        }
     }
 
     public void setRetryTemplate(RetryTemplate retryTemplate) {
