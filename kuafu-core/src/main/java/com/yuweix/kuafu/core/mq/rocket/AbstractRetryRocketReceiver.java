@@ -19,12 +19,19 @@ public abstract class AbstractRetryRocketReceiver<T> extends AbstractRocketRecei
         getRetryTemplate().execute(retryCallback -> {
             super.handleMessage(message);
             return null;
-        }, recoveryCallback -> null);
+        }, recoveryCallback -> {
+            recover(message);
+            return null;
+        });
     }
 
     @Override
     protected void handleException(Message message, Exception ex) {
         throw new RuntimeException(ex);
+    }
+
+    protected void recover(Message message) {
+
     }
 
     public void setRetryTemplate(RetryTemplate retryTemplate) {

@@ -28,6 +28,7 @@ public abstract class AbstractRabbitReceiver<T> extends AbstractBaseRabbitReceiv
             channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
         } catch (IOException ioe) {
             log.error("拒绝Rabbit消息异常, Error: {}", ioe.getMessage(), ioe);
+            throw new RuntimeException(ioe);
         }
     }
 }
