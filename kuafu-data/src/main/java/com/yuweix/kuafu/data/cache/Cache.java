@@ -9,7 +9,7 @@ public interface Cache {
 	 * @param key
 	 * @return
 	 */
-	boolean contains(String key);
+	boolean hasKey(String key);
 
 	/**
 	 * @param key

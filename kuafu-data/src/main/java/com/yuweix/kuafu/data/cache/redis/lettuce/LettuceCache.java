@@ -1,10 +1,6 @@
 package com.yuweix.kuafu.data.cache.redis.lettuce;
 
 
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
 import com.yuweix.kuafu.data.cache.AbstractCache;
 import com.yuweix.kuafu.data.cache.MessageHandler;
 import com.yuweix.kuafu.data.cache.redis.RedisCache;
@@ -21,6 +17,10 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.scripting.support.ResourceScriptSource;
+
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -83,9 +83,8 @@ public class LettuceCache extends AbstractCache implements RedisCache {
 	}
 
 	@Override
-	public boolean contains(String key) {
-		Object object = redisTemplate.opsForValue().get(key);
-		return object != null;
+	public boolean hasKey(String key) {
+		return redisTemplate.hasKey(key);
 	}
 
 	@Override
@@ -482,7 +481,7 @@ public class LettuceCache extends AbstractCache implements RedisCache {
 		if (owner == null) {
 			return false;
 		}
-		if (!contains(key)) {
+		if (!hasKey(key)) {
 			return true;
 		}
 		DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
