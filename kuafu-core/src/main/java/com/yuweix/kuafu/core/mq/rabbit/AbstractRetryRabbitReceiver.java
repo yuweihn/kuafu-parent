@@ -29,7 +29,7 @@ public abstract class AbstractRetryRabbitReceiver<T> extends AbstractBaseRabbitR
             super.handleMessage(message, channel);
             return null;
         }, recoveryCallback -> {
-            recover(message, channel);
+            recovery(message, channel);
             return null;
         });
     }
@@ -39,7 +39,7 @@ public abstract class AbstractRetryRabbitReceiver<T> extends AbstractBaseRabbitR
         throw new RuntimeException(ex);
     }
 
-    protected void recover(Message message, Channel channel) {
+    protected void recovery(Message message, Channel channel) {
         try {
             channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
         } catch (IOException ioe) {
