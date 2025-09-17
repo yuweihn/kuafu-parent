@@ -20,7 +20,7 @@ public abstract class AbstractRetryRocketReceiver<T> extends AbstractRocketRecei
             super.handleMessage(message);
             return null;
         }, recoveryCallback -> {
-            recover(message);
+            recovery(message);
             return null;
         });
     }
@@ -30,7 +30,7 @@ public abstract class AbstractRetryRocketReceiver<T> extends AbstractRocketRecei
         throw new RuntimeException(ex);
     }
 
-    protected void recover(Message message) {
+    protected void recovery(Message message) {
 
     }
 
