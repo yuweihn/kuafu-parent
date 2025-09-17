@@ -83,10 +83,9 @@ public class JedisCache extends AbstractCache implements RedisCache {
 	}
 
 	@Override
-	public boolean contains(String key) {
-		Object object = redisTemplate.opsForValue().get(key);
-		return object != null;
-	}
+	public boolean hasKey(String key) {
+        return redisTemplate.hasKey(key);
+    }
 
 	@Override
 	public void expire(String key, long timeout) {
@@ -482,7 +481,7 @@ public class JedisCache extends AbstractCache implements RedisCache {
 		if (owner == null) {
 			return false;
 		}
-		if (!contains(key)) {
+		if (!hasKey(key)) {
 			return true;
 		}
 		DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();

@@ -57,7 +57,7 @@ public class JedisClusterCache extends AbstractCache implements RedisCache {
 	}
 
 	@Override
-	public boolean contains(String key) {
+	public boolean hasKey(String key) {
 		Boolean exists = jedisCluster.exists(key);
 		return exists != null && exists;
 	}
@@ -471,7 +471,7 @@ public class JedisClusterCache extends AbstractCache implements RedisCache {
 		if (owner == null) {
 			return false;
 		}
-		if (!contains(key)) {
+		if (!hasKey(key)) {
 			return true;
 		}
 		DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
