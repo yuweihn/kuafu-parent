@@ -25,7 +25,7 @@ public abstract class StreamUtil {
 			}
 			return out.toByteArray();
 		} catch (Exception e) {
-			log.error(e.getMessage());
+            log.error("读取流内容失败, Error: {}", e.getMessage());
 			return null;
 		} finally {
 			if (out != null) {
@@ -50,7 +50,7 @@ public abstract class StreamUtil {
 			}
 			out.flush();
 		} catch (Exception e) {
-			log.error(e.getMessage());
+            log.error("写入流内容失败, Error: {}", e.getMessage());
 		} finally {
 			if (bis != null) {
 				try {

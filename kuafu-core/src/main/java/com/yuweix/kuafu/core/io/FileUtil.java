@@ -24,11 +24,13 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class FileUtil extends StreamUtil {
 	private static final Logger log = LoggerFactory.getLogger(FileUtil.class);
+
+
 	/**
 	 * 读取文件内容
 	 * @param filePath
 	 */
-	public static String getContentFromFile(String filePath) {
+	public static String getFileContent(String filePath) {
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
 		BufferedReader bf = null;
@@ -49,9 +51,9 @@ public abstract class FileUtil extends StreamUtil {
 			} while (line != null);
 			return builder.toString();
 		} catch (Exception e) {
-			log.error("", e);
-			throw new RuntimeException(e);
-		} finally {
+            log.error("读取文件内容失败, Error: {}", e.getMessage(), e);
+            throw new RuntimeException(e);
+        } finally {
 			if (bf != null) {
 				try {
 					bf.close();
@@ -117,7 +119,7 @@ public abstract class FileUtil extends StreamUtil {
 			bos = new BufferedOutputStream(fos);
 			bos.write(content);
 		} catch (Exception e) {
-			log.error("", e);
+            log.error("写入文件失败, Error: {}", e.getMessage(), e);
 			throw new RuntimeException(e);
 		} finally {
 			if (bos != null) {
