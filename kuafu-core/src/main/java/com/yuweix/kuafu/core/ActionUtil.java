@@ -10,7 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
@@ -229,6 +232,50 @@ public abstract class ActionUtil {
 			throw new RuntimeException(e);
 		}
 	}
+
+    public static void download(byte[] bytes, String fileName) {
+        if (bytes == null) {
+            log.warn("文件内容为空，bytes: {}", bytes);
+            return;
+        }
+        HttpServletResponse resp = getResponse();
+        ByteArrayInputStream bis = null;
+        BufferedInputStream bfis = null;
+        try {
+            fileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+            resp.setContentType("application/octet-stream");
+            resp.setCharacterEncoding("utf-8");
+            resp.setHeader("Content-disposition", "attachment;filename=" + fileName);
+            resp.setHeader("_filename", fileName);
+            resp.setHeader("Access-Control-Expose-Headers", "_filename");
+            bis = new ByteArrayInputStream(bytes);
+            bfis = new BufferedInputStream(bis);
+            OutputStream os = resp.getOutputStream();
+            byte[] buffer = new byte[1024];
+
+            for(int i = bfis.read(buffer); i != -1; i = bfis.read(buffer)) {
+                os.write(buffer, 0, i);
+            }
+
+            os.flush();
+        } catch (Exception e) {
+            log.error("下载文件出错[ActionUtil.download]，Error: {}", e.getMessage(), e);
+            throw new RuntimeException(e);
+        } finally {
+            if (bfis != null) {
+                try {
+                    bfis.close();
+                } catch (IOException ignored) {
+                }
+            }
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
 
 	/**
 	 * 转发到指定URL
