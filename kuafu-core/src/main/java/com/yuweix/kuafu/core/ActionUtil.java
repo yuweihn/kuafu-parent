@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -202,20 +203,20 @@ public abstract class ActionUtil {
 		return (String) request.getServletContext().getAttribute(Constant.STATIC_PATH_KEY);
 	}
 
-	public static void output(String str) {
-		output(str.getBytes(StandardCharsets.UTF_8), "text/html");
+	public static void output(byte[] bytes) {
+		output(bytes, "text/html");
 	}
 
-	public static void output(byte[] content, String contentType) {
-		output(content, contentType, null);
+	public static void output(byte[] bytes, String contentType) {
+		output(bytes, contentType, null);
 	}
 
 	/**
 	 * contentType 不含字符集
 	 */
-	public static void output(byte[] content, String contentType, Map<String, String> headers) {
-        if (content == null) {
-            log.warn("content为空");
+	public static void output(byte[] bytes, String contentType, Map<String, String> headers) {
+        if (bytes == null) {
+            log.warn("响应内容为空");
             return;
         }
         HttpServletResponse resp = getResponse();
@@ -235,7 +236,7 @@ public abstract class ActionUtil {
         }
 
         try {
-            bis = new ByteArrayInputStream(content);
+            bis = new ByteArrayInputStream(bytes);
             bfis = new BufferedInputStream(bis);
             OutputStream os = resp.getOutputStream();
             byte[] buffer = new byte[1024];
@@ -259,6 +260,21 @@ public abstract class ActionUtil {
                 } catch (IOException ignored) {
                 }
             }
+        }
+    }
+
+    public static void download(byte[] bytes, String fileName) {
+        try {
+            String attachFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Content-Disposition", "attachment;filename=" + attachFileName);
+            headers.put("_filename", attachFileName);
+            headers.put("Access-Control-Expose-Headers", "_filename");
+            output(bytes, "application/octet-stream", headers);
+        } catch (Exception e) {
+            log.error("下载文件失败，Error: {}", e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 
