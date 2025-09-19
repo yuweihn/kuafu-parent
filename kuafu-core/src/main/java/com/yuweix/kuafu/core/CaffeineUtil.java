@@ -1,7 +1,8 @@
 package com.yuweix.kuafu.core;
 
 
-import com.google.common.cache.*;
+import com.github.benmanes.caffeine.cache.*;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,29 +16,29 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author yuwei
  */
-public class GuavaUtil {
-	private static final Logger log = LoggerFactory.getLogger(GuavaUtil.class);
+public class CaffeineUtil {
+	private static final Logger log = LoggerFactory.getLogger(CaffeineUtil.class);
 
 
 	private LoadingCache<String, String> cache = null;
 
 
-	private GuavaUtil(long duration) {
+	private CaffeineUtil(long duration) {
 		try {
-            cache = CacheBuilder.newBuilder()
+            cache = Caffeine.newBuilder()
                     .expireAfterAccess(duration, TimeUnit.SECONDS)
                     .removalListener(new RemovalListener<String, String>() {
                         @Override
-                        public void onRemoval(RemovalNotification<String, String> rn) {
+                        public void onRemoval(@Nullable String key, @Nullable String value, RemovalCause removalCause) {
                             if (log.isDebugEnabled()) {
-                                log.debug("Guava缓存回收成功，键：{}, 值：{}", rn.getKey(), rn.getValue());
+                                log.debug("Caffeine缓存回收成功，键：{}, 值：{}", key, value);
                             }
                         }
                     }).build(new CacheLoader<String, String>() {
                         @Override
                         public String load(String key) {
                             if (log.isDebugEnabled()) {
-                                log.debug("Guava缓存值不存在，初始化空值，Key：{}", key);
+                                log.debug("Caffeine缓存值不存在，初始化空值，Key：{}", key);
                             }
                             return null;
                         }
@@ -50,19 +51,19 @@ public class GuavaUtil {
 	/**
 	 * @param duration   缓存时间(单位：秒)
 	 */
-	public static GuavaUtil create(long duration) {
-		return new GuavaUtil(duration);
+	public static CaffeineUtil create(long duration) {
+		return new CaffeineUtil(duration);
 	}
 
 	public boolean put(String key, String value) {
 		try {
             cache.put(key, value);
 			if (log.isDebugEnabled()) {
-				log.debug("Guava缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
+				log.debug("Caffeine缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
 			}
 			return true;
 		} catch (Exception e) {
-			log.error("Guava设置缓存值出错，Error: {}", e.getMessage(), e);
+			log.error("Caffeine设置缓存值出错，Error: {}", e.getMessage(), e);
 			return false;
 		}
 	}
@@ -71,11 +72,11 @@ public class GuavaUtil {
 		try {
             cache.putAll(map);
 			if (log.isDebugEnabled()) {
-				log.debug("Guava缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
+				log.debug("Caffeine缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
 			}
 			return true;
 		} catch (Exception e) {
-			log.error("Guava批量设置缓存值出错，Error: {}", e.getMessage(), e);
+			log.error("Caffeine批量设置缓存值出错，Error: {}", e.getMessage(), e);
 			return false;
 		}
 	}
@@ -83,12 +84,12 @@ public class GuavaUtil {
 	public String get(String key) {
 		String val = null;
 		try {
-			val = cache.get(key);
+			val = cache.get(key, t -> null);
 			if (log.isDebugEnabled()) {
-				log.debug("Guava缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
+				log.debug("Caffeine缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
 			}
 		} catch (Exception e) {
-			log.error("Guava获取缓存值出错，Error: {}", e.getMessage(), e);
+			log.error("Caffeine获取缓存值出错，Error: {}", e.getMessage(), e);
 		}
 		return val;
 	}
@@ -98,10 +99,10 @@ public class GuavaUtil {
 		try {
 			val = cache.getIfPresent(key);
 			if (log.isDebugEnabled()) {
-				log.debug("Guava缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
+				log.debug("Caffeine缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
 			}
 		} catch (Exception e) {
-			log.error("Guava获取缓存值出错，Error: {}", e.getMessage(), e);
+			log.error("Caffeine获取缓存值出错，Error: {}", e.getMessage(), e);
 		}
 		return val;
 	}
@@ -110,11 +111,11 @@ public class GuavaUtil {
 		try {
             cache.invalidate(key);
 			if (log.isDebugEnabled()) {
-				log.debug("Guava缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
+				log.debug("Caffeine缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
 			}
 			return true;
 		} catch (Exception e) {
-			log.error("Guava移除缓存出错，Error: {}", e.getMessage(), e);
+			log.error("Caffeine移除缓存出错，Error: {}", e.getMessage(), e);
 			return false;
 		}
 	}
@@ -126,11 +127,11 @@ public class GuavaUtil {
 		try {
             cache.invalidateAll(keys);
 			if (log.isDebugEnabled()) {
-				log.debug("Guava缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
+				log.debug("Caffeine缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
 			}
 			return true;
 		} catch (Exception e) {
-			log.error("Guava批量移除缓存出错，Error: {}", e.getMessage(), e);
+			log.error("Caffeine批量移除缓存出错，Error: {}", e.getMessage(), e);
 			return false;
 		}
 	}
@@ -142,11 +143,11 @@ public class GuavaUtil {
 		try {
             cache.invalidateAll();
 			if (log.isDebugEnabled()) {
-				log.debug("Guava缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
+				log.debug("Caffeine缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
 			}
 			return true;
 		} catch (Exception e) {
-			log.error("Guava清空所有缓存出错，Error: {}", e.getMessage(), e);
+			log.error("Caffeine清空所有缓存出错，Error: {}", e.getMessage(), e);
 			return false;
 		}
 	}
@@ -157,12 +158,12 @@ public class GuavaUtil {
 	public long size() {
 		long size = 0;
 		try {
-			size = cache.size();
+			size = cache.estimatedSize();
 			if (log.isDebugEnabled()) {
-				log.debug("Guava缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
+				log.debug("Caffeine缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
 			}
 		} catch (Exception e) {
-			log.error("Guava获取缓存项数量出错，Error: {}", e.getMessage(), e);
+			log.error("Caffeine获取缓存项数量出错，Error: {}", e.getMessage(), e);
 		}
 		return size;
 	}
@@ -178,10 +179,10 @@ public class GuavaUtil {
 				list.add(item.getKey());
 			}
 			if (log.isDebugEnabled()) {
-				log.debug("Guava缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
+				log.debug("Caffeine缓存命中率：{}，新值平均加载时间：{}", getHitRate(), getAverageLoadPenalty());
 			}
 		} catch (Exception e) {
-			log.error("Guava获取所有缓存项的键出错，Error: {}", e.getMessage(), e);
+			log.error("Caffeine获取所有缓存项的键出错，Error: {}", e.getMessage(), e);
 		}
 		return list;
 	}
