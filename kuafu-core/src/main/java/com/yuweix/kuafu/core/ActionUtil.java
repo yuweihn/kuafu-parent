@@ -214,52 +214,37 @@ public abstract class ActionUtil {
 	 * contentType 不含字符集
 	 */
 	public static void output(byte[] content, String contentType, Map<String, String> headers) {
-		HttpServletResponse response = getResponse();
-		assert response != null;
-		response.setContentType(contentType + "; charset=" + Constant.ENCODING_UTF_8);
-		response.setHeader("Cache-Control", "no-cache, no-store");
-		response.setHeader("Pragma", "no-cache");
-		response.setDateHeader("Expires", 0);
-
-		if (headers != null) {
-			for (Map.Entry<String, String> entry: headers.entrySet()) {
-				response.setHeader(entry.getKey(), entry.getValue());
-			}
-		}
-		try {
-			response.getOutputStream().write(content);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-    public static void download(byte[] bytes, String fileName) {
-        if (bytes == null) {
-            log.warn("文件内容为空，bytes: {}", bytes);
+        if (content == null) {
+            log.warn("content为空");
             return;
         }
         HttpServletResponse resp = getResponse();
+        assert resp != null;
         ByteArrayInputStream bis = null;
         BufferedInputStream bfis = null;
+
+        resp.setContentType(contentType + "; charset=" + Constant.ENCODING_UTF_8);
+        resp.setCharacterEncoding(Constant.ENCODING_UTF_8);
+        resp.setHeader("Cache-Control", "no-cache, no-store");
+        resp.setHeader("Pragma", "no-cache");
+        resp.setDateHeader("Expires", 0);
+        if (headers != null) {
+            for (Map.Entry<String, String> entry: headers.entrySet()) {
+                resp.setHeader(entry.getKey(), entry.getValue());
+            }
+        }
+
         try {
-            fileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
-            resp.setContentType("application/octet-stream");
-            resp.setCharacterEncoding("utf-8");
-            resp.setHeader("Content-disposition", "attachment;filename=" + fileName);
-            resp.setHeader("_filename", fileName);
-            resp.setHeader("Access-Control-Expose-Headers", "_filename");
-            bis = new ByteArrayInputStream(bytes);
+            bis = new ByteArrayInputStream(content);
             bfis = new BufferedInputStream(bis);
             OutputStream os = resp.getOutputStream();
             byte[] buffer = new byte[1024];
-
             for(int i = bfis.read(buffer); i != -1; i = bfis.read(buffer)) {
                 os.write(buffer, 0, i);
             }
-
             os.flush();
         } catch (Exception e) {
-            log.error("下载文件出错[ActionUtil.download]，Error: {}", e.getMessage(), e);
+            log.error("Http响应出错[ActionUtil.output]，Error: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         } finally {
             if (bfis != null) {
