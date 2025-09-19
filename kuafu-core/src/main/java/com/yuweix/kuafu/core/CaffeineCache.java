@@ -16,14 +16,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author yuwei
  */
-public class CaffeineUtil {
-	private static final Logger log = LoggerFactory.getLogger(CaffeineUtil.class);
+public class CaffeineCache {
+	private static final Logger log = LoggerFactory.getLogger(CaffeineCache.class);
 
 
 	private LoadingCache<String, String> cache = null;
 
 
-	private CaffeineUtil(long duration) {
+	private CaffeineCache(long duration) {
 		try {
             cache = Caffeine.newBuilder()
                     .expireAfterAccess(duration, TimeUnit.SECONDS)
@@ -51,8 +51,8 @@ public class CaffeineUtil {
 	/**
 	 * @param duration   缓存时间(单位：秒)
 	 */
-	public static CaffeineUtil create(long duration) {
-		return new CaffeineUtil(duration);
+	public static CaffeineCache create(long duration) {
+		return new CaffeineCache(duration);
 	}
 
 	public boolean put(String key, String value) {

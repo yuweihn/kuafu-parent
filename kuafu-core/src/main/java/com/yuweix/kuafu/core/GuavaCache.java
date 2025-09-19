@@ -15,14 +15,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author yuwei
  */
-public class GuavaUtil {
-    private static final Logger log = LoggerFactory.getLogger(GuavaUtil.class);
+public class GuavaCache {
+    private static final Logger log = LoggerFactory.getLogger(GuavaCache.class);
 
 
     private LoadingCache<String, String> cache = null;
 
 
-    private GuavaUtil(long duration) {
+    private GuavaCache(long duration) {
         try {
             cache = CacheBuilder.newBuilder()
                     .expireAfterAccess(duration, TimeUnit.SECONDS)
@@ -50,8 +50,8 @@ public class GuavaUtil {
     /**
      * @param duration   缓存时间(单位：秒)
      */
-    public static GuavaUtil create(long duration) {
-        return new GuavaUtil(duration);
+    public static GuavaCache create(long duration) {
+        return new GuavaCache(duration);
     }
 
     public boolean put(String key, String value) {
