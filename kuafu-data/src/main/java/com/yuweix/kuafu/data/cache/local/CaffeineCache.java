@@ -16,14 +16,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author yuwei
  */
-public class CaffeineCache {
+public class CaffeineCache implements LocalCache {
 	private static final Logger log = LoggerFactory.getLogger(CaffeineCache.class);
 
 
 	private LoadingCache<String, String> cache = null;
 
 
-	private CaffeineCache(long duration) {
+    public CaffeineCache(long duration) {
 		try {
             cache = Caffeine.newBuilder()
                     .expireAfterAccess(duration, TimeUnit.SECONDS)
@@ -123,7 +123,7 @@ public class CaffeineCache {
 	/**
 	 * 批量移除缓存
 	 */
-	public boolean removeAll(Iterable<String> keys) {
+	public boolean removeAll(List<String> keys) {
 		try {
             cache.invalidateAll(keys);
 			if (log.isDebugEnabled()) {
