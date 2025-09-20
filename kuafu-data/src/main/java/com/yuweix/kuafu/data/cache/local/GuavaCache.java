@@ -54,6 +54,7 @@ public class GuavaCache implements LocalCache {
         return new GuavaCache(duration);
     }
 
+    @Override
     public boolean put(String key, String value) {
         try {
             cache.put(key, value);
@@ -67,7 +68,8 @@ public class GuavaCache implements LocalCache {
         }
     }
 
-    public boolean putAll(Map<String, String> map) {
+    @Override
+    public boolean put(Map<String, String> map) {
         try {
             cache.putAll(map);
             if (log.isDebugEnabled()) {
@@ -80,6 +82,7 @@ public class GuavaCache implements LocalCache {
         }
     }
 
+    @Override
     public String get(String key) {
         String val = null;
         try {
@@ -93,6 +96,7 @@ public class GuavaCache implements LocalCache {
         return val;
     }
 
+    @Override
     public String getIfPresent(String key) {
         String val = null;
         try {
@@ -106,6 +110,7 @@ public class GuavaCache implements LocalCache {
         return val;
     }
 
+    @Override
     public boolean remove(String key) {
         try {
             cache.invalidate(key);
@@ -122,7 +127,8 @@ public class GuavaCache implements LocalCache {
     /**
      * 批量移除缓存
      */
-    public boolean removeAll(List<String> keys) {
+    @Override
+    public boolean remove(List<String> keys) {
         try {
             cache.invalidateAll(keys);
             if (log.isDebugEnabled()) {
@@ -138,6 +144,7 @@ public class GuavaCache implements LocalCache {
     /**
      * 清空所有缓存
      */
+    @Override
     public boolean removeAll() {
         try {
             cache.invalidateAll();
@@ -154,6 +161,7 @@ public class GuavaCache implements LocalCache {
     /**
      * 获取缓存项数量
      */
+    @Override
     public long size() {
         long size = 0;
         try {
@@ -170,6 +178,7 @@ public class GuavaCache implements LocalCache {
     /**
      * 获取所有缓存项的键
      */
+    @Override
     public List<String> keys() {
         List<String> list = new ArrayList<>();
         try {
