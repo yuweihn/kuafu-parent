@@ -71,7 +71,7 @@ public abstract class AbstractCache implements Cache {
 	}
 
 	private static List<String> split(String value, int maxLength) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (maxLength <= 0 || value.length() <= maxLength) {
 			list.add(value);
 			return list;
