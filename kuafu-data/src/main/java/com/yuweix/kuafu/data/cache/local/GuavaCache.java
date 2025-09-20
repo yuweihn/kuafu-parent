@@ -15,14 +15,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author yuwei
  */
-public class GuavaCache {
+public class GuavaCache implements LocalCache {
 	private static final Logger log = LoggerFactory.getLogger(GuavaCache.class);
 
 
 	private LoadingCache<String, String> cache = null;
 
 
-	private GuavaCache(long duration) {
+    public GuavaCache(long duration) {
 		try {
             cache = CacheBuilder.newBuilder()
                     .expireAfterAccess(duration, TimeUnit.SECONDS)
@@ -122,7 +122,7 @@ public class GuavaCache {
 	/**
 	 * 批量移除缓存
 	 */
-	public boolean removeAll(Iterable<String> keys) {
+	public boolean removeAll(List<String> keys) {
 		try {
             cache.invalidateAll(keys);
 			if (log.isDebugEnabled()) {
