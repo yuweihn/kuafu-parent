@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.core;
+package com.yuweix.kuafu.data.cache.local;
 
 
 import com.google.common.cache.*;
