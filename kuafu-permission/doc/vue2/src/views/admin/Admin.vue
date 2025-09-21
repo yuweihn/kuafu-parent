@@ -32,9 +32,6 @@
 						<el-form-item label="性别：">
 							<span>{{scope.row.genderName}}</span>
 						</el-form-item>
-						<el-form-item label="最近登录时间：">
-							<span>{{scope.row.lastLoginTime}}</span>
-						</el-form-item>
 						<el-form-item label="头像：">
 							<el-image :src="scope.row.avatar" style="width: 80px; height: 80px"
 								:preview-src-list="preview.showList" @click="showBigPict(scope.row.avatar)"/>
@@ -59,7 +56,6 @@
 			<el-table-column prop="accountNo" label="用户名" width="130" :show-overflow-tooltip="true" />
 			<el-table-column prop="realName" label="真实姓名" width="130" :show-overflow-tooltip="true" />
 			<el-table-column prop="genderName" label="性别" width="80" />
-			<el-table-column prop="lastLoginTime" label="最近登录时间" width="145" />
 			<el-table-column prop="createTime" label="创建时间" width="145" />
 			<!--
 			<el-table-column prop="updater" label="更新人" width="90" :formatter="formatUpdater" />
