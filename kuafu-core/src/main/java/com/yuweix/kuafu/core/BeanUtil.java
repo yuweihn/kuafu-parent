@@ -436,4 +436,22 @@ public abstract class BeanUtil {
 			throw new RuntimeException(e);
 		}
 	}
+
+    /**
+     * 取嵌套Map的值
+     */
+    public static Object getNestedMapValue(Map<String, Object> root, String[] pathList) {
+        Object current = root;
+        for (String path: pathList) {
+            if (!(current instanceof Map)) {
+                return null;
+            }
+            Map<String, Object> curMap = (Map<String, Object>) current;
+            current = curMap.get(path);
+            if (current == null) {
+                return null;
+            }
+        }
+        return current;
+    }
 }
