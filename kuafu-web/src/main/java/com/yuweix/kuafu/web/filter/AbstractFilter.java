@@ -114,9 +114,9 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		long startTimeMillis = System.currentTimeMillis();
 		R req = wrap(adjustMethod(request));
 		T resp = wrap(response);
-		beforeFilter(req, resp);
 		Map<String, Object> logInfoMap = new LinkedHashMap<>();
 		try {
+            beforeFilter(req, resp);
 			setCharacterEncoding(req, resp);
 			setContextPath(req);
 			setAccessControl(req, resp);
