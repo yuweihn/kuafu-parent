@@ -17,6 +17,7 @@ public class SensitiveUtil {
     public static Object shield(Object object, String fieldName) {
         try {
             Field field = object.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
             Object val = field.get(object);
             return shield(object, fieldName, val);
         } catch (Exception ex) {
