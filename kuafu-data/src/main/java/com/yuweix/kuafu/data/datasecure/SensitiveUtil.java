@@ -14,12 +14,24 @@ public class SensitiveUtil {
     private static final Logger log = LoggerFactory.getLogger(SensitiveUtil.class);
 
 
-    public static<T> T shield(Object object, String fieldName) {
+    private static Field getField(Object object, String fieldName) {
+        Field field = null;
         try {
-            Field field = object.getClass().getDeclaredField(fieldName);
+            field = object.getClass().getDeclaredField(fieldName);
+        } catch (NoSuchFieldException ignored) {
+        }
+        return field;
+    }
+
+    public static<T> T shield(Object object, String fieldName) {
+        Field field = getField(object, fieldName);
+        if (field == null) {
+            return null;
+        }
+        try {
             field.setAccessible(true);
             T val = (T) field.get(object);
-            return shield(object, fieldName, val);
+            return shield(field, val);
         } catch (Exception ex) {
             log.error("脱敏失败，Error: {}", ex.getMessage(), ex);
             return null;
@@ -27,20 +39,22 @@ public class SensitiveUtil {
     }
 
     public static<T> T shield(Object object, String fieldName, T val) {
-        try {
-            if (!(val instanceof String) || "".equals(val)) {
-                return val;
-            }
-            Field field = object.getClass().getDeclaredField(fieldName);
-            Sensitive sensitive;
-            if (String.class != field.getType() || (sensitive = field.getAnnotation(Sensitive.class)) == null) {
-                return val;
-            }
-            return (T) replace((String) val, sensitive.regex(), sensitive.replacement());
-        } catch (Exception ex) {
-            log.error("脱敏失败，Error: {}", ex.getMessage(), ex);
-            return null;
+        Field field = getField(object, fieldName);
+        return shield(field, val);
+    }
+
+    private static<T> T shield(Field field, T val) {
+        if (field == null || val == null) {
+            return val;
         }
+        if (!(val instanceof String) || "".equals(val)) {
+            return val;
+        }
+        Sensitive sensitive;
+        if (String.class != field.getType() || (sensitive = field.getAnnotation(Sensitive.class)) == null) {
+            return val;
+        }
+        return (T) replace((String) val, sensitive.regex(), sensitive.replacement());
     }
 
     private static String replace(String val, String regex, String replacement) {
