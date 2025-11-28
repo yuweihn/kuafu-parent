@@ -21,7 +21,7 @@ public class SensitiveUtil {
             T val = (T) field.get(object);
             return shield(object, fieldName, val);
         } catch (Exception ex) {
-            log.error("获取字段出错，Error: {}", ex.getMessage(), ex);
+            log.error("脱敏失败，Error: {}", ex.getMessage(), ex);
             return null;
         }
     }
@@ -38,7 +38,7 @@ public class SensitiveUtil {
             }
             return (T) replace((String) val, sensitive.regex(), sensitive.replacement());
         } catch (Exception ex) {
-            log.error("获取字段出错，Error: {}", ex.getMessage(), ex);
+            log.error("脱敏失败，Error: {}", ex.getMessage(), ex);
             return null;
         }
     }
