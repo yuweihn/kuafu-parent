@@ -32,14 +32,11 @@ public class SensitiveUtil {
                 return val;
             }
             Field field = object.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
             Sensitive sensitive;
             if (String.class != field.getType() || (sensitive = field.getAnnotation(Sensitive.class)) == null) {
                 return val;
             }
-            String shieldVal = replace((String) val, sensitive.regex(), sensitive.replacement());
-            field.set(object, shieldVal);
-            return shieldVal;
+            return replace((String) val, sensitive.regex(), sensitive.replacement());
         } catch (Exception ex) {
             log.error("获取字段出错，Error: {}", ex.getMessage(), ex);
             return null;
