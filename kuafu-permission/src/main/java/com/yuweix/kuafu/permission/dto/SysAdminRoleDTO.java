@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * @author yuwei
  */
-public class SysAdminRoleDto implements Serializable {
+public class SysAdminRoleDTO implements Serializable {
 	/**
 	 *
 	 */

@@ -9,7 +9,7 @@ import com.yuweix.kuafu.dao.mybatis.where.Criteria;
 import com.yuweix.kuafu.dao.mybatis.where.Operator;
 import com.yuweix.kuafu.permission.dao.SysAdminDao;
 import com.yuweix.kuafu.permission.dao.SysAdminRoleRelDao;
-import com.yuweix.kuafu.permission.dto.AdminDto;
+import com.yuweix.kuafu.permission.dto.AdminDTO;
 import com.yuweix.kuafu.permission.enums.EnumGender;
 import com.yuweix.kuafu.permission.model.SysAdmin;
 import com.yuweix.kuafu.sequence.base.Sequence;
@@ -70,15 +70,15 @@ public class SysAdminServiceImpl implements SysAdminService {
 	}
 	
 	@Override
-	public AdminDto findAdminById(long id) {
+	public AdminDTO findAdminById(long id) {
 		SysAdmin admin = sysAdminDao.get(id);
 		return toAdminDto(admin);
 	}
-	private AdminDto toAdminDto(SysAdmin admin) {
+	private AdminDTO toAdminDto(SysAdmin admin) {
 		if (admin == null) {
 			return null;
 		}
-		AdminDto dto = new AdminDto();
+		AdminDTO dto = new AdminDTO();
 		dto.setId(admin.getId());
 		dto.setAccountNo(admin.getAccountNo());
 		dto.setPassword(admin.getPassword());
@@ -96,7 +96,7 @@ public class SysAdminServiceImpl implements SysAdminService {
 	}
 	
 	@Override
-	public Response<Boolean, AdminDto> login(String accountNo, String password) {
+	public Response<Boolean, AdminDTO> login(String accountNo, String password) {
 		SysAdmin admin = sysAdminDao.findAdminByAccountNo(accountNo);
 		if (admin == null) {
 			return new Response<>(false, "账号不存在[" + accountNo + "]");
@@ -170,7 +170,7 @@ public class SysAdminServiceImpl implements SysAdminService {
 	}
 
 	@Override
-	public List<AdminDto> queryAdminList(String keywords, int pageNo, int pageSize) {
+	public List<AdminDTO> queryAdminList(String keywords, int pageNo, int pageSize) {
 		Criteria criteria = null;
 		if (keywords != null && !"".equals(keywords.trim())) {
 			criteria = Criteria.of("account_no", Operator.like, "%" + keywords.trim() + "%");
@@ -180,7 +180,7 @@ public class SysAdminServiceImpl implements SysAdminService {
 		return list == null || list.size() <= 0
 				? new ArrayList<>()
 				: list.stream().map(admin -> {
-					AdminDto dto = this.toAdminDto(admin);
+					AdminDTO dto = this.toAdminDto(admin);
 					dto.setPassword(null);
 					return dto;
 				}).collect(Collectors.toList());

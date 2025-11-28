@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * @author yuwei
  */
-public class AdminRoleDto implements Serializable {
+public class AdminRoleDTO implements Serializable {
 	/**
 	 *
 	 */

@@ -6,8 +6,8 @@ import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.permission.annotations.Permission;
 import com.yuweix.kuafu.permission.common.PermissionUtil;
 import com.yuweix.kuafu.permission.common.Properties;
-import com.yuweix.kuafu.permission.dto.AdminDto;
-import com.yuweix.kuafu.permission.dto.PermissionDto;
+import com.yuweix.kuafu.permission.dto.AdminDTO;
+import com.yuweix.kuafu.permission.dto.PermissionDTO;
 import com.yuweix.kuafu.permission.service.SysAdminService;
 import com.yuweix.kuafu.permission.service.SysPermissionService;
 import org.apache.http.entity.ContentType;
@@ -54,10 +54,10 @@ public class PermissionCheckInterceptor implements HandlerInterceptor {
 			return true;
 		}
 
-		AdminDto adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = PermissionUtil.getLoginAccount();
 		boolean ok = false;
 		for (String permNo : permNos) {
-			PermissionDto permissionDto = sysPermissionService.queryPermissionByNo(permNo);
+			PermissionDTO permissionDto = sysPermissionService.queryPermissionByNo(permNo);
 			if (permissionDto == null) {
 				continue;
 			}

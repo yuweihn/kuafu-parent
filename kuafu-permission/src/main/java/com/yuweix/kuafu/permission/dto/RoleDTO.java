@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * @author yuwei
  */
-public class RoleDto implements Serializable {
+public class RoleDTO implements Serializable {
 	/**
 	 * 
 	 */

@@ -7,7 +7,7 @@ import com.yuweix.kuafu.dao.mybatis.where.Operator;
 import com.yuweix.kuafu.permission.dao.SysAdminRoleRelDao;
 import com.yuweix.kuafu.permission.dao.SysRoleDao;
 import com.yuweix.kuafu.permission.dao.SysRolePermissionRelDao;
-import com.yuweix.kuafu.permission.dto.RoleDto;
+import com.yuweix.kuafu.permission.dto.RoleDTO;
 import com.yuweix.kuafu.permission.model.SysRole;
 import com.yuweix.kuafu.sequence.base.Sequence;
 import org.springframework.stereotype.Service;
@@ -37,17 +37,17 @@ public class SysRoleServiceImpl implements SysRoleService {
 
 
 	@Override
-	public List<RoleDto> queryAllRoleList() {
+	public List<RoleDTO> queryAllRoleList() {
 		List<SysRole> roleList = sysRoleDao.findList(null, null);
 		return roleList == null || roleList.size() <= 0
 				? new ArrayList<>()
 				: roleList.stream().map(this::toRoleDto).collect(Collectors.toList());
 	}
-	private RoleDto toRoleDto(SysRole role) {
+	private RoleDTO toRoleDto(SysRole role) {
 		if (role == null) {
 			return null;
 		}
-		RoleDto dto = new RoleDto();
+		RoleDTO dto = new RoleDTO();
 		dto.setId(role.getId());
 		dto.setRoleNo(role.getRoleNo());
 		dto.setRoleName(role.getRoleName());
@@ -90,7 +90,7 @@ public class SysRoleServiceImpl implements SysRoleService {
 	}
 
 	@Override
-	public List<RoleDto> queryRoleList(String keywords, int pageNo, int pageSize) {
+	public List<RoleDTO> queryRoleList(String keywords, int pageNo, int pageSize) {
 		Criteria criteria = Criteria.of("1", Operator.eq, 1);
 		if (keywords != null && !"".equals(keywords.trim())) {
 			criteria = Criteria.of("role_no", Operator.like, "%" + keywords + "%")
@@ -109,7 +109,7 @@ public class SysRoleServiceImpl implements SysRoleService {
 	}
 
 	@Override
-	public RoleDto queryRoleById(long roleId) {
+	public RoleDTO queryRoleById(long roleId) {
 		SysRole role = sysRoleDao.get(roleId);
 		return toRoleDto(role);
 	}

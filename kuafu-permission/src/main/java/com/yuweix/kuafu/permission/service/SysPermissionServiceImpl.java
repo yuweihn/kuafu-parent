@@ -38,20 +38,20 @@ public class SysPermissionServiceImpl implements SysPermissionService {
 
 
 	@Override
-	public List<PermissionDto> queryPermissionListIncludeChildren(List<Long> idList, String keywords, List<String> permTypeList
+	public List<PermissionDTO> queryPermissionListIncludeChildren(List<Long> idList, String keywords, List<String> permTypeList
 			, Boolean visible) {
 		List<SysPermission> permissionList = permissionDao.queryPermissionList(idList, null, keywords, permTypeList, visible
 				, null, null);
-		List<PermissionDto> dtoList = permissionList == null || permissionList.size() <= 0
+		List<PermissionDTO> dtoList = permissionList == null || permissionList.size() <= 0
 				? new ArrayList<>()
 				: permissionList.stream().map(this::toPermissionDto).collect(Collectors.toList());
 		return buildPermTree(dtoList);
 	}
-	private PermissionDto toPermissionDto(SysPermission permission) {
+	private PermissionDTO toPermissionDto(SysPermission permission) {
 		if (permission == null) {
 			return null;
 		}
-		PermissionDto dto = new PermissionDto();
+		PermissionDTO dto = new PermissionDTO();
 		dto.setId(permission.getId());
 		dto.setPermNo(permission.getPermNo());
 		dto.setTitle(permission.getTitle());
@@ -74,7 +74,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
 	/**
 	 * 构建树状结构
 	 */
-	private <T extends AbstractTreeDto<T>>List<T> buildPermTree(List<T> dtoList) {
+	private <T extends AbstractTreeDTO<T>>List<T> buildPermTree(List<T> dtoList) {
 		if (dtoList == null || dtoList.size() <= 0) {
 			return dtoList;
 		}
@@ -94,7 +94,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
 	}
 
 	@Override
-	public List<PermissionMenuTreeDto> getMenuTreeListByAdminId(long adminId) {
+	public List<PermissionMenuTreeDTO> getMenuTreeListByAdminId(long adminId) {
 		List<Long> permIdList = sysAdminDao.queryPermissionIdListByAdminId(adminId);
 		if (permIdList == null) {
 			permIdList = new ArrayList<>();
@@ -105,19 +105,19 @@ public class SysPermissionServiceImpl implements SysPermissionService {
 
 		List<SysPermission> permissionList = permissionDao.queryPermissionList(permIdList, null, null
 				, permTypeList, null, null, null);
-		List<PermissionMenuTreeDto> dtoList = permissionList == null || permissionList.size() <= 0
+		List<PermissionMenuTreeDTO> dtoList = permissionList == null || permissionList.size() <= 0
 				? new ArrayList<>()
 				: permissionList.stream().map(this::toPermissionMenuTreeDto).collect(Collectors.toList());
 		return buildPermTree(dtoList);
 	}
-	private PermissionMenuTreeDto toPermissionMenuTreeDto(SysPermission permission) {
+	private PermissionMenuTreeDTO toPermissionMenuTreeDto(SysPermission permission) {
 		if (permission == null) {
 			return null;
 		}
-		PermissionMenuTreeDto.Meta meta = new PermissionMenuTreeDto.Meta();
+		PermissionMenuTreeDTO.Meta meta = new PermissionMenuTreeDTO.Meta();
 		meta.setTitle(permission.getTitle());
 		meta.setIcon(permission.getIcon());
-		PermissionMenuTreeDto dto = new PermissionMenuTreeDto();
+		PermissionMenuTreeDTO dto = new PermissionMenuTreeDTO();
 		dto.setId(permission.getId());
 		dto.setPath(permission.getPath() == null ? "" : permission.getPath());
 		dto.setName(permission.getPermNo() == null ? "" : permission.getPermNo());
@@ -149,7 +149,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
 	}
 
 	@Override
-	public PermissionDto queryPermissionById(long permissionId) {
+	public PermissionDTO queryPermissionById(long permissionId) {
 		SysPermission permission = permissionDao.get(permissionId);
 		return toPermissionDto(permission);
 	}
@@ -237,52 +237,52 @@ public class SysPermissionServiceImpl implements SysPermissionService {
 		if (idList == null || idList.size() <= 0) {
 			return;
 		}
-		List<PermissionIdDto> idDtoList = new ArrayList<>();
+		List<PermissionIdDTO> idDtoList = new ArrayList<>();
 		for (Long id: idList) {
 			SysPermission perm = permissionDao.get(id);
 			if (perm == null) {
 				continue;
 			}
-			PermissionIdDto idDto = new PermissionIdDto();
+			PermissionIdDTO idDto = new PermissionIdDTO();
 			idDto.setId(perm.getId());
 			idDto.setParentId(perm.getParentId());
 			idDtoList.add(idDto);
 		}
 		deletePermissionTreeList(buildPermTree(idDtoList));
 	}
-	private void deletePermissionTreeList(List<PermissionIdDto> list) {
+	private void deletePermissionTreeList(List<PermissionIdDTO> list) {
 		if (list == null || list.size() <= 0) {
 			return;
 		}
-		for (PermissionIdDto dto: list) {
+		for (PermissionIdDTO dto: list) {
 			deletePermissionTreeList(dto.getChildren());
 			deletePermission(dto.getId());
 		}
 	}
 
 	@Override
-	public PermissionDto queryPermissionByNo(String permNo) {
+	public PermissionDTO queryPermissionByNo(String permNo) {
 		SysPermission permission = permissionDao.queryPermissionByNo(permNo);
 		return toPermissionDto(permission);
 	}
 
 	@Override
-	public PermissionExportDto getPermissionExportDto() {
+	public PermissionExportDTO getPermissionExportDto() {
 		List<SysPermission> list = permissionDao.queryPermissionList(null, null, null, null, null
 				, null, null);
-		List<PermissionDto> dtoList = list == null || list.size() <= 0
+		List<PermissionDTO> dtoList = list == null || list.size() <= 0
 				? new ArrayList<>()
 				: list.stream().map(this::toPermissionDto).collect(Collectors.toList());
-		return new PermissionExportDto(buildPermTree(dtoList));
+		return new PermissionExportDTO(buildPermTree(dtoList));
 	}
 
 
 	@Override
-	public void doImport(Long parentId, List<PermissionDto> list) {
+	public void doImport(Long parentId, List<PermissionDTO> list) {
 		if (list == null || list.size() <= 0) {
 			return;
 		}
-		for (PermissionDto dto: list) {
+		for (PermissionDTO dto: list) {
 			Long newParentId = doImport(dto.getPermNo(), dto.getTitle(), parentId, dto.getOrderNum(), dto.getPath()
 					, dto.getComponent(), dto.getIfExt(), dto.getPermType(), dto.getVisible(), dto.getIcon(), dto.getDescr()
 					, dto.getCreator(), dto.getCreateTime(), dto.getModifier(), dto.getModifyTime());

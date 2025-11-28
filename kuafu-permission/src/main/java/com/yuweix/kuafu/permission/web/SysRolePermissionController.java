@@ -5,9 +5,9 @@ import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.permission.annotations.Permission;
 import com.yuweix.kuafu.permission.common.PermissionUtil;
 import com.yuweix.kuafu.permission.common.Properties;
-import com.yuweix.kuafu.permission.dto.AdminDto;
-import com.yuweix.kuafu.permission.dto.PermissionDto;
-import com.yuweix.kuafu.permission.dto.RolePermissionDto;
+import com.yuweix.kuafu.permission.dto.AdminDTO;
+import com.yuweix.kuafu.permission.dto.PermissionDTO;
+import com.yuweix.kuafu.permission.dto.RolePermissionDTO;
 import com.yuweix.kuafu.permission.service.SysPermissionService;
 import com.yuweix.kuafu.permission.service.SysRolePermissionService;
 import org.springframework.stereotype.Controller;
@@ -43,12 +43,12 @@ public class SysRolePermissionController {
 	@Permission(value = "sys.role.permission.list")
 	@RequestMapping(value = "/sys/role/permission/list", method = GET)
 	@ResponseBody
-	public Response<String, RolePermissionDto> queryPermissionListByRoleId(@RequestParam(value = "roleId", required = true) long roleId) {
-		List<PermissionDto> permissionList = sysPermissionService.queryPermissionListIncludeChildren(null
+	public Response<String, RolePermissionDTO> queryPermissionListByRoleId(@RequestParam(value = "roleId", required = true) long roleId) {
+		List<PermissionDTO> permissionList = sysPermissionService.queryPermissionListIncludeChildren(null
 				, null, null, null);
 		List<Long> permIdList = sysRolePermissionService.queryPermissionIdListByRoleId(roleId);
 
-		RolePermissionDto dto = new RolePermissionDto();
+		RolePermissionDTO dto = new RolePermissionDTO();
 		dto.setPermList(permissionList);
 		dto.setCheckedPermIdList(permIdList);
 		return new Response<>(properties.getSuccessCode(), "ok", dto);
@@ -68,7 +68,7 @@ public class SysRolePermissionController {
 				permIdList.add(permId);
 			}
 		}
-		AdminDto adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = PermissionUtil.getLoginAccount();
 		sysRolePermissionService.saveRolePermission(roleId, permIdList, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}

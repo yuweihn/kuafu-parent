@@ -7,8 +7,8 @@ import com.yuweix.kuafu.dao.mybatis.where.Criteria;
 import com.yuweix.kuafu.dao.mybatis.where.Operator;
 import com.yuweix.kuafu.permission.dao.SysAdminRoleRelDao;
 import com.yuweix.kuafu.permission.dao.SysRoleDao;
-import com.yuweix.kuafu.permission.dto.AdminRoleDto;
-import com.yuweix.kuafu.permission.dto.SysAdminRoleDto;
+import com.yuweix.kuafu.permission.dto.AdminRoleDTO;
+import com.yuweix.kuafu.permission.dto.SysAdminRoleDTO;
 import com.yuweix.kuafu.permission.model.SysAdminRoleRel;
 import com.yuweix.kuafu.permission.model.SysRole;
 import com.yuweix.kuafu.sequence.base.Sequence;
@@ -41,16 +41,16 @@ public class SysAdminRoleServiceImpl implements SysAdminRoleService {
 	}
 
 	@Override
-	public List<AdminRoleDto> queryAdminRoleListByAdminId(long adminId, String keywords, int pageNo, int pageSize) {
-		List<AdminRoleDto> dtoList = new ArrayList<>();
-		List<SysAdminRoleDto> arDtoList = sysAdminRoleRelDao.queryAdminRoleListByAdminId(adminId, null, keywords, pageNo, pageSize);
+	public List<AdminRoleDTO> queryAdminRoleListByAdminId(long adminId, String keywords, int pageNo, int pageSize) {
+		List<AdminRoleDTO> dtoList = new ArrayList<>();
+		List<SysAdminRoleDTO> arDtoList = sysAdminRoleRelDao.queryAdminRoleListByAdminId(adminId, null, keywords, pageNo, pageSize);
 
 		if (CollectionUtils.isEmpty(arDtoList)) {
 			return dtoList;
 		}
 
-		for (SysAdminRoleDto arDto: arDtoList) {
-			AdminRoleDto dto = new AdminRoleDto();
+		for (SysAdminRoleDTO arDto: arDtoList) {
+			AdminRoleDTO dto = new AdminRoleDTO();
 			dto.setId(arDto.getId());
 			dto.setAdminId(arDto.getAdminId());
 			dto.setRoleId(arDto.getRoleId());
@@ -127,14 +127,14 @@ public class SysAdminRoleServiceImpl implements SysAdminRoleService {
 	}
 
 	@Override
-	public AdminRoleDto queryAdminRoleById(long id) {
+	public AdminRoleDTO queryAdminRoleById(long id) {
 		SysAdminRoleRel rel = sysAdminRoleRelDao.get(id);
 		if (rel == null) {
 			return null;
 		}
 		SysRole role = sysRoleDao.get(rel.getRoleId());
 
-		AdminRoleDto dto = new AdminRoleDto();
+		AdminRoleDTO dto = new AdminRoleDTO();
 		dto.setId(rel.getId());
 		dto.setAdminId(rel.getAdminId());
 		dto.setRoleId(rel.getRoleId());

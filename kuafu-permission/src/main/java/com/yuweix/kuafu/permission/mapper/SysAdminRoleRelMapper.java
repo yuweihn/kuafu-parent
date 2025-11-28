@@ -4,7 +4,7 @@ package com.yuweix.kuafu.permission.mapper;
 import com.yuweix.kuafu.dao.PersistUtil;
 import com.yuweix.kuafu.dao.mybatis.BaseMapper;
 import com.yuweix.kuafu.dao.mybatis.provider.AbstractProvider;
-import com.yuweix.kuafu.permission.dto.SysAdminRoleDto;
+import com.yuweix.kuafu.permission.dto.SysAdminRoleDTO;
 import com.yuweix.kuafu.permission.model.SysAdmin;
 import com.yuweix.kuafu.permission.model.SysAdminRoleRel;
 import com.yuweix.kuafu.permission.model.SysRole;
@@ -29,7 +29,7 @@ public interface SysAdminRoleRelMapper extends BaseMapper<SysAdminRoleRel, Long>
 	int queryAdminRoleCountByAdminId(@Param("adminId")Long adminId, @Param("roleId")Long roleId, @Param("keywords")String keywords);
 
 	@SelectProvider(type = Provider.class, method = "queryAdminRoleListByAdminId")
-	List<SysAdminRoleDto> queryAdminRoleListByAdminId(@Param("adminId")Long adminId, @Param("roleId")Long roleId
+	List<SysAdminRoleDTO> queryAdminRoleListByAdminId(@Param("adminId")Long adminId, @Param("roleId")Long roleId
 			, @Param("keywords")String keywords, @Param("pageNo")Integer pageNo, @Param("pageSize")Integer pageSize);
 
 	class Provider extends AbstractProvider {

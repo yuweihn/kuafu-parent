@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author yuwei
  */
-public class PermissionDto extends AbstractTreeDto<PermissionDto> implements Serializable {
+public class PermissionDTO extends AbstractTreeDTO<PermissionDTO> implements Serializable {
 	/**
 	 *
 	 */
@@ -29,7 +29,7 @@ public class PermissionDto extends AbstractTreeDto<PermissionDto> implements Ser
 	private String icon;
 	private String descr;
 
-	private List<PermissionDto> children = new ArrayList<>();
+	private List<PermissionDTO> children = new ArrayList<>();
 
 	private String creator;
 	private String createTime;
@@ -37,7 +37,7 @@ public class PermissionDto extends AbstractTreeDto<PermissionDto> implements Ser
 	private String modifyTime;
 
 
-	public PermissionDto addChild(PermissionDto child) {
+	public PermissionDTO addChild(PermissionDTO child) {
 		children.add(child);
 		return this;
 	}
@@ -133,11 +133,11 @@ public class PermissionDto extends AbstractTreeDto<PermissionDto> implements Ser
 		this.visible = visible;
 	}
 
-	public List<PermissionDto> getChildren() {
+	public List<PermissionDTO> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<PermissionDto> children) {
+	public void setChildren(List<PermissionDTO> children) {
 		this.children = children;
 	}
 

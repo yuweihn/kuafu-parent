@@ -8,19 +8,19 @@ import java.util.List;
 /**
  * @author yuwei
  */
-public class RolePermissionDto implements Serializable {
+public class RolePermissionDTO implements Serializable {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private List<PermissionDto> permList;
+	private List<PermissionDTO> permList;
 	private List<Long> checkedPermIdList;
 
-	public List<PermissionDto> getPermList() {
+	public List<PermissionDTO> getPermList() {
 		return permList;
 	}
 
-	public void setPermList(List<PermissionDto> permList) {
+	public void setPermList(List<PermissionDTO> permList) {
 		this.permList = permList;
 	}
 

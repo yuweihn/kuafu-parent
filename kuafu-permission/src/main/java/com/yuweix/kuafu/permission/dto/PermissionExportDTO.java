@@ -11,20 +11,20 @@ import java.util.List;
 /**
  * @author yuwei
  */
-public class PermissionExportDto implements Serializable {
+public class PermissionExportDTO implements Serializable {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private static final String SALT = "Rewfe5..;;43po6baasfpcxr034;;',";
 
-	private List<PermissionDto> list;
+	private List<PermissionDTO> list;
 	private String sign;
 
-	public PermissionExportDto() {
+	public PermissionExportDTO() {
 
 	}
-	public PermissionExportDto(List<PermissionDto> list) {
+	public PermissionExportDTO(List<PermissionDTO> list) {
 		this.setList(list);
 	}
 
@@ -37,11 +37,11 @@ public class PermissionExportDto implements Serializable {
 		return SecurityUtil.getMd5(JsonUtil.toJSONString(list) + SALT);
 	}
 
-	public List<PermissionDto> getList() {
+	public List<PermissionDTO> getList() {
 		return list;
 	}
 
-	public void setList(List<PermissionDto> list) {
+	public void setList(List<PermissionDTO> list) {
 		this.list = list;
 		this.sign = this.toSgin();
 	}

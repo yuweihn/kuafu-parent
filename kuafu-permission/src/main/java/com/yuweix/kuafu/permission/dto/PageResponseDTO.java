@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author yuwei
  */
-public class PageResponseDto<T> implements Serializable {
+public class PageResponseDTO<T> implements Serializable {
 	/**
 	 * 
 	 */
