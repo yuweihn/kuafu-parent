@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.permission.service;
 
 
-import com.yuweix.kuafu.permission.dto.RoleDto;
+import com.yuweix.kuafu.permission.dto.RoleDTO;
 import java.util.List;
 
 
@@ -13,7 +13,7 @@ public interface SysRoleService {
 	 * 查询所有角色
 	 * @return
 	 */
-	List<RoleDto> queryAllRoleList();
+	List<RoleDTO> queryAllRoleList();
 
 	/**
 	 * 添加角色
@@ -28,10 +28,10 @@ public interface SysRoleService {
 	/**
 	 * 查询角色列表
 	 */
-	List<RoleDto> queryRoleList(String keywords, int pageNo, int pageSize);
+	List<RoleDTO> queryRoleList(String keywords, int pageNo, int pageSize);
 
 	Long queryIdByRoleNo(String roleNo);
-	RoleDto queryRoleById(long roleId);
+	RoleDTO queryRoleById(long roleId);
 	void updateRole(long id, String roleNo, String roleName, String modifier);
 	void deleteRole(long roleId);
 }

@@ -7,9 +7,9 @@ import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.permission.annotations.Permission;
 import com.yuweix.kuafu.permission.common.PermissionUtil;
 import com.yuweix.kuafu.permission.common.Properties;
-import com.yuweix.kuafu.permission.dto.AdminDto;
-import com.yuweix.kuafu.permission.dto.PermissionDto;
-import com.yuweix.kuafu.permission.dto.PermissionExportDto;
+import com.yuweix.kuafu.permission.dto.AdminDTO;
+import com.yuweix.kuafu.permission.dto.PermissionDTO;
+import com.yuweix.kuafu.permission.dto.PermissionExportDTO;
 import com.yuweix.kuafu.permission.service.SysPermissionService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletOutputStream;
@@ -54,7 +54,7 @@ public class SysPermissionController {
 	@Permission(value = "sys.permission.list")
 	@RequestMapping(value = "/sys/permission/list", method = GET)
 	@ResponseBody
-	public Response<String, List<PermissionDto>> queryPermissionList(@RequestParam(value = "keywords", required = false) String keywords
+	public Response<String, List<PermissionDTO>> queryPermissionList(@RequestParam(value = "keywords", required = false) String keywords
 			, @RequestParam(value = "visible", required = false) Boolean visible
 			, @RequestParam(value = "types", required = false) String[] types) {
 		List<String> permTypeList = null;
@@ -69,7 +69,7 @@ public class SysPermissionController {
 				permTypeList = null;
 			}
 		}
-		List<PermissionDto> permissionList = sysPermissionService.queryPermissionListIncludeChildren(null, keywords
+		List<PermissionDTO> permissionList = sysPermissionService.queryPermissionListIncludeChildren(null, keywords
 				, permTypeList, visible);
 		return new Response<>(properties.getSuccessCode(), "ok", permissionList);
 	}
@@ -91,7 +91,7 @@ public class SysPermissionController {
 			, @RequestParam(value = "visible", required = false, defaultValue = "true") boolean visible
 			, @RequestParam(value = "icon", required = false) String icon
 			, @RequestParam(value = "descr", required = false) String descr) {
-		AdminDto adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = PermissionUtil.getLoginAccount();
 		sysPermissionService.addPermission(permNo, title, parentId, orderNum, path, component, ifExt
 				, permType, visible, icon, descr, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
@@ -115,7 +115,7 @@ public class SysPermissionController {
 			, @RequestParam(value = "visible", required = false, defaultValue = "true") boolean visible
 			, @RequestParam(value = "icon", required = false) String icon
 			, @RequestParam(value = "descr", required = false) String descr) {
-		AdminDto adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = PermissionUtil.getLoginAccount();
 		sysPermissionService.updatePermission(id, permNo, title, parentId, orderNum, path, component, ifExt
 				, permType, visible, icon, descr, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
@@ -143,7 +143,7 @@ public class SysPermissionController {
 	@RequestMapping(value = "/sys/permission/export", method = POST)
 	@ResponseBody
 	public void doExport(HttpServletResponse response) throws Exception {
-		PermissionExportDto exportDto = sysPermissionService.getPermissionExportDto();
+		PermissionExportDTO exportDto = sysPermissionService.getPermissionExportDto();
 
 		String fileName = URLEncoder.encode(properties.getAppName() + ".permission." + DateUtil.formatDate(new Date(), "yyyyMMddHHmmss") + ".json", "utf-8");
 		response.setContentType("application/octet-stream");
@@ -188,13 +188,13 @@ public class SysPermissionController {
 	@ResponseBody
 	public Response<String, Void> doImport(@RequestParam(value = "file", required = true) MultipartFile file) throws Exception {
 		String str = new String(file.getBytes(), StandardCharsets.UTF_8);
-		PermissionExportDto dto = "".equals(str)
+		PermissionExportDTO dto = "".equals(str)
 				? null
-				: JsonUtil.parseObject(str, PermissionExportDto.class);
+				: JsonUtil.parseObject(str, PermissionExportDTO.class);
 		if (dto == null || !dto.verify()) {
 			return new Response<>(properties.getFailureCode(), "验签失败！");
 		}
-		List<PermissionDto> list = dto.getList();
+		List<PermissionDTO> list = dto.getList();
 		if (list == null || list.size() <= 0) {
 			return new Response<>(properties.getFailureCode(), "No Data.");
 		}

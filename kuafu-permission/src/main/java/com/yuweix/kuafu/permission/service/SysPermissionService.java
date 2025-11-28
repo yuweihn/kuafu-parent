@@ -1,9 +1,9 @@
 package com.yuweix.kuafu.permission.service;
 
 
-import com.yuweix.kuafu.permission.dto.PermissionDto;
-import com.yuweix.kuafu.permission.dto.PermissionExportDto;
-import com.yuweix.kuafu.permission.dto.PermissionMenuTreeDto;
+import com.yuweix.kuafu.permission.dto.PermissionDTO;
+import com.yuweix.kuafu.permission.dto.PermissionExportDTO;
+import com.yuweix.kuafu.permission.dto.PermissionMenuTreeDTO;
 
 import java.util.List;
 
@@ -12,15 +12,15 @@ import java.util.List;
  * @author yuwei
  */
 public interface SysPermissionService {
-	List<PermissionDto> queryPermissionListIncludeChildren(List<Long> idList, String keywords, List<String> permTypeList
+	List<PermissionDTO> queryPermissionListIncludeChildren(List<Long> idList, String keywords, List<String> permTypeList
 			, Boolean visible);
 
-	PermissionDto queryPermissionById(long permissionId);
+	PermissionDTO queryPermissionById(long permissionId);
 
 	/**
 	 * 查询指定人员的权限菜单
 	 */
-	List<PermissionMenuTreeDto> getMenuTreeListByAdminId(long adminId);
+	List<PermissionMenuTreeDTO> getMenuTreeListByAdminId(long adminId);
 
 	/**
 	 * 查询指定人员的权限按钮
@@ -40,8 +40,8 @@ public interface SysPermissionService {
 	void deletePermission(long permissionId);
 	void deletePermissions(List<Long> idList);
 
-	PermissionDto queryPermissionByNo(String permNo);
+	PermissionDTO queryPermissionByNo(String permNo);
 
-	PermissionExportDto getPermissionExportDto();
-	void doImport(Long parentId, List<PermissionDto> list);
+	PermissionExportDTO getPermissionExportDto();
+	void doImport(Long parentId, List<PermissionDTO> list);
 }

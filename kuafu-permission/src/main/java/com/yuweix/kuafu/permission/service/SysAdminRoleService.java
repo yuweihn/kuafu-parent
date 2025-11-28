@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.permission.service;
 
 
-import com.yuweix.kuafu.permission.dto.AdminRoleDto;
+import com.yuweix.kuafu.permission.dto.AdminRoleDTO;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface SysAdminRoleService {
 	int queryAdminRoleCountByAdminId(long adminId, String keywords);
-	List<AdminRoleDto> queryAdminRoleListByAdminId(long adminId, String keywords, int pageNo, int pageSize);
+	List<AdminRoleDTO> queryAdminRoleListByAdminId(long adminId, String keywords, int pageNo, int pageSize);
 	
 	/**
 	 * 给指定人员分配角色；
@@ -19,7 +19,7 @@ public interface SysAdminRoleService {
 	void addAdminRoleList(long adminId, List<Long> roleIdList, String modifier);
 	
 	long addAdminRole(long adminId, long roleId, String creator);
-	AdminRoleDto queryAdminRoleById(long id);
+	AdminRoleDTO queryAdminRoleById(long id);
 	void updateAdminRole(long id, long adminId, long roleId, String modifier);
 	void deleteAdminRole(long id);
 

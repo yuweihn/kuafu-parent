@@ -5,9 +5,9 @@ import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.permission.annotations.Permission;
 import com.yuweix.kuafu.permission.common.PermissionUtil;
 import com.yuweix.kuafu.permission.common.Properties;
-import com.yuweix.kuafu.permission.dto.AdminDto;
-import com.yuweix.kuafu.permission.dto.PageResponseDto;
-import com.yuweix.kuafu.permission.dto.RoleDto;
+import com.yuweix.kuafu.permission.dto.AdminDTO;
+import com.yuweix.kuafu.permission.dto.PageResponseDTO;
+import com.yuweix.kuafu.permission.dto.RoleDTO;
 import com.yuweix.kuafu.permission.service.SysRoleService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
@@ -38,12 +38,12 @@ public class SysRoleController {
 	@Permission(value = "sys.role.list")
 	@RequestMapping(value = "/sys/role/list", method = GET)
 	@ResponseBody
-	public Response<String, PageResponseDto<RoleDto>> queryRoleList(@RequestParam(value = "keywords", required = false) String keywords
+	public Response<String, PageResponseDTO<RoleDTO>> queryRoleList(@RequestParam(value = "keywords", required = false) String keywords
 			, @RequestParam(value = "pageNo", required = false, defaultValue = "1") int pageNo
 			, @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
 		int count = sysRoleService.queryRoleCount(keywords);
-		List<RoleDto> roleList = sysRoleService.queryRoleList(keywords, pageNo, pageSize);
-		PageResponseDto<RoleDto> dto = new PageResponseDto<>();
+		List<RoleDTO> roleList = sysRoleService.queryRoleList(keywords, pageNo, pageSize);
+		PageResponseDTO<RoleDTO> dto = new PageResponseDTO<>();
 		dto.setSize(count);
 		dto.setList(roleList);
 		return new Response<>(properties.getSuccessCode(), "ok", dto);
@@ -55,8 +55,8 @@ public class SysRoleController {
 	@Permission(value = "sys.role.info")
 	@RequestMapping(value = "/sys/role/info", method = GET)
 	@ResponseBody
-	public Response<String, RoleDto> queryRoleInfo(@RequestParam(value = "id", required = true) long id) {
-		RoleDto role = sysRoleService.queryRoleById(id);
+	public Response<String, RoleDTO> queryRoleInfo(@RequestParam(value = "id", required = true) long id) {
+		RoleDTO role = sysRoleService.queryRoleById(id);
 		if (role == null) {
 			return new Response<>(properties.getFailureCode(), "无数据");
 		} else {
@@ -72,7 +72,7 @@ public class SysRoleController {
 	@ResponseBody
 	public Response<String, Void> createRole(@RequestParam(value = "roleNo", required = true)String roleNo
 			, @RequestParam(value = "roleName", required = true) String roleName) {
-		AdminDto adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = PermissionUtil.getLoginAccount();
 		sysRoleService.addRole(roleNo.trim(), roleName, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
@@ -86,7 +86,7 @@ public class SysRoleController {
 	public Response<String, Void> updateRole(@RequestParam(value = "id", required = true) long id
 			, @RequestParam(value = "roleNo", required = true)String roleNo
 			, @RequestParam(value = "roleName", required = true) String roleName) {
-		AdminDto adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = PermissionUtil.getLoginAccount();
 		sysRoleService.updateRole(id, roleNo.trim(), roleName, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}

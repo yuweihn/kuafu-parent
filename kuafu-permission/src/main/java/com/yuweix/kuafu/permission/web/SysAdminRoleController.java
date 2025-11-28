@@ -5,9 +5,9 @@ import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.permission.annotations.Permission;
 import com.yuweix.kuafu.permission.common.PermissionUtil;
 import com.yuweix.kuafu.permission.common.Properties;
-import com.yuweix.kuafu.permission.dto.AdminDto;
-import com.yuweix.kuafu.permission.dto.AdminRoleDto;
-import com.yuweix.kuafu.permission.dto.PageResponseDto;
+import com.yuweix.kuafu.permission.dto.AdminDTO;
+import com.yuweix.kuafu.permission.dto.AdminRoleDTO;
+import com.yuweix.kuafu.permission.dto.PageResponseDTO;
 import com.yuweix.kuafu.permission.service.SysAdminRoleService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
@@ -38,13 +38,13 @@ public class SysAdminRoleController {
 	@Permission(value = "sys.admin.role.list")
 	@RequestMapping(value = "/sys/admin/role/list", method = GET)
 	@ResponseBody
-	public Response<String, PageResponseDto<AdminRoleDto>> queryAdminRoleList(@RequestParam(value = "adminId", required = true) long adminId
+	public Response<String, PageResponseDTO<AdminRoleDTO>> queryAdminRoleList(@RequestParam(value = "adminId", required = true) long adminId
 			, @RequestParam(value = "keywords", required = false) String keywords
 			, @RequestParam(value = "pageNo", required = false, defaultValue = "1") int pageNo
 			, @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
 		int count = sysAdminRoleService.queryAdminRoleCountByAdminId(adminId, keywords);
-		List<AdminRoleDto> roleList = sysAdminRoleService.queryAdminRoleListByAdminId(adminId, keywords, pageNo, pageSize);
-		PageResponseDto<AdminRoleDto> dto = new PageResponseDto<>();
+		List<AdminRoleDTO> roleList = sysAdminRoleService.queryAdminRoleListByAdminId(adminId, keywords, pageNo, pageSize);
+		PageResponseDTO<AdminRoleDTO> dto = new PageResponseDTO<>();
 		dto.setSize(count);
 		dto.setList(roleList);
 		return new Response<>(properties.getSuccessCode(), "ok", dto);
@@ -56,8 +56,8 @@ public class SysAdminRoleController {
 	@Permission(value = "sys.admin.role.info")
 	@RequestMapping(value = "/sys/admin/role/info", method = GET)
 	@ResponseBody
-	public Response<String, AdminRoleDto> queryAdminRoleInfo(@RequestParam(value = "id", required = true) long id) {
-		AdminRoleDto dto = sysAdminRoleService.queryAdminRoleById(id);
+	public Response<String, AdminRoleDTO> queryAdminRoleInfo(@RequestParam(value = "id", required = true) long id) {
+		AdminRoleDTO dto = sysAdminRoleService.queryAdminRoleById(id);
 		return new Response<>(properties.getSuccessCode(), "ok", dto);
 	}
 
@@ -69,7 +69,7 @@ public class SysAdminRoleController {
 	@ResponseBody
 	public Response<String, Long> addAdminRole(@RequestParam(value = "adminId", required = true) long adminId
 			, @RequestParam(value = "roleId", required = true) long roleId) {
-		AdminDto adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = PermissionUtil.getLoginAccount();
 		long id = sysAdminRoleService.addAdminRole(adminId, roleId, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok", id);
 	}
@@ -83,7 +83,7 @@ public class SysAdminRoleController {
 	public Response<String, Void> updateAdminRole(@RequestParam(value = "id", required = true) long id
 			, @RequestParam(value = "adminId", required = true) long adminId
 			, @RequestParam(value = "roleId", required = true) long roleId) {
-		AdminDto adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = PermissionUtil.getLoginAccount();
 		sysAdminRoleService.updateAdminRole(id, adminId, roleId, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}

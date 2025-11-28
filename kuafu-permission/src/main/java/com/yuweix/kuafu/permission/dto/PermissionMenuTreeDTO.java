@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author yuwei
  */
-public class PermissionMenuTreeDto extends AbstractTreeDto<PermissionMenuTreeDto> implements Serializable {
+public class PermissionMenuTreeDTO extends AbstractTreeDTO<PermissionMenuTreeDTO> implements Serializable {
 	/**
 	 * 
 	 */
@@ -25,10 +25,10 @@ public class PermissionMenuTreeDto extends AbstractTreeDto<PermissionMenuTreeDto
 	private Meta meta;
 	private Long parentId;
 
-	private List<PermissionMenuTreeDto> children = new ArrayList<>();
+	private List<PermissionMenuTreeDTO> children = new ArrayList<>();
 
 
-	public PermissionMenuTreeDto addChild(PermissionMenuTreeDto child) {
+	public PermissionMenuTreeDTO addChild(PermissionMenuTreeDTO child) {
 		children.add(child);
 		return this;
 	}
@@ -133,11 +133,11 @@ public class PermissionMenuTreeDto extends AbstractTreeDto<PermissionMenuTreeDto
 		this.parentId = parentId;
 	}
 
-	public List<PermissionMenuTreeDto> getChildren() {
+	public List<PermissionMenuTreeDTO> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<PermissionMenuTreeDto> children) {
+	public void setChildren(List<PermissionMenuTreeDTO> children) {
 		this.children = children;
 	}
 }

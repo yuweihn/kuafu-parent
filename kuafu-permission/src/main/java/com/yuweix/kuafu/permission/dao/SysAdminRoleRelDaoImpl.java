@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.permission.dao;
 
 
-import com.yuweix.kuafu.permission.dto.SysAdminRoleDto;
+import com.yuweix.kuafu.permission.dto.SysAdminRoleDTO;
 import com.yuweix.kuafu.permission.mapper.SysAdminRoleRelMapper;
 import com.yuweix.kuafu.permission.mapper.SysRolePermissionRelMapper;
 import com.yuweix.kuafu.permission.model.SysAdminRoleRel;
@@ -106,7 +106,7 @@ public class SysAdminRoleRelDaoImpl extends CacheableDao<SysAdminRoleRel, Long> 
 	}
 
 	@Override
-	public List<SysAdminRoleDto> queryAdminRoleListByAdminId(Long adminId, Long roleId, String keywords, int pageNo, int pageSize) {
+	public List<SysAdminRoleDTO> queryAdminRoleListByAdminId(Long adminId, Long roleId, String keywords, int pageNo, int pageSize) {
 		return sysAdminRoleRelMapper.queryAdminRoleListByAdminId(adminId, roleId, keywords, pageNo, pageSize);
 	}
 
