@@ -14,11 +14,11 @@ public class SensitiveUtil {
     private static final Logger log = LoggerFactory.getLogger(SensitiveUtil.class);
 
 
-    public static Object shield(Object object, String fieldName) {
+    public static<T> T shield(Object object, String fieldName) {
         try {
             Field field = object.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
-            Object val = field.get(object);
+            T val = (T) field.get(object);
             return shield(object, fieldName, val);
         } catch (Exception ex) {
             log.error("获取字段出错，Error: {}", ex.getMessage(), ex);
@@ -26,7 +26,7 @@ public class SensitiveUtil {
         }
     }
 
-    public static Object shield(Object object, String fieldName, Object val) {
+    public static<T> T shield(Object object, String fieldName, T val) {
         try {
             if (!(val instanceof String) || "".equals(val)) {
                 return val;
@@ -36,7 +36,7 @@ public class SensitiveUtil {
             if (String.class != field.getType() || (sensitive = field.getAnnotation(Sensitive.class)) == null) {
                 return val;
             }
-            return replace((String) val, sensitive.regex(), sensitive.replacement());
+            return (T) replace((String) val, sensitive.regex(), sensitive.replacement());
         } catch (Exception ex) {
             log.error("获取字段出错，Error: {}", ex.getMessage(), ex);
             return null;
