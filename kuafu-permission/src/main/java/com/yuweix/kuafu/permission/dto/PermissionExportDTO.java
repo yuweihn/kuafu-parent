@@ -34,7 +34,7 @@ public class PermissionExportDTO implements Serializable {
 	}
 
 	private String toSgin() {
-		return SecurityUtil.getMd5(JsonUtil.toJSONString(list) + SALT);
+		return SecurityUtil.getMd5(JsonUtil.toString(list) + SALT);
 	}
 
 	public List<PermissionDTO> getList() {

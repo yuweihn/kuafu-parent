@@ -253,7 +253,7 @@ public abstract class MonitorUtil {
 		}
 		@Override
 		public String toString() {
-			return JsonUtil.toJSONString(Cpu.this);
+			return JsonUtil.toString(Cpu.this);
 		}
 	}
 
@@ -352,7 +352,7 @@ public abstract class MonitorUtil {
 		}
 		@Override
 		public String toString() {
-			return JsonUtil.toJSONString(Memory.this);
+			return JsonUtil.toString(Memory.this);
 		}
 	}
 
@@ -458,7 +458,7 @@ public abstract class MonitorUtil {
 		}
 		@Override
 		public String toString() {
-			return JsonUtil.toJSONString(Disk.this);
+			return JsonUtil.toString(Disk.this);
 		}
 	}
 
@@ -623,7 +623,7 @@ public abstract class MonitorUtil {
 		}
 		@Override
 		public String toString() {
-			return JsonUtil.toJSONString(Network.this);
+			return JsonUtil.toString(Network.this);
 		}
 	}
 }

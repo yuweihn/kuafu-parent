@@ -60,9 +60,9 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
             log.info("Rocket消息Body: {}", body);
             T t = deserialize(body);
             Object result = process(t);
-            log.info("Rocket消费完成, Result: {}", JsonUtil.toJSONString(result));
+            log.info("Rocket消费完成, Result: {}", JsonUtil.toString(result));
         } catch (Exception ex) {
-            log.error("Rocket消费异常message: {}, Exception: {}, ex: ", JsonUtil.toJSONString(message), ex.getMessage(), ex);
+            log.error("Rocket消费异常message: {}, Exception: {}, ex: ", JsonUtil.toString(message), ex.getMessage(), ex);
             handleException(message, ex);
         } finally {
             after(message);

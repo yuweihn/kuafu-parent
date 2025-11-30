@@ -9,7 +9,7 @@ import com.alibaba.fastjson2.TypeReference;
  * @author yuwei
  */
 public abstract class JsonUtil {
-	public static String toJSONString(Object obj) {
+	public static String toString(Object obj) {
 		return JSON.toJSONString(obj);
 	}
 	public static Object parse(String text) {

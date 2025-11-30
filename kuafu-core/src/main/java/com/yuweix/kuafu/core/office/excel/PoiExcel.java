@@ -251,7 +251,7 @@ public abstract class PoiExcel {
 			if (map.isEmpty()) {
 				continue;
 			}
-			list.add(JsonUtil.parseObject(JsonUtil.toJSONString(map), clz));
+			list.add(JsonUtil.parseObject(JsonUtil.toString(map), clz));
 		}
 		return list;
 	}

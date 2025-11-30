@@ -24,7 +24,7 @@ public class RocketConf {
         return new RocketSerializer() {
             @Override
             public <T> String serialize(T t) {
-                return JsonUtil.toJSONString(t);
+                return JsonUtil.toString(t);
             }
 
             @Override

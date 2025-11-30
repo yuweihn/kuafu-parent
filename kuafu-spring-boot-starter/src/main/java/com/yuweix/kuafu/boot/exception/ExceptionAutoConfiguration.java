@@ -49,7 +49,7 @@ public class ExceptionAutoConfiguration {
 
 				Response<String, Void> resp = new Response<>(errorCode == null || "".equals(errorCode) ? "" + status : errorCode
 						, httpStatus.getReasonPhrase() + "[" + status + "]");
-				return JsonUtil.toJSONString(resp);
+				return JsonUtil.toString(resp);
 			}
 		}
 
@@ -65,11 +65,11 @@ public class ExceptionAutoConfiguration {
 						protected void renderMergedOutputModel(Map<String, Object> map, HttpServletRequest req, HttpServletResponse resp) throws Exception {
 							resp.setContentType("application/json; charset=" + StandardCharsets.UTF_8);
 							ServletOutputStream out = resp.getOutputStream();
-							out.write(JsonUtil.toJSONString(map).getBytes(StandardCharsets.UTF_8));
+							out.write(JsonUtil.toString(map).getBytes(StandardCharsets.UTF_8));
 							out.flush();
 						}
 					};
-					String text = JsonUtil.toJSONString(new Response<String, Void>(errorCode == null || "".equals(errorCode) ? "500" : errorCode, content));
+					String text = JsonUtil.toString(new Response<String, Void>(errorCode == null || "".equals(errorCode) ? "500" : errorCode, content));
 					Map<String, Object> attributes = JsonUtil.parseObject(text, Map.class);
 					view.setAttributesMap(attributes);
 					return new ModelAndView(view);

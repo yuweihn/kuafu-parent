@@ -36,7 +36,7 @@ public class Response<C, D> implements Serializable {
 
 	@Override
 	public String toString() {
-		return JsonUtil.toJSONString(this);
+		return JsonUtil.toString(this);
 	}
 
 
