@@ -70,7 +70,7 @@ public class ExceptionAutoConfiguration {
 						}
 					};
 					String text = JsonUtil.toString(new Response<String, Void>(errorCode == null || "".equals(errorCode) ? "500" : errorCode, content));
-					Map<String, Object> attributes = JsonUtil.parseObject(text, Map.class);
+					Map<String, Object> attributes = JsonUtil.toObject(text, Map.class);
 					view.setAttributesMap(attributes);
 					return new ModelAndView(view);
 				}

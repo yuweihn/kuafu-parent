@@ -190,7 +190,7 @@ public class SysPermissionController {
 		String str = new String(file.getBytes(), StandardCharsets.UTF_8);
 		PermissionExportDTO dto = "".equals(str)
 				? null
-				: JsonUtil.parseObject(str, PermissionExportDTO.class);
+				: JsonUtil.toObject(str, PermissionExportDTO.class);
 		if (dto == null || !dto.verify()) {
 			return new Response<>(properties.getFailureCode(), "验签失败！");
 		}
