@@ -50,6 +50,6 @@ public class ErrorHttpResponse<B> implements HttpResponse<B> {
 
 	@Override
 	public String toString() {
-		return JsonUtil.toJSONString(this);
+		return JsonUtil.toString(this);
 	}
 }

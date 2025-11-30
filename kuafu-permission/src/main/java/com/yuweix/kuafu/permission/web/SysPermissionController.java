@@ -156,7 +156,7 @@ public class SysPermissionController {
 		OutputStreamWriter osw = null;
 		BufferedWriter bw = null;
 		try {
-			String str = exportDto == null ? "" : JsonUtil.toJSONString(exportDto);
+			String str = exportDto == null ? "" : JsonUtil.toString(exportDto);
 			osw = new OutputStreamWriter(out, StandardCharsets.UTF_8);
 			bw = new BufferedWriter(osw);
 			bw.append(str);

@@ -142,7 +142,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		long endTimeMillis = System.currentTimeMillis();
 		logInfoMap.put("status", resp.getStatus());
 		logInfoMap.put("timeCost", (endTimeMillis - startTimeMillis) + "ms");
-		log.info("{}", JsonUtil.toJSONString(logInfoMap));
+		log.info("{}", JsonUtil.toString(logInfoMap));
 	}
 
 	private void initTraceProperties(HttpServletRequest request) {
