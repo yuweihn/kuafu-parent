@@ -124,7 +124,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		if (typeReference != null) {
 			String txt = EntityUtils.toString(entity, charset != null ? charset : HttpConstant.ENCODING_UTF_8);
 			if (HttpStatus.SC_OK == status) {
-				body = (B) JsonUtil.parseObject(txt, typeReference);
+				body = (B) JsonUtil.toObject(txt, typeReference);
 			} else {
 				errorMessage.append(". ").append(txt);
 			}
@@ -154,7 +154,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 			 **/
 			String txt = EntityUtils.toString(entity, charset != null ? charset : HttpConstant.ENCODING_UTF_8);
 			if (HttpStatus.SC_OK == status) {
-				body = (B) JsonUtil.parseObject(txt, typeClass);
+				body = (B) JsonUtil.toObject(txt, typeClass);
 			} else {
 				errorMessage.append(". ").append(txt);
 			}

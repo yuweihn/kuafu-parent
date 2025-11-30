@@ -29,7 +29,7 @@ public class RocketConf {
 
             @Override
             public <T> T deserialize(String str, Class<T> clz) {
-                return JsonUtil.parseObject(str, clz);
+                return JsonUtil.toObject(str, clz);
             }
         };
     }
