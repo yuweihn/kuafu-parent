@@ -44,10 +44,7 @@ public class SensitiveUtil {
     }
 
     private static<T> T shield(Field field, T val) {
-        if (field == null || val == null) {
-            return val;
-        }
-        if (!(val instanceof String) || "".equals(val)) {
+        if (field == null || !(val instanceof String) || "".equals(val)) {
             return val;
         }
         Sensitive sensitive;
