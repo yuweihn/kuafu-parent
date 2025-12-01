@@ -1,15 +1,6 @@
 package com.yuweix.kuafu.http;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.util.*;
-
-import javax.servlet.http.Cookie;
-
-import com.alibaba.fastjson2.TypeReference;
 import com.yuweix.kuafu.core.JsonUtil;
 import com.yuweix.kuafu.http.response.HttpResponse;
 import org.apache.http.Header;
@@ -21,6 +12,17 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
 
+import javax.servlet.http.Cookie;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 
 /**
  * 以回调方式处理返回结果
@@ -28,7 +30,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<B>> {
 	private Class<?> typeClass;
-	private TypeReference<?> typeReference;
+    private Type type;
 	private HttpClientContext context;
 	private String charset;
 
@@ -46,8 +48,8 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		return this;
 	}
 
-	public CallbackResponseHandler<B> responseType(TypeReference<?> typeReference) {
-		this.typeReference = typeReference;
+	public CallbackResponseHandler<B> responseType(Type type) {
+        this.type = type;
 		return this;
 	}
 
@@ -123,10 +125,10 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 
 		StringBuilder errorMessage = new StringBuilder(statusLine.toString());
 		B body = null;
-		if (typeReference != null) {
+		if (type != null) {
 			String txt = EntityUtils.toString(entity, charset != null ? charset : HttpConstant.ENCODING_UTF_8);
 			if (HttpStatus.SC_OK == status) {
-				body = (B) JsonUtil.toObject(txt, typeReference);
+				body = JsonUtil.toObject(txt, type);
 			} else {
 				errorMessage.append(". ").append(txt);
 			}
