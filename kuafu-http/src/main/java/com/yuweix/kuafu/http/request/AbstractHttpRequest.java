@@ -1,18 +1,17 @@
 package com.yuweix.kuafu.http.request;
 
 
-import java.util.List;
-import jakarta.servlet.http.Cookie;
-
-import com.alibaba.fastjson2.TypeReference;
 import com.yuweix.kuafu.http.CallbackResponseHandler;
 import com.yuweix.kuafu.http.DefaultHttpDelete;
 import com.yuweix.kuafu.http.HttpContextAdaptor;
 import com.yuweix.kuafu.http.HttpMethod;
 import com.yuweix.kuafu.http.response.ErrorHttpResponse;
+import com.yuweix.kuafu.http.response.HttpResponse;
+import com.yuweix.kuafu.http.ssl.TrustAllSslSocketFactory;
 import com.yuweix.kuafu.http.strategy.connect.KeepAliveStrategy;
 import com.yuweix.kuafu.http.strategy.redirect.NeedRedirectStrategy;
 import com.yuweix.kuafu.http.strategy.retry.NotNeedRetryHandler;
+import jakarta.servlet.http.Cookie;
 import org.apache.http.Header;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponseInterceptor;
@@ -32,8 +31,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
-import com.yuweix.kuafu.http.ssl.TrustAllSslSocketFactory;
-import com.yuweix.kuafu.http.response.HttpResponse;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 
 /**
@@ -44,7 +44,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 	private String url;
 	private HttpMethod method;
 	private Class<?> responseTypeClass;
-	private TypeReference<?> responseTypeReference;
+    private Type responseType;
 	private List<Cookie> cookieList;
 	private List<Header> headerList;
 	private LayeredConnectionSocketFactory sslSocketFactory;
@@ -93,10 +93,10 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 	}
 
 	@SuppressWarnings("unchecked")
-	public T responseType(TypeReference<?> typeReference) {
-		this.responseTypeReference = typeReference;
-		return (T) this;
-	}
+	public T responseType(Type responseType) {
+        this.responseType = responseType;
+        return (T) this;
+    }
 
 	@SuppressWarnings("unchecked")
 	public T cookieList(List<Cookie> cookieList) {
@@ -265,7 +265,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		CloseableHttpClient client = builder.build();
 		CallbackResponseHandler<B> handler = CallbackResponseHandler.<B>create()
 																.responseType(responseTypeClass)
-																.responseType(responseTypeReference)
+																.responseType(responseType)
 																.context(context)
 																.charset(charset);
 		try {
