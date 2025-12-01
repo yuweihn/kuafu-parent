@@ -1,10 +1,8 @@
 package com.yuweix.kuafu.http.request;
 
 
-import com.yuweix.kuafu.http.CallbackResponseHandler;
-import com.yuweix.kuafu.http.DefaultHttpDelete;
-import com.yuweix.kuafu.http.HttpContextAdaptor;
-import com.yuweix.kuafu.http.HttpMethod;
+import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.http.*;
 import com.yuweix.kuafu.http.response.ErrorHttpResponse;
 import com.yuweix.kuafu.http.response.HttpResponse;
 import com.yuweix.kuafu.http.ssl.TrustAllSslSocketFactory;
@@ -57,10 +55,27 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 	private List<HttpResponseInterceptor> firstResponseInterceptorList;
 	private List<HttpResponseInterceptor> lastResponseInterceptorList;
 	private String charset;
+    private HttpJson json;
 
 
 	protected AbstractHttpRequest() {
 		this.responseTypeClass = String.class;
+        this.json = new HttpJson() {
+            @Override
+            public String toString(Object obj) {
+                return JsonUtil.toString(obj);
+            }
+
+            @Override
+            public <T> T toObject(String text, Type type) {
+                return JsonUtil.toObject(text, type);
+            }
+
+            @Override
+            public <T> T toObject(String text, Class<T> clz) {
+                return JsonUtil.toObject(text, clz);
+            }
+        };
 	}
 
 	protected void setHttpUriRequest(HttpUriRequest httpUriRequest) {
@@ -173,6 +188,12 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		return charset;
 	}
 
+    @SuppressWarnings("unchecked")
+    public T json(HttpJson json) {
+        this.json = json;
+        return (T) this;
+    }
+
 	protected ContentType getHeaderContentType() {
 		return null;
 	}
@@ -263,7 +284,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		}
 
 		CloseableHttpClient client = builder.build();
-		CallbackResponseHandler<B> handler = CallbackResponseHandler.<B>create()
+		CallbackResponseHandler<B> handler = CallbackResponseHandler.<B>create(json)
 																.responseType(responseTypeClass)
 																.responseType(responseType)
 																.context(context)
