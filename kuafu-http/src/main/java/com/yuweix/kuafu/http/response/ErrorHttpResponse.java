@@ -1,9 +1,9 @@
 package com.yuweix.kuafu.http.response;
 
 
-import com.yuweix.kuafu.core.JsonUtil;
-import org.apache.http.Header;
 import jakarta.servlet.http.Cookie;
+import org.apache.http.Header;
+
 import java.util.List;
 
 
@@ -16,7 +16,7 @@ public class ErrorHttpResponse<B> implements HttpResponse<B> {
 
 	public ErrorHttpResponse(int status, String errorMessage) {
 		this.status = status;
-		this.errorMessage = errorMessage;
+        this.errorMessage = errorMessage;
 	}
 
 	@Override
@@ -50,6 +50,6 @@ public class ErrorHttpResponse<B> implements HttpResponse<B> {
 
 	@Override
 	public String toString() {
-		return JsonUtil.toString(this);
+        return "{\"status\": " + status + ", \"errorMessage\": \"" + errorMessage + "\"}";
 	}
 }

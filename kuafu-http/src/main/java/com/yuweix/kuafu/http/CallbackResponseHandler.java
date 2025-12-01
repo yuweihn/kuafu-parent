@@ -33,14 +33,16 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
     private Type type;
 	private HttpClientContext context;
 	private String charset;
+    private HttpJson json;
 
 
-	private CallbackResponseHandler() {
-		this.typeClass = String.class;
+	private CallbackResponseHandler(HttpJson json) {
+        this.typeClass = String.class;
+        this.json = json;
 	}
 
-	public static<B> CallbackResponseHandler<B> create() {
-		return new CallbackResponseHandler<>();
+	public static<B> CallbackResponseHandler<B> create(HttpJson json) {
+		return new CallbackResponseHandler<>(json);
 	}
 
 	public CallbackResponseHandler<B> responseType(Class<?> typeClass) {
@@ -63,6 +65,11 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		return this;
 	}
 
+    public CallbackResponseHandler<B> json(HttpJson json) {
+        this.json = json;
+        return this;
+    }
+
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -75,7 +82,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		int status = statusLine.getStatusCode();
 		HttpEntity entity = response.getEntity();
 		if (entity == null) {
-			BasicHttpResponse<B> res = new BasicHttpResponse<>();
+			BasicHttpResponse<B> res = new BasicHttpResponse<>(json);
 			res.setStatus(status);
 			res.setErrorMessage("Entity is null.");
 			return res;
@@ -126,7 +133,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		if (type != null) {
 			String txt = EntityUtils.toString(entity, charset != null ? charset : HttpConstant.ENCODING_UTF_8);
 			if (HttpStatus.SC_OK == status) {
-                body = JsonUtil.toObject(txt, type);
+                body = json.toObject(txt, type);
 			} else {
 				errorMessage.append(". ").append(txt);
 			}
@@ -156,12 +163,12 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 			 **/
 			String txt = EntityUtils.toString(entity, charset != null ? charset : HttpConstant.ENCODING_UTF_8);
 			if (HttpStatus.SC_OK == status) {
-				body = (B) JsonUtil.toObject(txt, typeClass);
+				body = (B) json.toObject(txt, typeClass);
 			} else {
 				errorMessage.append(". ").append(txt);
 			}
 		}
-		return createBasicHttpResponse(status, errorMessage.toString(), body, headerList, cookieList, contentType);
+		return createBasicHttpResponse(status, errorMessage.toString(), body, headerList, cookieList, contentType, json);
 	}
 
 	private static byte[] read(InputStream is) {
@@ -188,8 +195,8 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 	}
 
 	private BasicHttpResponse<B> createBasicHttpResponse(int status, String errorMessage, B body
-			, List<Header> headerList, List<Cookie> cookieList, Header contentType) {
-		BasicHttpResponse<B> res = new BasicHttpResponse<>();
+			, List<Header> headerList, List<Cookie> cookieList, Header contentType, HttpJson json) {
+		BasicHttpResponse<B> res = new BasicHttpResponse<>(json);
 		res.setStatus(status);
 		res.setErrorMessage(errorMessage);
 		res.setBody(body);
@@ -205,11 +212,12 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		private B body;
 		private List<Cookie> cookieList;
 		private List<Header> headerList;
-		private String contentType;
+        private String contentType;
+        private HttpJson json;
 
 
-		public BasicHttpResponse() {
-
+		public BasicHttpResponse(HttpJson json) {
+            this.json = json;
 		}
 
 
@@ -262,7 +270,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 
 		@Override
 		public String toString() {
-			return JsonUtil.toString(this);
+			return json.toString(this);
 		}
 	}
 }
