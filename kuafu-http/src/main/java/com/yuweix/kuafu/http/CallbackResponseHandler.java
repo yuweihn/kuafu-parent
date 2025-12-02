@@ -85,7 +85,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		int status = statusLine.getStatusCode();
 		HttpEntity entity = response.getEntity();
 		if (entity == null) {
-			BasicHttpResponse<B> res = new BasicHttpResponse<>(json);
+			BasicHttpResponse res = new BasicHttpResponse();
 			res.setStatus(status);
 			res.setErrorMessage("Entity is null.");
 			return res;
@@ -172,35 +172,36 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 				errorMessage.append(". ").append(txt);
 			}
 		}
-		return createBasicHttpResponse(status, errorMessage.toString(), body, headerList, cookieList, contentType, json);
+		return createBasicHttpResponse(status, errorMessage.toString(), body, headerList, cookieList, contentType);
 	}
 
 	private static byte[] read(InputStream is) {
-		ByteArrayOutputStream out = null;
-		try {
-			out = new ByteArrayOutputStream();
-			byte[] buffer = new byte[1024];
-			int len;
-			while ((len = is.read(buffer)) != -1) {
-				out.write(buffer, 0, len);
-			}
-			return out.toByteArray();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+        ByteArrayOutputStream out = null;
+        try {
+            out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+            return out.toByteArray();
+        } catch (Exception e) {
+            log.error("读取流内容失败, Error: {}", e.getMessage());
+            throw new RuntimeException(e);
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    log.error("关闭输出流失败, Error: {}", e.getMessage(), e);
+                }
+            }
+        }
+    }
 
-	private BasicHttpResponse<B> createBasicHttpResponse(int status, String errorMessage, B body
-			, List<Header> headerList, List<Cookie> cookieList, Header contentType, HttpJson json) {
-		BasicHttpResponse<B> res = new BasicHttpResponse<>(json);
+	private BasicHttpResponse createBasicHttpResponse(int status, String errorMessage, B body
+			, List<Header> headerList, List<Cookie> cookieList, Header contentType) {
+		BasicHttpResponse res = new BasicHttpResponse();
 		res.setStatus(status);
 		res.setErrorMessage(errorMessage);
 		res.setBody(body);
@@ -210,18 +211,16 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		return res;
 	}
 
-	private static class BasicHttpResponse<B> implements HttpResponse<B> {
+	private class BasicHttpResponse implements HttpResponse<B> {
 		private int status;
 		private String errorMessage;
 		private B body;
 		private List<Cookie> cookieList;
 		private List<Header> headerList;
         private String contentType;
-        private HttpJson json;
 
 
-		public BasicHttpResponse(HttpJson json) {
-            this.json = json;
+		public BasicHttpResponse() {
 		}
 
 
