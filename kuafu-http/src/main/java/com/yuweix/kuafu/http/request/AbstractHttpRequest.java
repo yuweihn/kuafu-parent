@@ -71,12 +71,12 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
             }
 
             @Override
-            public <T> T toObject(String text, Type type) {
+            public <V> V toObject(String text, Type type) {
                 return JsonUtil.toObject(text, type);
             }
 
             @Override
-            public <T> T toObject(String text, Class<T> clz) {
+            public <V> V toObject(String text, Class<V> clz) {
                 return JsonUtil.toObject(text, clz);
             }
         };
