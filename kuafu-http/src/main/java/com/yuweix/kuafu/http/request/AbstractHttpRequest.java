@@ -294,11 +294,25 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 																.context(context)
                                                                 .charset(charset)
                                                                 .json(json);
-		try {
-			return client.execute(httpUriRequest, handler, context);
-		} catch (Exception ex) {
+        HttpResponse<B> resp = null;
+        long startTime = System.currentTimeMillis();
+        try {
+            log.info("Http请求开始, url: {}, method: {}", url, method);
+            resp = client.execute(httpUriRequest, handler, context);
+            return resp;
+        } catch (Exception ex) {
             log.error("CloseableHttpClient.execute失败, Error: {}", ex.getMessage(), ex);
-			return new ErrorHttpResponse<>(HttpStatus.SC_INTERNAL_SERVER_ERROR, ex.toString());
-		}
+            return new ErrorHttpResponse<>(HttpStatus.SC_INTERNAL_SERVER_ERROR, ex.toString());
+        } finally {
+            long endTime = System.currentTimeMillis();
+            log.info("Http请求结束, url: {}, method: {}, status: {}, body: {}, 耗时: {}ms", url, method
+                    , resp == null ? "" : resp.getStatus(), resp == null || resp.getBody() == null ? "" : json.toString(resp.getBody())
+                    , endTime - startTime);
+            try {
+                client.close();
+            } catch (Exception ex) {
+                log.error("CloseableHttpClient.close失败, Error: {}", ex.getMessage(), ex);
+            }
+        }
 	}
 }
