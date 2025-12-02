@@ -28,6 +28,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
 import java.lang.reflect.Type;
@@ -38,6 +40,8 @@ import java.util.List;
  * @author yuwei
  */
 public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> implements HttpRequest {
+    private static final Logger log = LoggerFactory.getLogger(AbstractHttpRequest.class);
+
 	private HttpUriRequest httpUriRequest;
 	private String url;
 	private HttpMethod method;
@@ -284,15 +288,17 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		}
 
 		CloseableHttpClient client = builder.build();
-		CallbackResponseHandler<B> handler = CallbackResponseHandler.<B>create(json)
+		CallbackResponseHandler<B> handler = CallbackResponseHandler.<B>create()
 																.responseType(responseTypeClass)
 																.responseType(responseType)
 																.context(context)
-																.charset(charset);
+																.charset(charset)
+                                                                .json(json);
 		try {
 			return client.execute(httpUriRequest, handler, context);
-		} catch (Exception e) {
-			return new ErrorHttpResponse<>(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.toString());
+		} catch (Exception ex) {
+            log.error("CloseableHttpClient.execute失败, Error: {}", ex.getMessage(), ex);
+			return new ErrorHttpResponse<>(HttpStatus.SC_INTERNAL_SERVER_ERROR, ex.toString());
 		}
 	}
 }

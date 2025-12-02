@@ -1,7 +1,6 @@
 package com.yuweix.kuafu.http;
 
 
-import com.yuweix.kuafu.core.JsonUtil;
 import com.yuweix.kuafu.http.response.HttpResponse;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -11,6 +10,8 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
 import java.io.ByteArrayOutputStream;
@@ -29,6 +30,8 @@ import java.util.List;
  * @author yuwei
  */
 public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<B>> {
+    private static final Logger log = LoggerFactory.getLogger(CallbackResponseHandler.class);
+
 	private Class<?> typeClass;
     private Type type;
 	private HttpClientContext context;
@@ -36,13 +39,12 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
     private HttpJson json;
 
 
-	private CallbackResponseHandler(HttpJson json) {
+	private CallbackResponseHandler() {
 		this.typeClass = String.class;
-        this.json = json;
 	}
 
-	public static<B> CallbackResponseHandler<B> create(HttpJson json) {
-		return new CallbackResponseHandler<>(json);
+	public static<B> CallbackResponseHandler<B> create() {
+		return new CallbackResponseHandler<>();
 	}
 
 	public CallbackResponseHandler<B> responseType(Class<?> typeClass) {
@@ -157,6 +159,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 				Decoder<?> decoder = (Decoder<?>) constructor.newInstance();
 				body = (B) decoder.decode(txt);
 			} catch (Exception e) {
+                log.error("Decoder解析失败, Error: {}", e.getMessage(), e);
 				throw new RuntimeException(e);
 			}
 		} else {
