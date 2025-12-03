@@ -20,7 +20,7 @@ import com.yuweix.kuafu.http.response.HttpResponse;
  * 上传文件
  * @author yuwei
  */
-public class HttpFileRequest extends AbstractHttpRequest<HttpFileRequest> {
+public class HttpFileRequest<B> extends AbstractHttpRequest<HttpFileRequest<B>, B> {
 	private List<FileField> fileFieldList;
 	private List<FormField> formFieldList;
 
@@ -31,12 +31,12 @@ public class HttpFileRequest extends AbstractHttpRequest<HttpFileRequest> {
 		formFieldList = new ArrayList<>();
 		method(HttpMethod.POST);
 	}
-	public static HttpFileRequest create() {
-		return new HttpFileRequest();
+	public static <B>HttpFileRequest<B> create() {
+		return new HttpFileRequest<>();
 	}
 
 
-	public HttpFileRequest addFile(String fieldName, byte[] content, String fileName) {
+	public HttpFileRequest<B> addFile(String fieldName, byte[] content, String fileName) {
 		FileWrapper fw = new FileWrapper();
 		fw.setContent(content);
 		fw.setFileName(fileName);
@@ -55,7 +55,7 @@ public class HttpFileRequest extends AbstractHttpRequest<HttpFileRequest> {
 		return this;
 	}
 
-	public HttpFileRequest formFieldList(Map<String, ?> map) {
+	public HttpFileRequest<B> formFieldList(Map<String, ?> map) {
 		if (map == null || map.isEmpty()) {
 			return this;
 		}
@@ -71,12 +71,12 @@ public class HttpFileRequest extends AbstractHttpRequest<HttpFileRequest> {
 		}
 		return formFieldList(formFieldList);
 	}
-	public HttpFileRequest formFieldList(List<FormField> formFieldList) {
+	public HttpFileRequest<B> formFieldList(List<FormField> formFieldList) {
 		this.formFieldList.clear();
 		this.formFieldList.addAll(formFieldList);
 		return this;
 	}
-	public HttpFileRequest addFormField(String key, String value) {
+	public HttpFileRequest<B> addFormField(String key, String value) {
 		if (key == null || "".equals(key) || value == null || "".equals(value)) {
 			return this;
 		}
@@ -86,7 +86,7 @@ public class HttpFileRequest extends AbstractHttpRequest<HttpFileRequest> {
 	}
 
 	@Override
-	public <B>HttpResponse<B> execute() {
+	public HttpResponse<B> execute() {
 		String charset = getCharset();
 		charset = charset != null ? charset : HttpConstant.ENCODING_UTF_8;
 		

@@ -13,7 +13,7 @@ import com.yuweix.kuafu.http.response.HttpResponse;
  * body请求
  * @author yuwei
  */
-public class HttpBodyRequest extends AbstractHttpRequest<HttpBodyRequest> {
+public class HttpBodyRequest<B> extends AbstractHttpRequest<HttpBodyRequest<B>, B> {
 	private String content;
 	private ContentType contentType;
 
@@ -23,23 +23,23 @@ public class HttpBodyRequest extends AbstractHttpRequest<HttpBodyRequest> {
 		contentType(ContentType.TEXT_PLAIN);
 		method(HttpMethod.POST);
 	}
-	public static HttpBodyRequest create() {
-		return new HttpBodyRequest();
+	public static <B>HttpBodyRequest<B> create() {
+		return new HttpBodyRequest<>();
 	}
 
 
-	public HttpBodyRequest content(String content) {
+	public HttpBodyRequest<B> content(String content) {
 		this.content = content;
 		return this;
 	}
-	public HttpBodyRequest contentType(ContentType contentType) {
+	public HttpBodyRequest<B> contentType(ContentType contentType) {
 		this.contentType = contentType;
 		return this;
 	}
 
 
 	@Override
-	public <B>HttpResponse<B> execute() {
+	public HttpResponse<B> execute() {
 		String charset = getCharset();
 		charset = charset != null ? charset : HttpConstant.ENCODING_UTF_8;
 
