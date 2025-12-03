@@ -26,7 +26,7 @@ import com.yuweix.kuafu.http.response.HttpResponse;
  * 表单请求
  * @author yuwei
  */
-public class HttpFormRequest<B> extends AbstractHttpRequest<HttpFormRequest<B>, B> {
+public class HttpFormRequest extends AbstractHttpRequest<HttpFormRequest> {
 	private List<FormField> fieldList;
 
 
@@ -35,12 +35,12 @@ public class HttpFormRequest<B> extends AbstractHttpRequest<HttpFormRequest<B>, 
 		fieldList = new ArrayList<>();
 		method(HttpMethod.GET);
 	}
-	public static <B>HttpFormRequest<B> create() {
-		return new HttpFormRequest<>();
+	public static HttpFormRequest create() {
+		return new HttpFormRequest();
 	}
 
 
-	public HttpFormRequest<B> fieldList(Map<String, ?> map) {
+	public HttpFormRequest fieldList(Map<String, ?> map) {
 		if (map == null || map.isEmpty()) {
 			return this;
 		}
@@ -56,12 +56,12 @@ public class HttpFormRequest<B> extends AbstractHttpRequest<HttpFormRequest<B>, 
 		}
 		return fieldList(fieldList);
 	}
-	public HttpFormRequest<B> fieldList(List<FormField> fieldList) {
+	public HttpFormRequest fieldList(List<FormField> fieldList) {
 		this.fieldList.clear();
 		this.fieldList.addAll(fieldList);
 		return this;
 	}
-	public HttpFormRequest<B> addField(String key, String value) {
+	public HttpFormRequest addField(String key, String value) {
 		if (key == null || "".equals(key) || value == null || "".equals(value)) {
 			return this;
 		}
@@ -71,7 +71,7 @@ public class HttpFormRequest<B> extends AbstractHttpRequest<HttpFormRequest<B>, 
 	}
 
 
-	private HttpResponse<B> doGet() {
+	private <B>HttpResponse<B> doGet() {
 		try {
 			URIBuilder uriBuilder = new URIBuilder(this.getUrl());
 			if (fieldList != null && fieldList.size() > 0) {
@@ -111,7 +111,7 @@ public class HttpFormRequest<B> extends AbstractHttpRequest<HttpFormRequest<B>, 
 	}
 
 	@Override
-	public HttpResponse<B> execute() {
+	public <B>HttpResponse<B> execute() {
 		HttpMethod method = getMethod();
 		if (method == null || HttpMethod.GET.equals(method)) {
 			return doGet();
