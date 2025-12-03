@@ -273,7 +273,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 
 		@Override
 		public String toString() {
-            return json.toString(BasicHttpResponse.this);
+            return json.toString(this);
 		}
 	}
 }
