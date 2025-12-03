@@ -13,50 +13,50 @@ import com.yuweix.kuafu.http.response.HttpResponse;
  * body请求
  * @author yuwei
  */
-public class HttpBodyRequest<B> extends AbstractHttpRequest<HttpBodyRequest<B>, B> {
-    private String content;
-    private ContentType contentType;
+public class HttpBodyRequest extends AbstractHttpRequest<HttpBodyRequest> {
+	private String content;
+	private ContentType contentType;
 
 
-    private HttpBodyRequest() {
-        super();
-        contentType(ContentType.TEXT_PLAIN);
-        method(HttpMethod.POST);
-    }
-    public static <B>HttpBodyRequest<B> create() {
-        return new HttpBodyRequest<>();
-    }
+	private HttpBodyRequest() {
+		super();
+		contentType(ContentType.TEXT_PLAIN);
+		method(HttpMethod.POST);
+	}
+	public static HttpBodyRequest create() {
+		return new HttpBodyRequest();
+	}
 
 
-    public HttpBodyRequest<B> content(String content) {
-        this.content = content;
-        return this;
-    }
-    public HttpBodyRequest<B> contentType(ContentType contentType) {
-        this.contentType = contentType;
-        return this;
-    }
+	public HttpBodyRequest content(String content) {
+		this.content = content;
+		return this;
+	}
+	public HttpBodyRequest contentType(ContentType contentType) {
+		this.contentType = contentType;
+		return this;
+	}
 
 
-    @Override
-    public HttpResponse<B> execute() {
-        String charset = getCharset();
-        charset = charset != null ? charset : HttpConstant.ENCODING_UTF_8;
+	@Override
+	public <B>HttpResponse<B> execute() {
+		String charset = getCharset();
+		charset = charset != null ? charset : HttpConstant.ENCODING_UTF_8;
 
-        StringEntity entity = new StringEntity(content, charset);
-        entity.setContentType(contentType.getMimeType());
-        entity.setContentEncoding(charset);
+		StringEntity entity = new StringEntity(content, charset);
+		entity.setContentType(contentType.getMimeType());
+		entity.setContentEncoding(charset);
 
-        HttpEntityEnclosingRequestBase requestBase = getRequestBase();
-        requestBase.setEntity(entity);
-        this.setHttpUriRequest(requestBase);
-        return execute0();
-    }
+		HttpEntityEnclosingRequestBase requestBase = getRequestBase();
+		requestBase.setEntity(entity);
+		this.setHttpUriRequest(requestBase);
+		return execute0();
+	}
 
-    @Override
-    protected ContentType getHeaderContentType() {
-        String charset = getCharset();
-        charset = charset != null ? charset : HttpConstant.ENCODING_UTF_8;
-        return contentType == null ? null : contentType.withCharset(charset);
-    }
+	@Override
+	protected ContentType getHeaderContentType() {
+		String charset = getCharset();
+		charset = charset != null ? charset : HttpConstant.ENCODING_UTF_8;
+		return contentType == null ? null : contentType.withCharset(charset);
+	}
 }
