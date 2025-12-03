@@ -274,7 +274,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 
 		@Override
 		public String toString() {
-			return json.toString(this);
+			return json.toString(BasicHttpResponse.this);
 		}
 	}
 }
