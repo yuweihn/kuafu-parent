@@ -231,7 +231,7 @@
                 <version>${maven.publish.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <publishingServerId>oss_sonatype</publishingServerId>
+                    <publishingServerId>central_sonatype</publishingServerId>
                 </configuration>
             </plugin>
 			<plugin>
