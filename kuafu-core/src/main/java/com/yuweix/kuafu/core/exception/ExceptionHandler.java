@@ -36,7 +36,7 @@ public class ExceptionHandler implements HandlerExceptionResolver {
 	@Override
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response
 			, Object handler, Exception ex) {
-		log.error("", ex);
+		log.error("系统异常, Error: {}", ex.getMessage(), ex);
 		return viewResolver.createView(showMessage(ex));
 	}
 
