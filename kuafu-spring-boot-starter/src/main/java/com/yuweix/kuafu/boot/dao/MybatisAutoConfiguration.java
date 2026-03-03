@@ -38,7 +38,7 @@ public class MybatisAutoConfiguration {
 				if (cache == null) {
 					return;
 				}
-				cache.remove(key);
+				cache.delete(key);
 			}
 		};
 	}

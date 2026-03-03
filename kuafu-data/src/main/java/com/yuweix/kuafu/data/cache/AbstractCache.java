@@ -23,7 +23,7 @@ public abstract class AbstractCache implements Cache {
 		}
 
 		for (int i = newSize; i < oldSize; i++) {
-			remove(key + "." + i);
+			delete(key + "." + i);
 		}
 		return b;
 	}
@@ -32,7 +32,7 @@ public abstract class AbstractCache implements Cache {
 	public String getSplit(String key) {
 		int size = parseValueSize(get(key));
 		if (size <= 0) {
-			remove(key);
+			delete(key);
 			return null;
 		}
 
@@ -48,13 +48,13 @@ public abstract class AbstractCache implements Cache {
 	public void removeSplit(String key) {
 		int size = parseValueSize(get(key));
 		if (size <= 0) {
-			remove(key);
+			delete(key);
 			return;
 		}
 
-		remove(key);
+		delete(key);
 		for (int i = 0; i < size; i++) {
-			remove(key + "." + i);
+			delete(key + "." + i);
 		}
 	}
 

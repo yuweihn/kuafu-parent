@@ -1,6 +1,8 @@
 package com.yuweix.kuafu.data.cache;
 
 
+import java.util.Collection;
+
 /**
  * @author yuwei
  */
@@ -30,10 +32,8 @@ public interface Cache {
 	String getSplit(String key);
 	void removeSplit(String key);
 
-	/**
-	 * @param key
-	 */
-	void remove(String key);
+	void delete(String key);
+	void delete(Collection<String> keys);
 
 	<T>boolean lock(String key, T owner, long timeout);
 	/**

@@ -38,7 +38,7 @@ public class HibernateAutoConfiguration {
                 if (cache == null) {
                     return;
                 }
-                cache.remove(key);
+                cache.delete(key);
             }
         };
     }
