@@ -108,8 +108,16 @@ public class LettuceCache extends AbstractCache implements RedisCache {
 	}
 
 	@Override
-	public void remove(String key) {
+	public void delete(String key) {
 		redisTemplate.delete(key);
+	}
+
+	@Override
+	public void delete(Collection<String> keys) {
+		if (keys == null || keys.size() <= 0) {
+			return;
+		}
+		redisTemplate.delete(keys);
 	}
 
 	@Override

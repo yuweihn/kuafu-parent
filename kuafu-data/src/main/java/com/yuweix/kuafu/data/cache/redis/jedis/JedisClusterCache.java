@@ -1,18 +1,17 @@
 package com.yuweix.kuafu.data.cache.redis.jedis;
 
 
-import java.util.*;
-
 import com.yuweix.kuafu.data.cache.AbstractCache;
 import com.yuweix.kuafu.data.cache.MessageHandler;
 import com.yuweix.kuafu.data.cache.redis.RedisCache;
-
 import com.yuweix.kuafu.data.serializer.CacheSerializer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPubSub;
+
+import java.util.*;
 
 
 /**
@@ -83,8 +82,16 @@ public class JedisClusterCache extends AbstractCache implements RedisCache {
 	}
 
 	@Override
-	public void remove(String key) {
+	public void delete(String key) {
 		jedisCluster.del(key);
+	}
+
+	@Override
+	public void delete(Collection<String> keys) {
+		if (keys == null || keys.size() <= 0) {
+			return;
+		}
+		jedisCluster.del(keys.toArray(new String[0]));
 	}
 
 	@Override
