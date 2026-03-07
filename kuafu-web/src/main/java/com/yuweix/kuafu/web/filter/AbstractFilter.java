@@ -347,7 +347,9 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	}
 
 	protected void afterFilter(R request, T response) {
-
+		String headerTraceKey = Constant.HEADER_X_TRACE_ID;
+		response.setHeader(headerTraceKey, MdcUtil.getTraceId());
+		response.addHeader("Access-Control-Expose-Headers", headerTraceKey);
 	}
 
 	@Override
