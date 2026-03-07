@@ -100,6 +100,7 @@ public class CacheContentHttpFilter extends AbstractFilter<CacheBodyRequestWrapp
 
 	@Override
 	protected void afterFilter(CacheBodyRequestWrapper request, ContentCachingResponseWrapper response) {
+		super.afterFilter(request, response);
 		try {
 			response.copyBodyToResponse();
 		} catch (IOException e) {

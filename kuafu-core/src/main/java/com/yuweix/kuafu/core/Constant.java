@@ -28,6 +28,8 @@ public abstract class Constant {
 	public static final String STATIC_PATH_KEY = "staticPath";
 
 	public static final String TRACE_ID_KEY = "traceId";
+	public static final String HEADER_X_TRACE_ID = "x-trace-id";
+
 	public static final String SPAN_ID_KEY = "spanId";
 	/**
 	 * 因不同sleuth版本下traceId会不同，可使用requestId代替
