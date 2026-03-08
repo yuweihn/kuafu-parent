@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -16,9 +18,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -201,6 +201,86 @@ public abstract class ActionUtil {
 	 */
 	public static String getStaticPath(HttpServletRequest request) {
 		return (String) request.getServletContext().getAttribute(Constant.STATIC_PATH_KEY);
+	}
+
+	/**
+	 * 跨域请求设置
+	 */
+	public static void setAccessControl(List<String> originWhiteList) {
+		HttpServletRequest req = getRequest();
+		assert req != null;
+
+		HttpServletResponse resp = getResponse();
+		assert resp != null;
+
+		setAccessControl(req, resp, originWhiteList);
+	}
+	public static void setAccessControl(HttpServletRequest request, HttpServletResponse response, List<String> originWhiteList) {
+		if (!response.containsHeader(Constant.ACCESS_CONTROL_ALLOW_ORIGIN)) {
+			String requestOrigin = request.getHeader("origin");
+			if (requestOrigin == null || "".equals(requestOrigin.trim()) || "null".equals(requestOrigin.trim())
+					|| (originWhiteList != null && originWhiteList.size() > 0 && !originWhiteList.contains(requestOrigin.trim()))) {
+				response.setHeader(Constant.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+			} else {
+				response.setHeader(Constant.ACCESS_CONTROL_ALLOW_ORIGIN, requestOrigin);
+				response.setHeader(Constant.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+			}
+			response.setHeader(Constant.ACCESS_CONTROL_MAX_AGE, "3600");
+		}
+
+		if (!response.containsHeader(Constant.ACCESS_CONTROL_ALLOW_METHODS)) {
+			List<HttpMethod> allowedMethods = Arrays.asList(HttpMethod.values());
+			response.setHeader(Constant.ACCESS_CONTROL_ALLOW_METHODS, StringUtils.collectionToCommaDelimitedString(allowedMethods));
+		}
+		if (!response.containsHeader(Constant.ACCESS_CONTROL_ALLOW_HEADERS)) {
+			response.setHeader(Constant.ACCESS_CONTROL_ALLOW_HEADERS, getAllowedHeaders(request));
+		}
+	}
+	public static String getAllowedHeaders() {
+		HttpServletRequest req = getRequest();
+		assert req != null;
+		return getAllowedHeaders(req);
+	}
+	public static String getAllowedHeaders(HttpServletRequest request) {
+		Enumeration<String> headerNames = request.getHeaderNames();
+		if (headerNames == null || !headerNames.hasMoreElements()) {
+			return "*";
+		}
+
+		StringBuilder builder = new StringBuilder("");
+		while (headerNames.hasMoreElements()) {
+			String headerName = headerNames.nextElement();
+			if (Constant.ACCESS_CONTROL_REQUEST_HEADERS.equalsIgnoreCase(headerName)) {
+				String headerVal = request.getHeader(headerName);
+				if (headerVal != null && !"".equals(headerVal.trim())) {
+					builder.append(headerVal).append(",");
+				}
+			} else {
+				builder.append(headerName).append(",");
+			}
+		}
+		return builder.deleteCharAt(builder.length() - 1).toString();
+	}
+
+	public static void addExposeHeader(String key, String val) {
+		HttpServletResponse resp = getResponse();
+		assert resp != null;
+		addExposeHeader(resp, key, val);
+	}
+	public static void addExposeHeader(HttpServletResponse response, String key, String val) {
+		response.setHeader(key, val);
+
+		Collection<String> headers = response.getHeaders(Constant.ACCESS_CONTROL_EXPOSE_HEADERS);
+		if (headers == null || headers.isEmpty()) {
+			response.setHeader(Constant.ACCESS_CONTROL_EXPOSE_HEADERS, key);
+		} else {
+			StringBuilder builder = new StringBuilder("");
+			for (String header : headers) {
+				builder.append(header).append(",");
+			}
+			builder.append(key);
+			response.setHeader(Constant.ACCESS_CONTROL_EXPOSE_HEADERS, builder.toString());
+		}
 	}
 
 	public static void output(byte[] bytes) {
