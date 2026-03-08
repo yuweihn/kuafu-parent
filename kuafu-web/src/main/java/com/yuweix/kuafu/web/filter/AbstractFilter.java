@@ -7,8 +7,6 @@ import com.yuweix.kuafu.core.JsonUtil;
 import com.yuweix.kuafu.core.MdcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpMethod;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -117,8 +115,8 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
             beforeFilter(req, resp);
 			setCharacterEncoding(req, resp);
 			setContextPath(req);
-			setAccessControl(req, resp);
-			addTraceHeader(resp);
+			ActionUtil.setAccessControl(req, resp, originWhiteList);
+			ActionUtil.addExposeHeader(resp, Constant.HEADER_X_TRACE_ID, MdcUtil.getTraceId());
 
 			filterChain.doFilter(req, resp);
 
@@ -258,51 +256,6 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		ActionUtil.addStaticPath(request, staticPath);
 	}
 
-	/**
-	 * 跨域请求设置
-	 */
-	protected void setAccessControl(R request, T response) {
-		if (!response.containsHeader(Constant.ACCESS_CONTROL_ALLOW_ORIGIN)) {
-			String requestOrigin = request.getHeader("origin");
-			if (requestOrigin == null || "".equals(requestOrigin.trim()) || "null".equals(requestOrigin.trim())
-					|| (originWhiteList != null && originWhiteList.size() > 0 && !originWhiteList.contains(requestOrigin.trim()))) {
-				response.setHeader(Constant.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
-			} else {
-				response.setHeader(Constant.ACCESS_CONTROL_ALLOW_ORIGIN, requestOrigin);
-				response.setHeader(Constant.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-			}
-			response.setHeader(Constant.ACCESS_CONTROL_MAX_AGE, "3600");
-		}
-
-		if (!response.containsHeader(Constant.ACCESS_CONTROL_ALLOW_METHODS)) {
-			List<HttpMethod> allowedMethods = Arrays.asList(HttpMethod.values());
-			response.setHeader(Constant.ACCESS_CONTROL_ALLOW_METHODS, StringUtils.collectionToCommaDelimitedString(allowedMethods));
-		}
-		if (!response.containsHeader(Constant.ACCESS_CONTROL_ALLOW_HEADERS)) {
-			response.setHeader(Constant.ACCESS_CONTROL_ALLOW_HEADERS, getAllowedHeaders(request));
-		}
-	}
-	private String getAllowedHeaders(HttpServletRequest request) {
-		Enumeration<String> headerNames = request.getHeaderNames();
-		if (headerNames == null || !headerNames.hasMoreElements()) {
-			return "*";
-		}
-
-		StringBuilder builder = new StringBuilder("");
-		while (headerNames.hasMoreElements()) {
-			String headerName = headerNames.nextElement();
-			if (Constant.ACCESS_CONTROL_REQUEST_HEADERS.equalsIgnoreCase(headerName)) {
-				String headerVal = request.getHeader(headerName);
-				if (headerVal != null && !"".equals(headerVal.trim())) {
-					builder.append(headerVal).append(",");
-				}
-			} else {
-				builder.append(headerName).append(",");
-			}
-		}
-		return builder.deleteCharAt(builder.length() - 1).toString();
-	}
-
 
 	protected void beforeFilter(R request, T response) {
 
@@ -348,12 +301,6 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 
 	protected void afterFilter(R request, T response) {
 
-	}
-
-	protected void addTraceHeader(T response) {
-		String headerTraceKey = Constant.HEADER_X_TRACE_ID;
-		response.setHeader(headerTraceKey, MdcUtil.getTraceId());
-		response.addHeader(Constant.ACCESS_CONTROL_EXPOSE_HEADERS, headerTraceKey);
 	}
 
 	@Override
