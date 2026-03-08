@@ -29,7 +29,6 @@ import java.util.*;
 public abstract class AbstractFilter<R extends HttpServletRequest, T extends HttpServletResponse> extends OncePerRequestFilter {
 	private static final Logger log = LoggerFactory.getLogger(AbstractFilter.class);
 
-	private static final String ACCESS_CONTROL_REQUEST_HEADERS = "access-control-request-headers";
 	private static final String DEFAULT_METHOD_PARAM = "_method";
 	private static final String DEFAULT_ENCODING = Constant.ENCODING_UTF_8;
 	private static final String DEFAULT_STATIC_PATH = "/static/";
@@ -262,24 +261,24 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	 * 跨域请求设置
 	 */
 	protected void setAccessControl(R request, T response) {
-		if (!response.containsHeader("Access-Control-Allow-Origin")) {
+		if (!response.containsHeader(Constant.ACCESS_CONTROL_ALLOW_ORIGIN)) {
 			String requestOrigin = request.getHeader("origin");
 			if (requestOrigin == null || "".equals(requestOrigin.trim()) || "null".equals(requestOrigin.trim())
 					|| (originWhiteList != null && originWhiteList.size() > 0 && !originWhiteList.contains(requestOrigin.trim()))) {
-				response.setHeader("Access-Control-Allow-Origin", "*");
+				response.setHeader(Constant.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
 			} else {
-				response.setHeader("Access-Control-Allow-Origin", requestOrigin);
-				response.setHeader("Access-Control-Allow-Credentials", "true");
+				response.setHeader(Constant.ACCESS_CONTROL_ALLOW_ORIGIN, requestOrigin);
+				response.setHeader(Constant.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
 			}
-			response.setHeader("Access-Control-Max-Age", "3600");
+			response.setHeader(Constant.ACCESS_CONTROL_MAX_AGE, "3600");
 		}
 
-		if (!response.containsHeader("Access-Control-Allow-Methods")) {
+		if (!response.containsHeader(Constant.ACCESS_CONTROL_ALLOW_METHODS)) {
 			List<HttpMethod> allowedMethods = Arrays.asList(HttpMethod.values());
-			response.setHeader("Access-Control-Allow-Methods", StringUtils.collectionToCommaDelimitedString(allowedMethods));
+			response.setHeader(Constant.ACCESS_CONTROL_ALLOW_METHODS, StringUtils.collectionToCommaDelimitedString(allowedMethods));
 		}
-		if (!response.containsHeader("Access-Control-Allow-Headers")) {
-			response.setHeader("Access-Control-Allow-Headers", getAllowedHeaders(request));
+		if (!response.containsHeader(Constant.ACCESS_CONTROL_ALLOW_HEADERS)) {
+			response.setHeader(Constant.ACCESS_CONTROL_ALLOW_HEADERS, getAllowedHeaders(request));
 		}
 	}
 	private String getAllowedHeaders(HttpServletRequest request) {
@@ -291,7 +290,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		StringBuilder builder = new StringBuilder("");
 		while (headerNames.hasMoreElements()) {
 			String headerName = headerNames.nextElement();
-			if (ACCESS_CONTROL_REQUEST_HEADERS.equalsIgnoreCase(headerName)) {
+			if (Constant.ACCESS_CONTROL_REQUEST_HEADERS.equalsIgnoreCase(headerName)) {
 				String headerVal = request.getHeader(headerName);
 				if (headerVal != null && !"".equals(headerVal.trim())) {
 					builder.append(headerVal).append(",");
@@ -349,7 +348,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	protected void afterFilter(R request, T response) {
 		String headerTraceKey = Constant.HEADER_X_TRACE_ID;
 		response.setHeader(headerTraceKey, MdcUtil.getTraceId());
-		response.addHeader("Access-Control-Expose-Headers", headerTraceKey);
+		response.addHeader(Constant.ACCESS_CONTROL_EXPOSE_HEADERS, headerTraceKey);
 	}
 
 	@Override

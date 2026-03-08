@@ -36,4 +36,12 @@ public abstract class Constant {
 	 */
 	public static final String REQUEST_ID_KEY = "requestId";
 	public static final String REQUEST_HEADER_X_REQUEST_ID = "x-request-id";
+
+	public static final String ACCESS_CONTROL_REQUEST_HEADERS = "access-control-request-headers";
+	public static final String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
+	public static final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+	public static final String ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
+	public static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
+	public static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
+	public static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
 }

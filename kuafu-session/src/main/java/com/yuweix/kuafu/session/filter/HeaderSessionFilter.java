@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.session.filter;
 
 
+import com.yuweix.kuafu.core.Constant;
 import com.yuweix.kuafu.session.SessionConstant;
 import com.yuweix.kuafu.session.cache.SessionCache;
 import com.yuweix.kuafu.session.conf.SessionConf;
@@ -42,7 +43,7 @@ public class HeaderSessionFilter extends SessionFilter {
 			sid = UUID.randomUUID().toString().replace("-", "");
 		}
 		response.setHeader(headerKey, sid);
-		response.addHeader("Access-Control-Expose-Headers", headerKey);
+		response.addHeader(Constant.ACCESS_CONTROL_EXPOSE_HEADERS, headerKey);
 		return sid;
 	}
 }
