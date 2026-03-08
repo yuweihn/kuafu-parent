@@ -119,6 +119,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 			setCharacterEncoding(req, resp);
 			setContextPath(req);
 			setAccessControl(req, resp);
+			addTraceHeader(resp);
 
 			filterChain.doFilter(req, resp);
 
@@ -341,6 +342,10 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	}
 
 	protected void afterFilter(R request, T response) {
+
+	}
+
+	protected void addTraceHeader(T response) {
 		String headerTraceKey = Constant.HEADER_X_TRACE_ID;
 		response.setHeader(headerTraceKey, MdcUtil.getTraceId());
 		response.addHeader(Constant.ACCESS_CONTROL_EXPOSE_HEADERS, headerTraceKey);
