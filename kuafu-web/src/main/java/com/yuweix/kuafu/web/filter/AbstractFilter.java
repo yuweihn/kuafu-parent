@@ -96,12 +96,12 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		try {
 			initTraceProperties(request);
-			doFilterInternal0(request, response, filterChain);
+			doFilter(request, response, filterChain);
 		} finally {
 			removeTraceProperties();
 		}
 	}
-	protected void doFilterInternal0(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		PathPattern exclusivePattern = InitParameter.getInstance().getExclusivePattern();
 		if (exclusivePattern != null && exclusivePattern.matches(request)) {
 			filterChain.doFilter(request, response);
