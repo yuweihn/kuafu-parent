@@ -98,13 +98,17 @@ public class CacheContentHttpFilter extends AbstractFilter<CacheBodyRequestWrapp
 		return limit(str, maxResponseSize);
 	}
 
-	@Override
-	protected void afterFilter(CacheBodyRequestWrapper request, ContentCachingResponseWrapper response) {
-		super.afterFilter(request, response);
+	protected void writeResponseBody(ContentCachingResponseWrapper response) {
 		try {
 			response.copyBodyToResponse();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	protected void afterFilter(CacheBodyRequestWrapper request, ContentCachingResponseWrapper response) {
+		super.afterFilter(request, response);
+		this.writeResponseBody(response);
 	}
 }
