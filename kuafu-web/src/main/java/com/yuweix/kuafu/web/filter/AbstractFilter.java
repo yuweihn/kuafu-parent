@@ -216,14 +216,16 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 
 		Map<String, Object> preLogMap = preLog(request);
 		Map<String, Object> postLogMap = postLog(request);
+		Map<String, Object> allLogMap = new LinkedHashMap<>();
 		if (preLogMap != null) {
-			baseLogMap.putAll(preLogMap);
+			allLogMap.putAll(preLogMap);
 		}
+		allLogMap.putAll(baseLogMap);
 		if (postLogMap != null) {
-			baseLogMap.putAll(postLogMap);
+			allLogMap.putAll(postLogMap);
 		}
 
-		return baseLogMap;
+		return allLogMap;
 	}
 
 	protected Map<String, Object> preLog(HttpServletRequest request) {
