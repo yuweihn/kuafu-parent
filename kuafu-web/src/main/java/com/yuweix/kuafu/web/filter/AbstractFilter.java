@@ -43,6 +43,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 
 	private boolean logAllHeaders = false;
 	private final List<String> logHeaders = new ArrayList<>();
+	private PathPattern exclusivePattern;
 
 
 	public void setMethodParam(String methodParam) {
@@ -101,7 +102,6 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		}
 	}
 	protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-		PathPattern exclusivePattern = InitParameter.getInstance().getExclusivePattern();
 		if (exclusivePattern != null && exclusivePattern.matches(request)) {
 			filterChain.doFilter(request, response);
 			return;
@@ -203,7 +203,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		String contentType = request.getContentType();
 		Map<String, String[]> params = request.getParameterMap();
 
-		LinkedHashMap<String, Object> baseLogMap = new LinkedHashMap<>();
+		Map<String, Object> baseLogMap = new LinkedHashMap<>();
 		baseLogMap.put("ip", ActionUtil.getRequestIP());
 		baseLogMap.put("method", request.getMethod().toLowerCase());
 		baseLogMap.put("url", url);
@@ -216,16 +216,14 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 
 		Map<String, Object> preLogMap = preLog(request);
 		Map<String, Object> postLogMap = postLog(request);
-		Map<String, Object> allLogMap = new LinkedHashMap<>();
 		if (preLogMap != null) {
-			allLogMap.putAll(preLogMap);
+			baseLogMap.putAll(preLogMap);
 		}
-		allLogMap.putAll(baseLogMap);
 		if (postLogMap != null) {
-			allLogMap.putAll(postLogMap);
+			baseLogMap.putAll(postLogMap);
 		}
 
-		return allLogMap;
+		return baseLogMap;
 	}
 
 	protected Map<String, Object> preLog(HttpServletRequest request) {
@@ -255,7 +253,6 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		ActionUtil.addContextPath(request);
 		ActionUtil.addStaticPath(request, staticPath);
 	}
-
 
 	protected void beforeFilter(R request, T response) {
 
@@ -307,12 +304,11 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	public void initFilterBean() throws ServletException {
 		super.initFilterBean();
 		FilterConfig config = this.getFilterConfig();
-		InitParameter initParameter = InitParameter.getInstance();
 
 		assert config != null;
 		String exclusive = config.getInitParameter("exclusive");
 		if (exclusive != null && !"".equals(exclusive.trim())) {
-			initParameter.setExclusivePattern(exclusive.split(","));
+			this.exclusivePattern = new PathPattern(exclusive.split(","));
 		}
 	}
 }
