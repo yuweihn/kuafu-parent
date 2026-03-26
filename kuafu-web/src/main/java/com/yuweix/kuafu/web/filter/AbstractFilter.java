@@ -275,7 +275,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
             if (val == null) {
                 continue;
             }
-            map.put("att", val);
+            map.put(att, val);
         }
         return map;
     }
