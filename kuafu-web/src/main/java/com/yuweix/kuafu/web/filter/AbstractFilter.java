@@ -1,10 +1,7 @@
 package com.yuweix.kuafu.web.filter;
 
 
-import com.yuweix.kuafu.core.ActionUtil;
-import com.yuweix.kuafu.core.Constant;
-import com.yuweix.kuafu.core.JsonUtil;
-import com.yuweix.kuafu.core.MdcUtil;
+import com.yuweix.kuafu.core.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
@@ -42,8 +39,13 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	private List<String> originWhiteList = new ArrayList<>();
 	private boolean allowLogRequest = true;
 
-	private boolean logAllHeaders = false;
-	private final List<String> logHeaders = new ArrayList<>();
+	/**
+	 * 允许打印的header
+	 * 1、如果为空，表示不打印任一header；
+	 * 2、如果仅包含一个元素且为星号(*)，则打印全部header；
+	 * 3、只打印指定的header，多个用逗号(,)隔开
+	 */
+	private List<String> logHeaders = null;
 	private PathPattern exclusivePattern;
 
 
@@ -71,27 +73,6 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		this.allowLogRequest = allowLogRequest;
 	}
 
-	public void setLogHeaders(String headers) {
-		if ("*".equals(headers)) {
-			this.logAllHeaders = true;
-			return;
-		}
-		this.logAllHeaders = false;
-		if (headers == null) {
-			return;
-		}
-		String[] arr = headers.trim().split(",");
-		if (arr.length <= 0) {
-			return;
-		}
-		this.logHeaders.clear();
-		for (String h: arr) {
-			if (h == null || h.trim().isEmpty()) {
-				continue;
-			}
-			this.logHeaders.add(h.trim());
-		}
-	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -259,7 +240,10 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	}
 
 	protected Map<String, Object> getRequestHeader(R request) {
-		if (this.logAllHeaders) {
+		if (this.logHeaders.isEmpty()) {
+			return null;
+		}
+		if (this.logHeaders.size() == 1 && "*".equals(this.logHeaders.get(0))) {
 			Enumeration<String> headerNames = request.getHeaderNames();
 			if (headerNames == null || !headerNames.hasMoreElements()) {
 				return null;
@@ -273,10 +257,6 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 				}
 			}
 			return map;
-		}
-
-		if (this.logHeaders.isEmpty()) {
-			return null;
 		}
 		Map<String, Object> map = new HashMap<>();
 		for (String h: this.logHeaders) {
@@ -300,15 +280,41 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 
 	}
 
+	protected Object limit(String str, Integer maxSize) {
+		if (maxSize == null || maxSize < 0) {
+			try {
+				return JsonUtil.toObject(str);
+			} catch (Exception e) {
+				return str;
+			}
+		}
+		if (maxSize == 0) {
+			return null;
+		}
+		if (str != null && str.length() > maxSize) {
+			str = str.substring(0, maxSize) + "......";
+		}
+		try {
+			return JsonUtil.toObject(str);
+		} catch (Exception e) {
+			return str;
+		}
+	}
+
 	@Override
 	public void initFilterBean() throws ServletException {
 		super.initFilterBean();
 		FilterConfig config = this.getFilterConfig();
-
 		assert config != null;
+
 		String exclusive = config.getInitParameter("exclusive");
 		if (exclusive != null && !"".equals(exclusive.trim())) {
 			this.exclusivePattern = new PathPattern(exclusive.split(","));
+		}
+
+		String logHeader = config.getInitParameter("logHeader");
+		if (logHeader != null && !"".equals(logHeader.trim())) {
+			this.logHeaders = BeanUtil.split(Collections.singletonList(logHeader), ",");
 		}
 	}
 }
