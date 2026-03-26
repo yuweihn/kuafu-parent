@@ -7,8 +7,6 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 
 /**
@@ -26,19 +24,8 @@ public class CacheContentHttpFilter extends AbstractFilter<CacheBodyRequestWrapp
 	}
 
 	@Override
-	protected Map<String, Object> logRequest(CacheBodyRequestWrapper request) {
-		Map<String, Object> logInfoMap = super.logRequest(request);
-		Object bodyInfo = getRequestBody(request);
-
-		if (bodyInfo == null || "".equals(bodyInfo)) {
-			return logInfoMap;
-		}
-
-		if (logInfoMap == null) {
-			logInfoMap = new LinkedHashMap<>();
-		}
-		logInfoMap.put("requestBody", bodyInfo);
-		return logInfoMap;
+	protected byte[] getRequestBodyBytes(CacheBodyRequestWrapper request) {
+		return request.getRequestBody();
 	}
 
 	@Override
