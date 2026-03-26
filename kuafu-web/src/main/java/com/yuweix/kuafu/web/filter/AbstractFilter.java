@@ -305,7 +305,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	}
 
 	protected Map<String, Object> getRequestHeader(R request) {
-		if (this.logHeaders.isEmpty()) {
+		if (this.logHeaders == null || this.logHeaders.isEmpty()) {
 			return null;
 		}
 		if (this.logHeaders.size() == 1 && "*".equals(this.logHeaders.get(0))) {
