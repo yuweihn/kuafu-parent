@@ -47,7 +47,15 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	 * 3、只打印指定的header，多个用逗号(,)隔开
 	 */
 	private List<String> logHeaders = null;
+	/**
+	 * 忽略的url
+	 */
 	private PathPattern exclusivePattern;
+	/**
+	 * 需打印的Request中的Attribute
+	 */
+	private List<String> requestAttributes = null;
+
 	private Integer maxRequestSize = null;
 	private Integer maxResponseSize = null;
 
@@ -244,15 +252,27 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		return null;
 	}
 
-	protected Map<String, Object> preLog(HttpServletRequest request) {
+	protected Map<String, Object> preLog(R request) {
 		Map<String, Object> map = new LinkedHashMap<>();
 		map.put("traceId", MdcUtil.getTraceId());
 		map.put("spanId", MdcUtil.getSpanId());
 		return map;
 	}
 
-	protected Map<String, Object> postLog(HttpServletRequest request) {
-		return null;
+	protected Map<String, Object> postLog(R request) {
+		if (this.requestAttributes == null || this.requestAttributes.size() <= 0) {
+			return null;
+		}
+
+		Map<String, Object> map = new LinkedHashMap<>();
+		for (String att : this.requestAttributes) {
+			Object val = request.getAttribute(att);
+			if (val == null) {
+				continue;
+			}
+			map.put("att", val);
+		}
+		return map;
 	}
 
 	/**
@@ -355,6 +375,11 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		String logHeader = config.getInitParameter("logHeader");
 		if (logHeader != null && !"".equals(logHeader.trim())) {
 			this.logHeaders = BeanUtil.split(Collections.singletonList(logHeader), ",");
+		}
+
+		String requestAtt = config.getInitParameter("requestAtt");
+		if (requestAtt != null && !"".equals(requestAtt.trim())) {
+			this.requestAttributes = BeanUtil.split(Collections.singletonList(requestAtt), ",");
 		}
 	}
 }
