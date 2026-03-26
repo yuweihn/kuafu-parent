@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -47,7 +48,22 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	 */
 	private List<String> logHeaders = null;
 	private PathPattern exclusivePattern;
+	private Integer maxRequestSize = null;
+	private Integer maxResponseSize = null;
 
+
+	public void setMaxRequestSize(Integer maxRequestSize) {
+		this.maxRequestSize = maxRequestSize;
+	}
+	public void setMaxResponseSize(Integer maxResponseSize) {
+		this.maxResponseSize = maxResponseSize;
+	}
+	public Integer getMaxRequestSize() {
+		return maxRequestSize;
+	}
+	public Integer getMaxResponseSize() {
+		return maxResponseSize;
+	}
 
 	public void setMethodParam(String methodParam) {
 		this.methodParam = methodParam;
@@ -202,6 +218,23 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		}
 
 		return allLogMap;
+	}
+
+	protected Object getRequestBody(CacheBodyRequestWrapper request) {
+		byte[] bytes = request.getRequestBody();
+		if (bytes.length <= 0) {
+			return null;
+		}
+
+		String content = new String(bytes, Charset.forName(getEncoding()));
+		if ("".equals(content)) {
+			return null;
+		}
+		try {
+			content = URLDecoder.decode(content, getEncoding());
+		} catch (Exception ignored) {
+		}
+		return limit(content, maxRequestSize);
 	}
 
 	protected Map<String, Object> preLog(HttpServletRequest request) {
