@@ -229,7 +229,10 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	}
 
 	protected Map<String, Object> preLog(HttpServletRequest request) {
-		return null;
+		Map<String, Object> map = new LinkedHashMap<>();
+		map.put("traceId", MdcUtil.getTraceId());
+		map.put("spanId", MdcUtil.getSpanId());
+		return map;
 	}
 
 	protected Map<String, Object> postLog(HttpServletRequest request) {
