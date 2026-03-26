@@ -71,26 +71,6 @@ public class CacheContentHttpFilter extends AbstractFilter<CacheBodyRequestWrapp
 		}
 		return limit(content, maxRequestSize);
 	}
-	private Object limit(String str, Integer maxSize) {
-		if (maxSize == null || maxSize < 0) {
-			try {
-				return JsonUtil.toObject(str);
-			} catch (Exception e) {
-				return str;
-			}
-		}
-		if (maxSize == 0) {
-			return null;
-		}
-		if (str != null && str.length() > maxSize) {
-			str = str.substring(0, maxSize) + "......";
-		}
-		try {
-			return JsonUtil.toObject(str);
-		} catch (Exception e) {
-			return str;
-		}
-	}
 
 	@Override
 	protected Object getResponseBody(ContentCachingResponseWrapper response) {
