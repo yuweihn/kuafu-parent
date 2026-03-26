@@ -210,6 +210,10 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		if (params != null && !params.isEmpty()) {
 			baseLogMap.put("params", params);
 		}
+		Object bodyInfo = getRequestBody(request);
+		if (bodyInfo == null || "".equals(bodyInfo)) {
+			baseLogMap.put("requestBody", bodyInfo);
+		}
 
 		Map<String, Object> preLogMap = preLog(request);
 		Map<String, Object> postLogMap = postLog(request);
@@ -225,9 +229,9 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		return allLogMap;
 	}
 
-	protected Object getRequestBody(CacheBodyRequestWrapper request) {
-		byte[] bytes = request.getRequestBody();
-		if (bytes.length <= 0) {
+	protected Object getRequestBody(R request) {
+		byte[] bytes = getRequestBodyBytes(request);
+		if (bytes == null || bytes.length <= 0) {
 			return null;
 		}
 
@@ -240,6 +244,9 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		} catch (Exception ignored) {
 		}
 		return limit(content, maxRequestSize);
+	}
+	protected byte[] getRequestBodyBytes(R request) {
+		return null;
 	}
 
 	protected Map<String, Object> preLog(HttpServletRequest request) {
