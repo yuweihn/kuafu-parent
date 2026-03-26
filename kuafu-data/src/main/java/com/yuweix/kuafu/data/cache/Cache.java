@@ -3,6 +3,7 @@ package com.yuweix.kuafu.data.cache;
 
 import java.util.Collection;
 
+
 /**
  * @author yuwei
  */
@@ -30,7 +31,7 @@ public interface Cache {
 
 	boolean putSplit(String key, String value, long timeout, int maxLength);
 	String getSplit(String key);
-	void removeSplit(String key);
+	void deleteSplit(String key);
 
 	void delete(String key);
 	void delete(Collection<String> keys);

@@ -45,7 +45,7 @@ public abstract class AbstractCache implements Cache {
 	}
 
 	@Override
-	public void removeSplit(String key) {
+	public void deleteSplit(String key) {
 		int size = parseValueSize(get(key));
 		if (size <= 0) {
 			delete(key);
