@@ -51,7 +51,7 @@ public abstract class Constant {
 	public static String LOGIN_ACCOUNT = "loginAccount";
 
 
-	@Value("${kuafu.login.account:}")
+	@Value("${kuafu.login.accountKey:}")
 	public void setLoginAccount(String loginAccount) {
 		if (loginAccount != null && !"".equals(loginAccount.trim())) {
 			LOGIN_ACCOUNT = loginAccount.trim();
