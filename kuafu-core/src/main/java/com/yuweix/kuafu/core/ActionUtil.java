@@ -391,9 +391,10 @@ public abstract class ActionUtil {
 		HttpSession session = getRequest().getSession();
 		try {
 			return (T) session.getAttribute(Constant.LOGIN_ACCOUNT_KEY);
-		} catch (Exception e) {
+		} catch (Exception ex) {
 			session.removeAttribute(Constant.LOGIN_ACCOUNT_KEY);
-			throw new RuntimeException(e);
+			log.error("获取登录人信息失败，Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		}
 	}
 }
