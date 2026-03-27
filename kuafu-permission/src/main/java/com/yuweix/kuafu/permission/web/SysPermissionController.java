@@ -1,11 +1,11 @@
 package com.yuweix.kuafu.permission.web;
 
 
+import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.DateUtil;
 import com.yuweix.kuafu.core.JsonUtil;
 import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.permission.annotations.Permission;
-import com.yuweix.kuafu.permission.common.PermissionUtil;
 import com.yuweix.kuafu.permission.common.Properties;
 import com.yuweix.kuafu.permission.dto.AdminDTO;
 import com.yuweix.kuafu.permission.dto.PermissionDTO;
@@ -91,7 +91,7 @@ public class SysPermissionController {
 			, @RequestParam(value = "visible", required = false, defaultValue = "true") boolean visible
 			, @RequestParam(value = "icon", required = false) String icon
 			, @RequestParam(value = "descr", required = false) String descr) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = ActionUtil.getLoginAccount();
 		sysPermissionService.addPermission(permNo, title, parentId, orderNum, path, component, ifExt
 				, permType, visible, icon, descr, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
@@ -115,7 +115,7 @@ public class SysPermissionController {
 			, @RequestParam(value = "visible", required = false, defaultValue = "true") boolean visible
 			, @RequestParam(value = "icon", required = false) String icon
 			, @RequestParam(value = "descr", required = false) String descr) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = ActionUtil.getLoginAccount();
 		sysPermissionService.updatePermission(id, permNo, title, parentId, orderNum, path, component, ifExt
 				, permType, visible, icon, descr, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");

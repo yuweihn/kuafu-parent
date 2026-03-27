@@ -20,9 +20,6 @@ public class Properties implements Serializable {
 
 	private String appName;
 
-	private String actionClass;
-	private String actionMethod;
-
 	private String successCode = "0000";
 	private String failureCode = "9999";
 	private String noAuthorityCode = "1005";
@@ -37,28 +34,6 @@ public class Properties implements Serializable {
 
 	public void setAppName(String appName) {
 		this.appName = appName;
-	}
-
-	public String getActionClass() {
-		if (actionClass == null) {
-			throw new RuntimeException("[actionClass] is required.");
-		}
-		return actionClass;
-	}
-
-	public void setActionClass(String actionClass) {
-		this.actionClass = actionClass;
-	}
-
-	public String getActionMethod() {
-		if (actionMethod == null) {
-			throw new RuntimeException("[actionMethod] is required.");
-		}
-		return actionMethod;
-	}
-
-	public void setActionMethod(String actionMethod) {
-		this.actionMethod = actionMethod;
 	}
 
 	public String getSuccessCode() {
