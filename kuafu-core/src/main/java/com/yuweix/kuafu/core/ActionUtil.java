@@ -12,6 +12,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -373,5 +374,26 @@ public abstract class ActionUtil {
 	 */
 	public static String redirect(String url) {
 		return "redirect:" + url;
+	}
+
+	/**
+	 * 当前登录人放入session
+	 */
+	public static<T> void putLoginAccount(T loginAccount) {
+		HttpSession session = getRequest().getSession();
+		if (loginAccount == null) {
+			session.removeAttribute(Constant.LOGIN_ACCOUNT);
+		} else {
+			session.setAttribute(Constant.LOGIN_ACCOUNT, loginAccount);
+		}
+	}
+	public static<T> T getLoginAccount() {
+		HttpSession session = getRequest().getSession();
+		try {
+			return (T) session.getAttribute(Constant.LOGIN_ACCOUNT);
+		} catch (Exception e) {
+			session.removeAttribute(Constant.LOGIN_ACCOUNT);
+			throw new RuntimeException(e);
+		}
 	}
 }

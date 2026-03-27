@@ -13,7 +13,7 @@ public abstract class Constant {
 	public static final String IMG_TYPE_JPG = ".jpg";
 	public static final int DEFAULT_HTTP_PORT = 80;
 	public static final int DEFAULT_HTTPS_PORT = 443;
-	
+
 	/**
 	 * 每页默认显示条数
 	 */
@@ -44,4 +44,6 @@ public abstract class Constant {
 	public static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
 	public static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
 	public static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
+
+	public static final String LOGIN_ACCOUNT = "loginAccount";
 }
