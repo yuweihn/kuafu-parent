@@ -382,17 +382,17 @@ public abstract class ActionUtil {
 	public static<T> void putLoginAccount(T loginAccount) {
 		HttpSession session = getRequest().getSession();
 		if (loginAccount == null) {
-			session.removeAttribute(Constant.LOGIN_ACCOUNT);
+			session.removeAttribute(Constant.LOGIN_ACCOUNT_KEY);
 		} else {
-			session.setAttribute(Constant.LOGIN_ACCOUNT, loginAccount);
+			session.setAttribute(Constant.LOGIN_ACCOUNT_KEY, loginAccount);
 		}
 	}
 	public static<T> T getLoginAccount() {
 		HttpSession session = getRequest().getSession();
 		try {
-			return (T) session.getAttribute(Constant.LOGIN_ACCOUNT);
+			return (T) session.getAttribute(Constant.LOGIN_ACCOUNT_KEY);
 		} catch (Exception e) {
-			session.removeAttribute(Constant.LOGIN_ACCOUNT);
+			session.removeAttribute(Constant.LOGIN_ACCOUNT_KEY);
 			throw new RuntimeException(e);
 		}
 	}

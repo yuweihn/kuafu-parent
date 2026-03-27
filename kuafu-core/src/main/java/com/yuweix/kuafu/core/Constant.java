@@ -48,13 +48,13 @@ public abstract class Constant {
 	public static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
 	public static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
 
-	public static String LOGIN_ACCOUNT = "loginAccount";
+	public static String LOGIN_ACCOUNT_KEY = "loginAccount";
 
 
 	@Value("${kuafu.login.accountKey:}")
-	public void setLoginAccount(String loginAccount) {
-		if (loginAccount != null && !"".equals(loginAccount.trim())) {
-			LOGIN_ACCOUNT = loginAccount.trim();
+	public void setLoginAccount(String accountKey) {
+		if (accountKey != null && !"".equals(accountKey.trim())) {
+			LOGIN_ACCOUNT_KEY = accountKey.trim();
 		}
 	}
 }
