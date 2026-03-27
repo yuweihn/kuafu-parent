@@ -1,9 +1,9 @@
 package com.yuweix.kuafu.permission.web;
 
 
+import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.permission.annotations.Permission;
-import com.yuweix.kuafu.permission.common.PermissionUtil;
 import com.yuweix.kuafu.permission.common.Properties;
 import com.yuweix.kuafu.permission.dto.AdminDTO;
 import com.yuweix.kuafu.permission.dto.PageResponseDTO;
@@ -72,7 +72,7 @@ public class SysRoleController {
 	@ResponseBody
 	public Response<String, Void> createRole(@RequestParam(value = "roleNo", required = true)String roleNo
 			, @RequestParam(value = "roleName", required = true) String roleName) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = ActionUtil.getLoginAccount();
 		sysRoleService.addRole(roleNo.trim(), roleName, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
@@ -86,7 +86,7 @@ public class SysRoleController {
 	public Response<String, Void> updateRole(@RequestParam(value = "id", required = true) long id
 			, @RequestParam(value = "roleNo", required = true)String roleNo
 			, @RequestParam(value = "roleName", required = true) String roleName) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = ActionUtil.getLoginAccount();
 		sysRoleService.updateRole(id, roleNo.trim(), roleName, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}

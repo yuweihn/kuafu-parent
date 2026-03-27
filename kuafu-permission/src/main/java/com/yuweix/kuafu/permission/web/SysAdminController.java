@@ -1,9 +1,9 @@
 package com.yuweix.kuafu.permission.web;
 
 
+import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.permission.annotations.Permission;
-import com.yuweix.kuafu.permission.common.PermissionUtil;
 import com.yuweix.kuafu.permission.common.Properties;
 import com.yuweix.kuafu.permission.dto.AdminDTO;
 import com.yuweix.kuafu.permission.dto.PageResponseDTO;
@@ -82,7 +82,7 @@ public class SysAdminController {
 			, @RequestParam(value = "password", required = true) String password
 			, @RequestParam(value = "realName", required = false) String realName
 			, @RequestParam(value = "gender", required = false) Byte gender) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = ActionUtil.getLoginAccount();
 		sysAdminService.createAccount(accountNo, password, realName, gender, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
@@ -96,7 +96,7 @@ public class SysAdminController {
 	public Response<String, Void> updateAdmin(@RequestParam(value = "accountId", required = true) long accountId
 			, @RequestParam(value = "realName", required = false) String realName
 			, @RequestParam(value = "gender", required = false) Byte gender) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = ActionUtil.getLoginAccount();
 		sysAdminService.updateAccount(accountId, realName, gender, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
@@ -109,7 +109,7 @@ public class SysAdminController {
 	@ResponseBody
 	public Response<String, Void> changePassword(@RequestParam(value = "accountId", required = true) long accountId
 			, @RequestParam(value = "password", required = true) String password) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = ActionUtil.getLoginAccount();
 		sysAdminService.changePassword(accountId, password, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
@@ -153,7 +153,7 @@ public class SysAdminController {
 	@RequestMapping(value = "/sys/admin/permission/menu/list", method = GET)
 	@ResponseBody
 	public Response<String, List<PermissionMenuTreeDTO>> getMenuTreeListByAdminId() {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = ActionUtil.getLoginAccount();
 		List<PermissionMenuTreeDTO> menuList = sysPermissionService.getMenuTreeListByAdminId(adminDto.getId());
 		return Response.of(properties.getSuccessCode(), "ok", menuList);
 	}
@@ -164,12 +164,8 @@ public class SysAdminController {
 	@RequestMapping(value = "/sys/admin/permission/button/list", method = GET)
 	@ResponseBody
 	public Response<String, List<String>> getPermissionNoListByAdminId() {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		AdminDTO adminDto = ActionUtil.getLoginAccount();
 		List<String> permList = sysPermissionService.getPermissionNoListByAdminId(adminDto.getId());
 		return Response.of(properties.getSuccessCode(), "ok", permList);
 	}
 }
-
-
-
-
