@@ -5,6 +5,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -374,5 +375,26 @@ public abstract class ActionUtil {
 	 */
 	public static String redirect(String url) {
 		return "redirect:" + url;
+	}
+
+	/**
+	 * 当前登录人放入session
+	 */
+	public static<T> void putLoginAccount(T loginAccount) {
+		HttpSession session = getRequest().getSession();
+		if (loginAccount == null) {
+			session.removeAttribute(Constant.LOGIN_ACCOUNT);
+		} else {
+			session.setAttribute(Constant.LOGIN_ACCOUNT, loginAccount);
+		}
+	}
+	public static<T> T getLoginAccount() {
+		HttpSession session = getRequest().getSession();
+		try {
+			return (T) session.getAttribute(Constant.LOGIN_ACCOUNT);
+		} catch (Exception e) {
+			session.removeAttribute(Constant.LOGIN_ACCOUNT);
+			throw new RuntimeException(e);
+		}
 	}
 }
