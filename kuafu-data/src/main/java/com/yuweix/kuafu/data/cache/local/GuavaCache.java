@@ -111,7 +111,7 @@ public class GuavaCache implements LocalCache {
     }
 
     @Override
-    public boolean remove(String key) {
+    public boolean delete(String key) {
         try {
             cache.invalidate(key);
             if (log.isDebugEnabled()) {
@@ -128,7 +128,7 @@ public class GuavaCache implements LocalCache {
      * 批量移除缓存
      */
     @Override
-    public boolean remove(List<String> keys) {
+    public boolean delete(List<String> keys) {
         try {
             cache.invalidateAll(keys);
             if (log.isDebugEnabled()) {
@@ -145,7 +145,7 @@ public class GuavaCache implements LocalCache {
      * 清空所有缓存
      */
     @Override
-    public boolean removeAll() {
+    public boolean deleteAll() {
         try {
             cache.invalidateAll();
             if (log.isDebugEnabled()) {

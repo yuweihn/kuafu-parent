@@ -13,9 +13,9 @@ public interface LocalCache {
     boolean put(Map<String, String> map);
     String get(String key);
     String getIfPresent(String key);
-    boolean remove(String key);
-    boolean remove(List<String> keys);
-    boolean removeAll();
+    boolean delete(String key);
+    boolean delete(List<String> keys);
+    boolean deleteAll();
     long size();
     List<String> keys();
 }
