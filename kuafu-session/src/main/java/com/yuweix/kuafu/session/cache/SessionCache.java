@@ -13,7 +13,7 @@ public interface SessionCache {
 	 */
 	boolean put(String key, String value, long timeout);
 	String get(String key);
-	void remove(String key);
+	void delete(String key);
 
 	/**
 	 * session同步完成之后的操作

@@ -201,9 +201,9 @@ public class CacheHttpSession implements HttpSession {
 	}
 
 	public void removeSessionFromCache() {
-		SessionConf.getInstance().getCache().remove(fullSessionId);
+		SessionConf.getInstance().getCache().delete(fullSessionId);
 		if (sessionIdKey != null) {
-			SessionConf.getInstance().getCache().remove(sessionIdKey);
+			SessionConf.getInstance().getCache().delete(sessionIdKey);
 		}
 	}
 
@@ -231,7 +231,7 @@ public class CacheHttpSession implements HttpSession {
 			 */
 			String sessionId = sessionCache.get(sessionIdKey);
 			if (sessionId != null && !sessionId.equals(fullSessionId)) {
-				sessionCache.remove(sessionId);
+				sessionCache.delete(sessionId);
 			}
 			sessionCache.put(sessionIdKey, fullSessionId, timeSec);
 		}
