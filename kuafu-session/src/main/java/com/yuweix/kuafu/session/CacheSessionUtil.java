@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * @author yuwei
  */
-public abstract class SessionUtil {
+public abstract class CacheSessionUtil {
 	/**
 	 * 根据指定sessionId获得登录时间
 	 * eg.  sessionId:  cache.kuafu.session.9ee627c1a0d14d17a5c794ad2dd8421d
