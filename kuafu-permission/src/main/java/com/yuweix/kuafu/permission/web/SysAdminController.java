@@ -82,7 +82,8 @@ public class SysAdminController {
 			, @RequestParam(value = "password", required = true) String password
 			, @RequestParam(value = "realName", required = false) String realName
 			, @RequestParam(value = "gender", required = false) Byte gender) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long adminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(adminId);
 		sysAdminService.createAccount(accountNo, password, realName, gender, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
@@ -96,7 +97,8 @@ public class SysAdminController {
 	public Response<String, Void> updateAdmin(@RequestParam(value = "accountId", required = true) long accountId
 			, @RequestParam(value = "realName", required = false) String realName
 			, @RequestParam(value = "gender", required = false) Byte gender) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long adminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(adminId);
 		sysAdminService.updateAccount(accountId, realName, gender, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
@@ -109,7 +111,8 @@ public class SysAdminController {
 	@ResponseBody
 	public Response<String, Void> changePassword(@RequestParam(value = "accountId", required = true) long accountId
 			, @RequestParam(value = "password", required = true) String password) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long adminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(adminId);
 		sysAdminService.changePassword(accountId, password, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
@@ -153,7 +156,8 @@ public class SysAdminController {
     @RequestMapping(value = "/sys/admin/permission/menu/list", method = GET)
     @ResponseBody
     public Response<String, List<PermissionMenuTreeDTO>> getMenuTreeListByAdminId() {
-        AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long adminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(adminId);
         List<PermissionMenuTreeDTO> menuList = sysPermissionService.getMenuTreeListByAdminId(adminDto.getId());
         return Response.of(properties.getSuccessCode(), "ok", menuList);
     }
@@ -164,7 +168,8 @@ public class SysAdminController {
     @RequestMapping(value = "/sys/admin/permission/button/list", method = GET)
     @ResponseBody
     public Response<String, List<String>> getPermissionNoListByAdminId() {
-        AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long adminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(adminId);
         List<String> permList = sysPermissionService.getPermissionNoListByAdminId(adminDto.getId());
         return Response.of(properties.getSuccessCode(), "ok", permList);
     }

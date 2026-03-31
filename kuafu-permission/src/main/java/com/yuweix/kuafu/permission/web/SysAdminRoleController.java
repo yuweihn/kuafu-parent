@@ -9,6 +9,7 @@ import com.yuweix.kuafu.permission.dto.AdminDTO;
 import com.yuweix.kuafu.permission.dto.AdminRoleDTO;
 import com.yuweix.kuafu.permission.dto.PageResponseDTO;
 import com.yuweix.kuafu.permission.service.SysAdminRoleService;
+import com.yuweix.kuafu.permission.service.SysAdminService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,6 +27,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
  */
 @Controller
 public class SysAdminRoleController {
+	@Resource
+	private SysAdminService sysAdminService;
 	@Resource
 	private SysAdminRoleService sysAdminRoleService;
 	@Resource
@@ -69,7 +72,8 @@ public class SysAdminRoleController {
 	@ResponseBody
 	public Response<String, Long> addAdminRole(@RequestParam(value = "adminId", required = true) long adminId
 			, @RequestParam(value = "roleId", required = true) long roleId) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long loginAdminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(loginAdminId);
 		long id = sysAdminRoleService.addAdminRole(adminId, roleId, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok", id);
 	}
@@ -83,7 +87,8 @@ public class SysAdminRoleController {
 	public Response<String, Void> updateAdminRole(@RequestParam(value = "id", required = true) long id
 			, @RequestParam(value = "adminId", required = true) long adminId
 			, @RequestParam(value = "roleId", required = true) long roleId) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long loginAdminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(loginAdminId);
 		sysAdminRoleService.updateAdminRole(id, adminId, roleId, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
@@ -94,7 +99,7 @@ public class SysAdminRoleController {
 	@Permission(value = "sys.admin.role.delete")
 	@RequestMapping(value = "/sys/admin/role/delete", method = DELETE)
 	@ResponseBody
-	public Response<String, Void> deleteAdminRole(@RequestParam(value = "ids", required = true)long[] ids) {
+	public Response<String, Void> deleteAdminRole(@RequestParam(value = "ids", required = true) long[] ids) {
 		for (long id: ids) {
 			sysAdminRoleService.deleteAdminRole(id);
 		}

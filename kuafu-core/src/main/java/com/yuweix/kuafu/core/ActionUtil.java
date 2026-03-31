@@ -379,22 +379,34 @@ public abstract class ActionUtil {
 	/**
 	 * 当前登录人放入session
 	 */
-	public static<T> void putLoginAccount(T loginAccount) {
-		HttpSession session = getRequest().getSession();
-		if (loginAccount == null) {
-			session.removeAttribute(Constant.LOGIN_ACCOUNT_KEY);
-		} else {
-			session.setAttribute(Constant.LOGIN_ACCOUNT_KEY, loginAccount);
-		}
-	}
-	public static<T> T getLoginAccount() {
-		HttpSession session = getRequest().getSession();
-		try {
-			return (T) session.getAttribute(Constant.LOGIN_ACCOUNT_KEY);
-		} catch (Exception ex) {
-			session.removeAttribute(Constant.LOGIN_ACCOUNT_KEY);
-			log.error("获取登录人信息失败，Error: {}", ex.getMessage(), ex);
-			throw new RuntimeException(ex);
-		}
-	}
+    public static<K, T> void putLoginAccount(K accountId, T account) {
+        HttpSession session = getRequest().getSession();
+        if (accountId == null || account == null) {
+            session.removeAttribute(Constant.LOGIN_ACCOUNT_ID_KEY);
+            session.removeAttribute(Constant.LOGIN_ACCOUNT_KEY);
+        } else {
+            session.setAttribute(Constant.LOGIN_ACCOUNT_ID_KEY, accountId);
+            session.setAttribute(Constant.LOGIN_ACCOUNT_KEY, account);
+        }
+    }
+    public static<K> K getLoginAccountId() {
+        HttpSession session = getRequest().getSession();
+        try {
+            return (K) session.getAttribute(Constant.LOGIN_ACCOUNT_ID_KEY);
+        } catch (Exception ex) {
+            session.removeAttribute(Constant.LOGIN_ACCOUNT_ID_KEY);
+            log.error("获取登录人ID失败，Error: {}", ex.getMessage(), ex);
+            throw new RuntimeException(ex);
+        }
+    }
+    public static<T> T getLoginAccount() {
+        HttpSession session = getRequest().getSession();
+        try {
+            return (T) session.getAttribute(Constant.LOGIN_ACCOUNT_KEY);
+        } catch (Exception ex) {
+            session.removeAttribute(Constant.LOGIN_ACCOUNT_KEY);
+            log.error("获取登录人信息失败，Error: {}", ex.getMessage(), ex);
+            throw new RuntimeException(ex);
+        }
+    }
 }

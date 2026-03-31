@@ -10,6 +10,7 @@ import com.yuweix.kuafu.permission.common.Properties;
 import com.yuweix.kuafu.permission.dto.AdminDTO;
 import com.yuweix.kuafu.permission.dto.PermissionDTO;
 import com.yuweix.kuafu.permission.dto.PermissionExportDTO;
+import com.yuweix.kuafu.permission.service.SysAdminService;
 import com.yuweix.kuafu.permission.service.SysPermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 public class SysPermissionController {
 	private static final Logger log = LoggerFactory.getLogger(SysPermissionController.class);
 
+	@Resource
+	private SysAdminService sysAdminService;
 	@Resource
 	private SysPermissionService sysPermissionService;
 	@Resource
@@ -91,7 +94,8 @@ public class SysPermissionController {
 			, @RequestParam(value = "visible", required = false, defaultValue = "true") boolean visible
 			, @RequestParam(value = "icon", required = false) String icon
 			, @RequestParam(value = "descr", required = false) String descr) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long adminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(adminId);
 		sysPermissionService.addPermission(permNo, title, parentId, orderNum, path, component, ifExt
 				, permType, visible, icon, descr, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
@@ -115,7 +119,8 @@ public class SysPermissionController {
 			, @RequestParam(value = "visible", required = false, defaultValue = "true") boolean visible
 			, @RequestParam(value = "icon", required = false) String icon
 			, @RequestParam(value = "descr", required = false) String descr) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long adminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(adminId);
 		sysPermissionService.updatePermission(id, permNo, title, parentId, orderNum, path, component, ifExt
 				, permType, visible, icon, descr, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
