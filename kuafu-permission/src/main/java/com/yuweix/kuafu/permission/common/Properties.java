@@ -52,9 +52,6 @@ public class Properties implements Serializable {
 	}
 
 	public String getActionMethod() {
-		if (actionMethod == null) {
-			throw new RuntimeException("[actionMethod] is required.");
-		}
 		return actionMethod;
 	}
 
