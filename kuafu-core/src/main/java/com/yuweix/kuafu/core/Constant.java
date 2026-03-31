@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 /**
  * @author yuwei
  **/
-public abstract class Constant {
+public class Constant {
 	public static final String ENCODING_UTF_8 = "utf-8";
 	public static final String LOCALE_ZH_CN = "zh_CN";
 	public static final String LOCALE_EN_US = "en_US";

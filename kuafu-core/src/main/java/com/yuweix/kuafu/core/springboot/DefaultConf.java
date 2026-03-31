@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.core.springboot;
 
 
+import com.yuweix.kuafu.core.Constant;
 import com.yuweix.kuafu.core.SpringContext;
 import com.yuweix.kuafu.core.serialize.FastSerializer;
 import com.yuweix.kuafu.core.serialize.Serializer;
@@ -15,6 +16,19 @@ import java.lang.reflect.Constructor;
  * @author yuwei
  */
 public class DefaultConf {
+    @ConditionalOnMissingBean(Constant.class)
+    @Bean
+    public Constant constant() {
+        try {
+            Class<?> clz = Class.forName(Constant.class.getName());
+            Constructor<?> constructor = clz.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return (Constant) constructor.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @ConditionalOnMissingBean(SpringContext.class)
     @Bean
     public SpringContext springContext() {

@@ -1,9 +1,9 @@
 package com.yuweix.kuafu.permission.web;
 
 
-import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.permission.annotations.Permission;
+import com.yuweix.kuafu.permission.common.PermissionUtil;
 import com.yuweix.kuafu.permission.common.Properties;
 import com.yuweix.kuafu.permission.dto.AdminDTO;
 import com.yuweix.kuafu.permission.dto.PermissionDTO;
@@ -68,7 +68,7 @@ public class SysRolePermissionController {
 				permIdList.add(permId);
 			}
 		}
-		AdminDTO adminDto = ActionUtil.getLoginAccount();
+		AdminDTO adminDto = PermissionUtil.getLoginAccount();
 		sysRolePermissionService.saveRolePermission(roleId, permIdList, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
