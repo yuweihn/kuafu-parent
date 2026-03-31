@@ -48,9 +48,16 @@ public class Constant {
 	public static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
 	public static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
 
+	public static String LOGIN_ACCOUNT_ID_KEY = "loginAccountId";
 	public static String LOGIN_ACCOUNT_KEY = "loginAccount";
 
 
+	@Value("${kuafu.login.accountIdKey:}")
+	public void setLoginAccountId(String accountIdKey) {
+		if (accountIdKey != null && !"".equals(accountIdKey.trim())) {
+			LOGIN_ACCOUNT_ID_KEY = accountIdKey.trim();
+		}
+	}
 	@Value("${kuafu.login.accountKey:}")
 	public void setLoginAccount(String accountKey) {
 		if (accountKey != null && !"".equals(accountKey.trim())) {

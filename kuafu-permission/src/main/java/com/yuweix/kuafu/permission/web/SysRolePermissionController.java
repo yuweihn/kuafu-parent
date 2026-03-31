@@ -8,6 +8,7 @@ import com.yuweix.kuafu.permission.common.Properties;
 import com.yuweix.kuafu.permission.dto.AdminDTO;
 import com.yuweix.kuafu.permission.dto.PermissionDTO;
 import com.yuweix.kuafu.permission.dto.RolePermissionDTO;
+import com.yuweix.kuafu.permission.service.SysAdminService;
 import com.yuweix.kuafu.permission.service.SysPermissionService;
 import com.yuweix.kuafu.permission.service.SysRolePermissionService;
 import jakarta.annotation.Resource;
@@ -29,6 +30,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
  */
 @Controller
 public class SysRolePermissionController {
+	@Resource
+	private SysAdminService sysAdminService;
 	@Resource
 	private SysPermissionService sysPermissionService;
 	@Resource
@@ -61,14 +64,15 @@ public class SysRolePermissionController {
 	@RequestMapping(value = "/sys/role/permission/save", method = POST)
 	@ResponseBody
 	public Response<String, Void> saveRolePermission(@RequestParam(value = "roleId", required = true) long roleId
-			, @RequestParam(value = "permIds", required = true)long[] permIds) {
+			, @RequestParam(value = "permIds", required = true) long[] permIds) {
 		List<Long> permIdList = new ArrayList<>();
 		if (permIds != null && permIds.length > 0) {
 			for (long permId : permIds) {
 				permIdList.add(permId);
 			}
 		}
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long adminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(adminId);
 		sysRolePermissionService.saveRolePermission(roleId, permIdList, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}

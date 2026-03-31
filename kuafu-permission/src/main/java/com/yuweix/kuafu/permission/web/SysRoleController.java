@@ -8,6 +8,7 @@ import com.yuweix.kuafu.permission.common.Properties;
 import com.yuweix.kuafu.permission.dto.AdminDTO;
 import com.yuweix.kuafu.permission.dto.PageResponseDTO;
 import com.yuweix.kuafu.permission.dto.RoleDTO;
+import com.yuweix.kuafu.permission.service.SysAdminService;
 import com.yuweix.kuafu.permission.service.SysRoleService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
  */
 @Controller
 public class SysRoleController {
+	@Resource
+	private SysAdminService sysAdminService;
 	@Resource
 	private SysRoleService sysRoleService;
 	@Resource
@@ -72,7 +75,8 @@ public class SysRoleController {
 	@ResponseBody
 	public Response<String, Void> createRole(@RequestParam(value = "roleNo", required = true)String roleNo
 			, @RequestParam(value = "roleName", required = true) String roleName) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long adminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(adminId);
 		sysRoleService.addRole(roleNo.trim(), roleName, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
@@ -86,7 +90,8 @@ public class SysRoleController {
 	public Response<String, Void> updateRole(@RequestParam(value = "id", required = true) long id
 			, @RequestParam(value = "roleNo", required = true)String roleNo
 			, @RequestParam(value = "roleName", required = true) String roleName) {
-		AdminDTO adminDto = PermissionUtil.getLoginAccount();
+		long adminId = PermissionUtil.getLoginAccountId();
+		AdminDTO adminDto = sysAdminService.findAdminById(adminId);
 		sysRoleService.updateRole(id, roleNo.trim(), roleName, adminDto.getAccountNo());
 		return new Response<>(properties.getSuccessCode(), "ok");
 	}
