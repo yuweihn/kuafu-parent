@@ -59,12 +59,12 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 	private List<HttpResponseInterceptor> firstResponseInterceptorList;
 	private List<HttpResponseInterceptor> lastResponseInterceptorList;
 	private String charset;
-    private HttpJson json;
+    private JsonParser jsonParser;
 
 
 	protected AbstractHttpRequest() {
         this.responseTypeClass = String.class;
-        this.json = new HttpJson() {
+        this.jsonParser = new JsonParser() {
             @Override
             public String toString(Object obj) {
                 return JsonUtil.toString(obj);
@@ -193,8 +193,8 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 	}
 
     @SuppressWarnings("unchecked")
-    public T json(HttpJson json) {
-        this.json = json;
+    public T jsonParser(JsonParser jsonParser) {
+        this.jsonParser = jsonParser;
         return (T) this;
     }
 
@@ -293,7 +293,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 																.responseType(responseType)
 																.context(context)
                                                                 .charset(charset)
-                                                                .json(json);
+                                                                .jsonParser(jsonParser);
         HttpResponse<B> resp = null;
         long startTime = System.currentTimeMillis();
         try {
@@ -306,7 +306,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
         } finally {
             long endTime = System.currentTimeMillis();
             log.info("Http请求结束, url: {}, method: {}, status: {}, body: {}, 耗时: {}ms", url, method
-                    , resp == null ? "" : resp.getStatus(), resp == null || resp.getBody() == null ? "" : json.toString(resp.getBody())
+                    , resp == null ? "" : resp.getStatus(), resp == null || resp.getBody() == null ? "" : jsonParser.toString(resp.getBody())
                     , endTime - startTime);
             try {
                 client.close();

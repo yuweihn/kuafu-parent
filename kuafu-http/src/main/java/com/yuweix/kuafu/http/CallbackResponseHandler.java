@@ -1,7 +1,6 @@
 package com.yuweix.kuafu.http;
 
 
-import com.yuweix.kuafu.http.request.AbstractHttpRequest;
 import com.yuweix.kuafu.http.response.HttpResponse;
 import jakarta.servlet.http.Cookie;
 import org.apache.http.Header;
@@ -37,7 +36,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
     private Type type;
 	private HttpClientContext context;
 	private String charset;
-    private HttpJson json;
+    private JsonParser jsonParser;
 
 
 	private CallbackResponseHandler() {
@@ -68,8 +67,8 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		return this;
 	}
 
-    public CallbackResponseHandler<B> json(HttpJson json) {
-        this.json = json;
+    public CallbackResponseHandler<B> jsonParser(JsonParser jsonParser) {
+        this.jsonParser = jsonParser;
         return this;
     }
 
@@ -136,7 +135,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		if (type != null) {
 			String txt = EntityUtils.toString(entity, charset != null ? charset : HttpConstant.ENCODING_UTF_8);
 			if (HttpStatus.SC_OK == status) {
-                body = json.toObject(txt, type);
+                body = jsonParser.toObject(txt, type);
 			} else {
 				errorMessage.append(". ").append(txt);
 			}
@@ -167,7 +166,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 			 **/
 			String txt = EntityUtils.toString(entity, charset != null ? charset : HttpConstant.ENCODING_UTF_8);
 			if (HttpStatus.SC_OK == status) {
-				body = (B) json.toObject(txt, typeClass);
+				body = (B) jsonParser.toObject(txt, typeClass);
 			} else {
 				errorMessage.append(". ").append(txt);
 			}
@@ -273,7 +272,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 
 		@Override
 		public String toString() {
-            return json.toString(this);
+            return jsonParser.toString(this);
 		}
 	}
 }
