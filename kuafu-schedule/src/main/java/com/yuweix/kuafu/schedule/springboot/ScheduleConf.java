@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
  */
 public class ScheduleConf {
 	@ConditionalOnMissingBean(ScheduleAspect.class)
-	@Bean(name = "scheduleAspect")
+	@Bean
 	public ScheduleAspect scheduleAspect() {
 		return new ScheduleAspect();
 	}
