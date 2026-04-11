@@ -44,7 +44,7 @@ public abstract class CacheableDao<T extends Serializable, PK extends Serializab
 
 	public void deleteByIdFromCache(PK id) {
 		String key = getPkCacheKeyPre() + id;
-		cache.remove(key);
+		cache.delete(key);
 	}
 
 	@Override

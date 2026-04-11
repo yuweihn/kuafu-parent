@@ -61,7 +61,7 @@ public class SysAdminDaoImpl extends CacheableDao<SysAdmin, Long> implements Sys
 	@Override
 	public void deleteAdminFromCache(String accountNo) {
 		String key = String.format(CACHE_KEY_ADMIN_BY_ACCOUNT_NO, getAppName(), accountNo);
-		cache.remove(key);
+		cache.delete(key);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class SysAdminDaoImpl extends CacheableDao<SysAdmin, Long> implements Sys
 	@Override
 	public void deleteHasPermissionFromCache(long adminId, long permissionId) {
 		String key = String.format(CACHE_KEY_HAS_PERMISSION_BY_ADMIN_ID_AND_PERMISSION_ID, getAppName(), adminId, permissionId);
-		cache.remove(key);
+		cache.delete(key);
 	}
 
 	@Override
