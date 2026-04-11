@@ -15,4 +15,5 @@ com.yuweix.kuafu.boot.web.FreeMarkerAutoConfiguration
 com.yuweix.kuafu.boot.exception.ExceptionAutoConfiguration
 com.yuweix.kuafu.boot.sharding.ShardingAutoConfiguration
 com.yuweix.kuafu.boot.schedule.ScheduleAutoConfiguration
+com.yuweix.kuafu.boot.feign.FeignFallbackAutoConfiguration
 com.yuweix.kuafu.boot.permission.PermissionAutoConfiguration
