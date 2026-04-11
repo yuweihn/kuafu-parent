@@ -14,5 +14,5 @@ public interface PersistCache {
 	 */
 	<T>boolean put(String key, T value, long timeout);
 	<T>T get(String key);
-	void remove(String key);
+	void delete(String key);
 }
