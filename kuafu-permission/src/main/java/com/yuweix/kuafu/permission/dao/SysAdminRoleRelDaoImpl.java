@@ -97,7 +97,7 @@ public class SysAdminRoleRelDaoImpl extends CacheableDao<SysAdminRoleRel, Long> 
 	@Override
 	public void deleteHasRoleFromCache(long adminId, long roleId) {
 		String key = String.format(CACHE_KEY_HAS_ROLE, getAppName(), adminId, roleId);
-		cache.remove(key);
+		cache.delete(key);
 	}
 
 	@Override
@@ -130,6 +130,6 @@ public class SysAdminRoleRelDaoImpl extends CacheableDao<SysAdminRoleRel, Long> 
 	@Override
 	public void deleteByAdminIdAndRoleIdFromCache(long adminId, long roleId) {
 		String key = String.format(CACHE_KEY_ADMIN_ROLE_BY_ADMIN_ID_ROLE_ID, getAppName(), adminId, roleId);
-		cache.remove(key);
+		cache.delete(key);
 	}
 }

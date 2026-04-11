@@ -58,6 +58,6 @@ public class SysRoleDaoImpl extends CacheableDao<SysRole, Long> implements SysRo
 	@Override
 	public void deleteRoleByNoFromCache(String roleNo) {
 		String key = String.format(CACHE_KEY_ROLE_BY_NO, getAppName(), roleNo);
-		cache.remove(key);
+		cache.delete(key);
 	}
 }

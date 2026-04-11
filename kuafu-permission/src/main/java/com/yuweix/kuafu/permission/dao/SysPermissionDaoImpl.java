@@ -73,7 +73,7 @@ public class SysPermissionDaoImpl extends CacheableDao<SysPermission, Long> impl
 	@Override
 	public void deletePermissionByNoFromCache(String permNo) {
 		String key = String.format(CACHE_KEY_PERMISSION_BY_NO, getAppName(), permNo);
-		cache.remove(key);
+		cache.delete(key);
 	}
 
 	@Override

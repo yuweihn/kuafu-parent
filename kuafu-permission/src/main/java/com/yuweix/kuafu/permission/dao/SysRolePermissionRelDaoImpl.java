@@ -107,7 +107,7 @@ public class SysRolePermissionRelDaoImpl extends CacheableDao<SysRolePermissionR
 	@Override
 	public void deleteByRoleIdAndPermIdFromCache(long roleId, long permId) {
 		String key = String.format(CACHE_KEY_RPR_BY_ROLE_PERM, getAppName(), roleId, permId);
-		cache.remove(key);
+		cache.delete(key);
 	}
 }
 
