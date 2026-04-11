@@ -34,7 +34,7 @@ public class HibernateAutoConfiguration {
                 return cache == null ? null : cache.get(key);
             }
             @Override
-            public void remove(String key) {
+            public void delete(String key) {
                 if (cache == null) {
                     return;
                 }
