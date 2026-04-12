@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.core.feign;
 
 
-import com.yuweix.kuafu.core.feign.annotations.FeignPre;
+import com.yuweix.kuafu.core.feign.annotations.PreFeign;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.slf4j.Logger;
@@ -25,11 +25,11 @@ public class FeignRequestInterceptor implements RequestInterceptor {
 	@Override
 	public void apply(RequestTemplate template) {
 		Class<?> clz = template.feignTarget().type();
-		FeignPre feignPre = clz.getAnnotation(FeignPre.class);
-		if (feignPre == null) {
+		PreFeign preFeign = clz.getAnnotation(PreFeign.class);
+		if (preFeign == null) {
 			return;
 		}
-		Class<? extends PreHandler> preHandlerClz = feignPre.value();
+		Class<? extends PreHandler> preHandlerClz = preFeign.value();
 		Map<Class<? extends PreHandler>, PreHandler> map = getPreHandlerMap();
 		PreHandler preHandler = map.get(preHandlerClz);
 		if (preHandler == null) {
