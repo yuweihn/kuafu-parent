@@ -23,6 +23,7 @@
         <commons.fileupload.version>1.5</commons.fileupload.version>
         <druid.version>1.1.10</druid.version>
         <fastjson2.version>2.0.8</fastjson2.version>
+        <feign.core.version>11.10</feign.core.version>
         <freemarker.version>2.3.28</freemarker.version>
         <guava.version>31.1-jre</guava.version>
         <hibernate.version>5.4.24.Final</hibernate.version>
@@ -360,6 +361,12 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-openfeign-core</artifactId>
                 <version>${openfeign.core.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-core</artifactId>
+                <version>${feign.core.version}</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>
