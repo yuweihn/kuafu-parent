@@ -36,7 +36,7 @@ public class EsServiceImpl implements EsService {
 	private Lock lock;
 
 	private static final String DEFAULT_FILTER_FIELD_NAME = "createTime";
-	private static final TypeMapping DEFAULT_MAPPING;
+	private static TypeMapping DEFAULT_MAPPING = null;
 	static {
 		try {
 			Property dateProperty = Property.of(pBuilder -> pBuilder.date(
@@ -44,7 +44,7 @@ public class EsServiceImpl implements EsService {
 			DEFAULT_MAPPING = new TypeMapping.Builder().properties(DEFAULT_FILTER_FIELD_NAME, dateProperty).build();
 		} catch (Exception e) {
 			log.error("创建TypeMapping失败, Error: {}", e.getMessage(), e);
-			throw new RuntimeException(e);
+			DEFAULT_MAPPING = new TypeMapping.Builder().build();
 		}
 	}
 
