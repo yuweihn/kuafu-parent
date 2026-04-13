@@ -11,6 +11,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.yuweix.kuafu.boot.redis.LettuceAutoConfiguration,\
   com.yuweix.kuafu.boot.redis.LettuceMsAutoConfiguration,\
   com.yuweix.kuafu.boot.redis.LettuceClusterAutoConfiguration,\
+  com.yuweix.kuafu.boot.es.EsAutoConfiguration,\
   com.yuweix.kuafu.boot.web.I18nAutoConfiguration,\
   com.yuweix.kuafu.boot.web.FreeMarkerAutoConfiguration,\
   com.yuweix.kuafu.boot.exception.ExceptionAutoConfiguration,\
