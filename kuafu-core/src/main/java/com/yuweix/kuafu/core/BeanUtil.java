@@ -458,11 +458,11 @@ public abstract class BeanUtil {
         return current;
     }
 
-	public static <T>Class<T> getGenericClass(Class<?> clz) {
+	public static<T> Class<T> getGenericClass(Class<?> clz) {
 		return getGenericClass(clz, 0);
 	}
 	@SuppressWarnings("unchecked")
-	public static <T>Class<T> getGenericClass(Class<?> clz, int index) {
+	public static<T> Class<T> getGenericClass(Class<?> clz, int index) {
 		if (clz == null) {
 			return null;
 		}
