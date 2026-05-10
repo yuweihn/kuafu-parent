@@ -463,6 +463,9 @@ public abstract class BeanUtil {
 	}
 	@SuppressWarnings("unchecked")
 	public static <T>Class<T> getGenericClass(Class<?> clz, int index) {
+		if (clz == null) {
+			return null;
+		}
 		Class<T> genericClz = null;
 		Type t = clz.getGenericSuperclass();
 		if (t instanceof ParameterizedType) {
