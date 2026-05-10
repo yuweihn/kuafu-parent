@@ -9,6 +9,8 @@ import org.springframework.util.Assert;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
@@ -421,9 +423,9 @@ public abstract class BeanUtil {
 		try {
 			field.setAccessible(true);
 			field.set(obj, val);
-		} catch (Exception e) {
-			log.error("Error: {}", e.getMessage());
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error("setVal>>>Error: {}", ex.getMessage());
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -431,15 +433,16 @@ public abstract class BeanUtil {
 		try {
 			field.setAccessible(true);
 			return field.get(obj);
-		} catch (Exception e) {
-			log.error("Error: {}", e.getMessage());
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error("getVal>>>Error: {}", ex.getMessage());
+			throw new RuntimeException(ex);
 		}
 	}
 
     /**
      * 取嵌套Map的值
      */
+	@SuppressWarnings("unchecked")
     public static Object getNestedMapValue(Map<String, Object> root, String[] pathList) {
         Object current = root;
         for (String path: pathList) {
@@ -454,4 +457,17 @@ public abstract class BeanUtil {
         }
         return current;
     }
+
+	public static <T>Class<T> getGenericClass(Class<?> clz) {
+		return getGenericClass(clz, 0);
+	}
+	@SuppressWarnings("unchecked")
+	public static <T>Class<T> getGenericClass(Class<?> clz, int index) {
+		Class<T> genericClz = null;
+		Type t = clz.getGenericSuperclass();
+		if (t instanceof ParameterizedType) {
+			genericClz = (Class<T>) ((ParameterizedType) t).getActualTypeArguments()[index];
+		}
+		return genericClz;
+	}
 }
