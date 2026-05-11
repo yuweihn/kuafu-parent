@@ -1,12 +1,15 @@
 package com.yuweix.kuafu.core.encrypt;
 
 
-import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 
 
 /**
@@ -14,6 +17,8 @@ import javax.crypto.spec.SecretKeySpec;
  * @author yuwei
  */
 public abstract class SecurityAesUtil {
+	private static final Logger log = LoggerFactory.getLogger(SecurityAesUtil.class);
+
 	
 	/**
 	 * 加密
@@ -34,8 +39,8 @@ public abstract class SecurityAesUtil {
 			byte[] byteContent = content.getBytes(StandardCharsets.UTF_8);
 			cipher.init(Cipher.ENCRYPT_MODE, key);// 初始化
 			return parseByte2HexStr(cipher.doFinal(byteContent)); // 加密
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("encode>>>Error: {}", ex.getMessage(), ex);
 		}
 		return null;
 	}
@@ -56,9 +61,10 @@ public abstract class SecurityAesUtil {
 			SecretKeySpec key = new SecretKeySpec(enCodeFormat, "AES");
 			Cipher cipher = Cipher.getInstance("AES");// 创建密码器
 			cipher.init(Cipher.DECRYPT_MODE, key);// 初始化
-			return new String(cipher.doFinal(parseHexStr2Byte(content))); // 加密
-		} catch (Exception e) {
-			e.printStackTrace();
+			byte[] byteContent = parseHexStr2Byte(content);
+			return byteContent == null ? null :new String(cipher.doFinal(byteContent)); // 加密
+		} catch (Exception ex) {
+			log.error("decode>>>Error: {}", ex.getMessage(), ex);
 		}
 		return null;
 	}
@@ -84,7 +90,7 @@ public abstract class SecurityAesUtil {
 	 * @return
 	 */
 	private static byte[] parseHexStr2Byte(String value) {
-		if (value.length() < 1) {
+		if (value == null || value.isEmpty()) {
 			return null;
 		}
 		byte[] result = new byte[value.length() / 2];

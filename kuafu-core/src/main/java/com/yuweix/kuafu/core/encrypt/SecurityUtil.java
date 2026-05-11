@@ -53,8 +53,8 @@ public abstract class SecurityUtil {
 			String val = new String(arr).toLowerCase();
 			log.debug(val);
 			return val;
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("getSecurityByAlgor>>>Error: {}", ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -86,8 +86,8 @@ public abstract class SecurityUtil {
 			} else {
 				return null;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("decode>>>Error: {}", ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -97,8 +97,8 @@ public abstract class SecurityUtil {
 			Cipher encrypt = Cipher.getInstance(Algor.DES.getCode());
 			encrypt.init(1, buildDESKey(getMd5(SECURITY_KEY)));
 			return bytesToHexStr(encrypt.doFinal(word.getBytes(StandardCharsets.UTF_8)));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("encrypt>>>Error: {}", ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -108,8 +108,8 @@ public abstract class SecurityUtil {
 			Cipher decrypt = Cipher.getInstance(Algor.DES.getCode());
 			decrypt.init(2, buildDESKey(getMd5(SECURITY_KEY)));
 			return new String(decrypt.doFinal(Objects.requireNonNull(hexStrToBytes(word))), StandardCharsets.UTF_8);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("decrypt>>>Error: {}", ex.getMessage(), ex);
 			return null;
 		}
 	}
