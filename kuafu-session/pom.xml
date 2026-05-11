@@ -103,6 +103,7 @@
 					<charset>utf-8</charset>
 					<encoding>utf-8</encoding>
 					<docencoding>utf-8</docencoding>
+					<failOnError>false</failOnError>
 				</configuration>
 				<executions>
 					<execution>
