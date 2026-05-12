@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import java.util.Map;
  */
 @ComponentScan(basePackages = "com.yuweix.kuafu.permission", useDefaultFilters = true)
 public class PermissionConf {
+	@Primary
 	@Bean
 	@ConfigurationProperties(prefix = "kuafu.sequence", ignoreUnknownFields = true)
 	public SequenceBean sequenceBean() {
