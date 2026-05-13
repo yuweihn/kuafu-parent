@@ -19,7 +19,6 @@ import java.lang.reflect.Type;
  */
 public abstract class JacksonUtil {
     private static final Logger log = LoggerFactory.getLogger(JacksonUtil.class);
-
     private static final ObjectMapper mapper = new ObjectMapper();
 
     static {
