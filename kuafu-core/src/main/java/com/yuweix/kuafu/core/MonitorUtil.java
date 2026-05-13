@@ -1,24 +1,15 @@
 package com.yuweix.kuafu.core;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.lang.management.ManagementFactory;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
+import com.sun.management.OperatingSystemMXBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import com.sun.management.OperatingSystemMXBean;
+import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 /**
@@ -26,6 +17,8 @@ import com.sun.management.OperatingSystemMXBean;
  */
 @SuppressWarnings("restriction")
 public abstract class MonitorUtil {
+	private static final Logger log = LoggerFactory.getLogger(MonitorUtil.class);
+
 	private static final int FAULT_LENGTH = 10;
 	private static final String OS_NAME = System.getProperty("os.name");
 
@@ -73,7 +66,7 @@ public abstract class MonitorUtil {
 				return 0;
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("Get cpu usage fow windows error: {}", ex.getMessage(), ex);
 			return 0;
 		}
 	}
@@ -113,8 +106,8 @@ public abstract class MonitorUtil {
 				cpuRate = 0;
 			}
 			return cpuRate;
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (InterruptedException ex) {
+			log.error("Get cpu usage for Linux error: {}", ex.getMessage(), ex);
 			return 0;
 		}
 	}
@@ -150,8 +143,8 @@ public abstract class MonitorUtil {
 					break;
 				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("Read cpu for Linux error: {}", ex.getMessage(), ex);
 		} finally {
 			try {
 				if (buffer != null) {
@@ -219,12 +212,12 @@ public abstract class MonitorUtil {
 			retn[1] = knelTime + userTime;
 			return retn;
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("Read cpu for windows error: {}", ex.getMessage(), ex);
 		} finally {
 			try {
 				proc.getInputStream().close();
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (Exception ex) {
+				log.error("Close input stream for windows error: {}", ex.getMessage(), ex);
 			}
 		}
 		return null;
@@ -253,7 +246,7 @@ public abstract class MonitorUtil {
 		}
 		@Override
 		public String toString() {
-			return JsonUtil.toString(Cpu.this);
+			return JsonUtil.toJson(Cpu.this);
 		}
 	}
 
@@ -278,8 +271,8 @@ public abstract class MonitorUtil {
 			// 剩余的物理内存
 			long freePhysicalMemorySize = osmxb.getFreeMemorySize();
 			return new Memory(totalVirtualMemory, totalVirtualMemory - freePhysicalMemorySize);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("Get memory usage for Windows error: {}", ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -316,8 +309,8 @@ public abstract class MonitorUtil {
 			long cached = Long.parseLong(map.get("Cached").toString());
 
 			return new Memory(memTotal, memUsed - buffers - cached);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("Get memory usage for Linux error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			try {
@@ -352,7 +345,7 @@ public abstract class MonitorUtil {
 		}
 		@Override
 		public String toString() {
-			return JsonUtil.toString(Memory.this);
+			return JsonUtil.toJson(Memory.this);
 		}
 	}
 
@@ -428,8 +421,8 @@ public abstract class MonitorUtil {
 				}
 			}
 			return new Disk(totalHD, usedHD);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("Get disk usage for Linux error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			try {
@@ -458,7 +451,7 @@ public abstract class MonitorUtil {
 		}
 		@Override
 		public String toString() {
-			return JsonUtil.toString(Disk.this);
+			return JsonUtil.toJson(Disk.this);
 		}
 	}
 
@@ -494,8 +487,8 @@ public abstract class MonitorUtil {
 			double rx = MathUtil.div((ndb2.down - ndb1.down) * 1000, sleep);
 			double tx = MathUtil.div((ndb2.up - ndb1.up) * 1000, sleep);
 			return new Network(rx, tx);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("Get network info for Windows error: {}", ex.getMessage(), ex);
 			return new Network(0, 0);
 		} finally {
 			try {
@@ -529,16 +522,16 @@ public abstract class MonitorUtil {
 			String command = "ifconfig";
 			pro1 = r.exec(command);
 			input1 = new BufferedReader(new InputStreamReader(pro1.getInputStream()));
-			NetDataBytes ndb1 = readInLine(input1, "linux");
+			NetDataBytes ndb1 = readInLine(input1, "Linux");
 			Thread.sleep(sleep);
 			pro2 = r.exec(command);
 			input2 = new BufferedReader(new InputStreamReader(pro2.getInputStream()));
-			NetDataBytes ndb2 = readInLine(input2, "linux");
+			NetDataBytes ndb2 = readInLine(input2, "Linux");
 			double rx = MathUtil.div((ndb2.down - ndb1.down) * 1000, sleep);
 			double tx = MathUtil.div((ndb2.up - ndb1.up) * 1000, sleep);
 			return new Network(rx, tx);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("Get network info for Linux error: {}", ex.getMessage(), ex);
 			return new Network(0, 0);
 		} finally {
 			try {
@@ -567,7 +560,7 @@ public abstract class MonitorUtil {
 		String txResult = "";
 		StringTokenizer tokenStat = null;
 		try {
-			if ("linux".equalsIgnoreCase(osType)) {
+			if ("Linux".equalsIgnoreCase(osType)) {
 				long rx = 0, tx = 0;
 				String line = null;
 				while ((line = input.readLine()) != null) {
@@ -589,8 +582,8 @@ public abstract class MonitorUtil {
 				rxResult = tokenStat.nextToken();
 				txResult = tokenStat.nextToken();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("Read in line error: {}", ex.getMessage(), ex);
 		}
 		return new NetDataBytes(Long.parseLong(txResult), Long.parseLong(rxResult));
 	}
@@ -623,8 +616,7 @@ public abstract class MonitorUtil {
 		}
 		@Override
 		public String toString() {
-			return JsonUtil.toString(Network.this);
+			return JsonUtil.toJson(Network.this);
 		}
 	}
 }
-

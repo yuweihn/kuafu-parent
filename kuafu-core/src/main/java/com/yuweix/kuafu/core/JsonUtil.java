@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
  * @author yuwei
  */
 public abstract class JsonUtil {
-    public static String toString(Object obj) {
+    public static String toJson(Object obj) {
         return JSON.toJSONString(obj);
     }
     public static Object toObject(String text) {

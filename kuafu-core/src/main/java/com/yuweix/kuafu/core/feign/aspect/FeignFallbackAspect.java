@@ -40,7 +40,7 @@ public class FeignFallbackAspect {
         try {
             log.info("Method: {}, Params: {}", method.getDeclaringClass().getSimpleName() + "." + method.getName(), point.getArgs());
             Object result = point.proceed();
-            log.info("Result: {}", JsonUtil.toString(result));
+            log.info("Result: {}", JsonUtil.toJson(result));
             return result;
         } catch (Exception ex) {
             log.error("Feign调用异常，Error: {}", ex.getMessage());

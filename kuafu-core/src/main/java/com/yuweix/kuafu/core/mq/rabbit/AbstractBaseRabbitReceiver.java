@@ -56,7 +56,7 @@ public abstract class AbstractBaseRabbitReceiver<T> {
             MdcUtil.setRequestId(requestId);
             MdcUtil.setSpanId(spanId);
             before(message, channel);
-            log.info("Rabbit接收消息: {}", JsonUtil.toString(message));
+            log.info("Rabbit接收消息: {}", JsonUtil.toJson(message));
             byte[] bytes = message.getBody();
             if (bytes == null || bytes.length <= 0) {
                 channel.basicAck(deliveryTag, false);
@@ -71,7 +71,7 @@ public abstract class AbstractBaseRabbitReceiver<T> {
             T t = deserialize(body);
             Object result = process(t);
             channel.basicAck(deliveryTag, false);
-            log.info("Rabbit消费完成, Result: {}", JsonUtil.toString(result));
+            log.info("Rabbit消费完成, Result: {}", JsonUtil.toJson(result));
         } catch (Exception ex) {
             log.error("Rabbit消费异常message: {}, Exception: {}, ex: ", body, ex.getMessage(), ex);
             handleException(message, channel, ex);
