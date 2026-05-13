@@ -1,8 +1,8 @@
 package com.yuweix.kuafu.permission.dto;
 
 
-import com.yuweix.kuafu.core.encrypt.SecurityUtil;
 import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.encrypt.SecurityUtil;
 
 import java.io.Serializable;
 import java.util.List;
@@ -34,7 +34,7 @@ public class PermissionExportDTO implements Serializable {
 	}
 
 	private String toSgin() {
-		return SecurityUtil.getMd5(JsonUtil.toString(list) + SALT);
+		return SecurityUtil.getMd5(JsonUtil.toJson(list) + SALT);
 	}
 
 	public List<PermissionDTO> getList() {

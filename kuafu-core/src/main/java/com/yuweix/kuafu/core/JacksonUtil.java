@@ -27,7 +27,7 @@ public abstract class JacksonUtil {
     }
 
 
-	public static String toString(Object obj) {
+	public static String toJson(Object obj) {
         if (obj == null) {
             log.error("Object cannot be null");
             return null;

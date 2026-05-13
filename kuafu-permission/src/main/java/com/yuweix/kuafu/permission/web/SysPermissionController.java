@@ -161,12 +161,12 @@ public class SysPermissionController {
 		OutputStreamWriter osw = null;
 		BufferedWriter bw = null;
 		try {
-			String str = exportDto == null ? "" : JsonUtil.toString(exportDto);
+			String str = exportDto == null ? "" : JsonUtil.toJson(exportDto);
 			osw = new OutputStreamWriter(out, StandardCharsets.UTF_8);
 			bw = new BufferedWriter(osw);
 			bw.append(str);
-		} catch (Exception e) {
-			log.error("", e);
+		} catch (Exception ex) {
+			log.error("导出权限时发生异常, Error: {}", ex.getMessage(), ex);
 		} finally {
 			if (bw != null) {
 				try {

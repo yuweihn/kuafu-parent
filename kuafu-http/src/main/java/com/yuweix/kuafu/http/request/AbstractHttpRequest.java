@@ -66,8 +66,8 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		this.responseTypeClass = String.class;
         this.jsonParser = new JsonParser() {
             @Override
-            public String toString(Object obj) {
-                return JsonUtil.toString(obj);
+            public String toJson(Object obj) {
+                return JsonUtil.toJson(obj);
             }
 
             @Override
@@ -306,7 +306,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		} finally {
             long endTime = System.currentTimeMillis();
             log.info("Http请求结束, url: {}, method: {}, status: {}, body: {}, 耗时: {}ms", url, method
-                    , resp == null ? "" : resp.getStatus(), resp == null || resp.getBody() == null ? "" : jsonParser.toString(resp.getBody())
+                    , resp == null ? "" : resp.getStatus(), resp == null || resp.getBody() == null ? "" : jsonParser.toJson(resp.getBody())
                     , endTime - startTime);
             try {
                 client.close();
