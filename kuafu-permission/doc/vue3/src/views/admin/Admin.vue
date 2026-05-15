@@ -126,7 +126,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer" style="padding-right: 10px;">
 				<el-button @click.native="pwdFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="pwdSubmit" :loading="pwdLoading" v-hasPerm="['sys.admin.change.password']">提交</el-button>
+				<el-button type="primary" @click.native="changePassword" :loading="pwdLoading" v-hasPerm="['sys.admin.change.password']">提交</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -207,10 +207,13 @@ function handlePassword(index, row) {
     pwdForm.value.password = null;
     pwdFormVisible.value = true;
 }
-function pwdSubmit() {
+function changePassword() {
     proxy.$refs.pwdFormRef.validate((valid) => {
         if (valid) {
-            var params = "accountId=" + pwdForm.value.id + "&password=" + proxy.$md5(pwdForm.value.password);
+            let params = {
+                accountId: pwdForm.value.id,
+                password: proxy.$md5(pwdForm.value.password)
+            };
             pwdLoading.value = true;
             proxy.request.post('/sys/admin/change-password', params).then((res) => {
                 proxy.$modal.msgSuccess(res.data.msg);

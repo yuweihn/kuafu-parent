@@ -45,9 +45,11 @@ function show(index, row) {
 function editSubmit() {
     proxy.$refs.editFormRef.validate((valid) => {
         if (valid) {
-            var params = "_fk=u&id=" + editForm.value.id
-                    + (editForm.value.roleNo ? "&roleNo=" + editForm.value.roleNo : "")
-                    + (editForm.value.roleName ? "&roleName=" + editForm.value.roleName : "");
+            let params = {
+                id: editForm.value.id,
+                roleNo: editForm.value.roleNo,
+                roleName: editForm.value.roleName
+            };
             loading.value = true;
             proxy.request.post('/sys/role/update', params).then((res) => {
                 proxy.$modal.msgSuccess(res.data.msg);

@@ -176,18 +176,20 @@ function onIconClearClick() {
 function editSubmit() {
     proxy.$refs.editFormRef.validate((valid) => {
         if (valid) {
-            var params = "_fk=u&id=" + editForm.value.id
-                    + (editForm.value.permNo ? "&permNo=" + editForm.value.permNo : "")
-                    + (editForm.value.title ? "&title=" + editForm.value.title : "")
-                    + (editForm.value.parentId && editForm.value.parentId != 0 ? "&parentId=" + editForm.value.parentId : "")
-                    + (editForm.value.orderNum ? "&orderNum=" + editForm.value.orderNum : "")
-                    + (editForm.value.path ? "&path=" + editForm.value.path : "")
-                    + (editForm.value.component ? "&component=" + editForm.value.component : "")
-                    + (editForm.value.ifExt != null ? "&ifExt=" + editForm.value.ifExt : "")
-                    + (editForm.value.permType ? "&permType=" + editForm.value.permType : "")
-                    + (editForm.value.visible != null ? "&visible=" + editForm.value.visible : "")
-                    + (editForm.value.icon ? "&icon=" + editForm.value.icon : "")
-                    + (editForm.value.descr ? "&descr=" + editForm.value.descr : "");
+            let params = {
+                id: editForm.value.id,
+                permNo: editForm.value.permNo,
+                title: editForm.value.title,
+                parentId: editForm.value.parentId && editForm.value.parentId != 0 ? editForm.value.parentId : null,
+                orderNum: editForm.value.orderNum,
+                path: editForm.value.path,
+                component: editForm.value.component,
+                ifExt: editForm.value.ifExt,
+                permType: editForm.value.permType,
+                visible: editForm.value.visible,
+                icon: editForm.value.icon,
+                descr: editForm.value.descr
+            };
             loading.value = true;
             proxy.request.post('/sys/permission/update', params).then((res) => {
                 proxy.$modal.msgSuccess(res.data.msg);

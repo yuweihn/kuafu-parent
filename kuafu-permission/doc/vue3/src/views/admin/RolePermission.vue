@@ -32,7 +32,7 @@ function show(rId, roleName) {
     getPermissionListByRoleId();
 }
 function getPermissionListByRoleId() {
-    var params = {
+    let params = {
         roleId: roleId.value
     };
     loading.value = true;
@@ -58,9 +58,12 @@ function setChecked(cList) {
 function submit() {
     const hkeys = proxy.$refs.permMenuRef.getHalfCheckedKeys();
     const keys = proxy.$refs.permMenuRef.getCheckedKeys();
-    hkeys.push(keys);
+    const allKeys = hkeys.concat(keys);
 
-    var params = "roleId=" + roleId.value + "&permIds=" + hkeys;
+    let params = {
+        roleId: roleId.value,
+        permIds: allKeys.join(',')
+    };
     loading.value = true;
     proxy.request.post('/sys/role/permission/save', params).then((res) => {
         proxy.$modal.msgSuccess(res.data.msg);

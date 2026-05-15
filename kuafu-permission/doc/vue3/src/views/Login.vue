@@ -61,7 +61,10 @@ function handleSubmit2() {
             loading.value = true;
             //NProgress.start();
 
-            const params = "accountNo=" + ruleForm2.value.account + "&password=" + proxy.$md5(ruleForm2.value.checkPass);
+            let params = {
+                accountNo: ruleForm2.value.account,
+                password: proxy.$md5(ruleForm2.value.checkPass)
+            };
             proxy.request.post('/admin/login', params).then((res) => {
                 proxy.session.putUser(res.data.data);
                 proxy.session.putToken(res.headers[import.meta.env.VITE_APP_TOKEN_NAME]);

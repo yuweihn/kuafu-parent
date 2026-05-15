@@ -43,9 +43,10 @@ function show() {
 function addSubmit() {
     proxy.$refs.addFormRef.validate((valid) => {
         if (valid) {
-            var params = "_fk=u"
-                    + (addForm.value.roleNo ? "&roleNo=" + addForm.value.roleNo : "")
-                    + (addForm.value.roleName ? "&roleName=" + addForm.value.roleName : "");
+            let params = {
+                roleNo: addForm.value.roleNo,
+                roleName: addForm.value.roleName
+            };
             loading.value = true;
             proxy.request.post('/sys/role/create', params).then((res) => {
                 proxy.$modal.msgSuccess(res.data.msg);

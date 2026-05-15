@@ -119,7 +119,7 @@ function onSelsChanged(v) {
     sels.value = v;
 }
 function getPermissionList() {
-    var params = {
+    let params = {
         keywords: filters.value.keywords ? filters.value.keywords : null,
         visible: filters.value.visible != null && filters.value.visible !== '' ? filters.value.visible : null
     };

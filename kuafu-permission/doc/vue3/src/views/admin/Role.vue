@@ -142,7 +142,7 @@ function getRoleList(pno, psize) {
     if (psize != null) {
         pageSize.value = psize;
     }
-    var params = {
+    let params = {
         keywords: filters.value.keywords ? filters.value.keywords : null,
         pageNo: pageNo.value,
         pageSize: pageSize.value
@@ -164,7 +164,7 @@ function handleDel(index, row) {
     batchRemove();
 }
 function batchRemove() {
-    var ids = sels.value.map(item => item.id).toString();
+    let ids = sels.value.map(item => item.id).toString();
     proxy.$modal.confirm('确定删除选中记录吗?', '提示', {type: 'warning'}).then(function() {
         listLoading.value = true;
         proxy.request.delete('/sys/role/delete', {ids: ids}).then((res) => {

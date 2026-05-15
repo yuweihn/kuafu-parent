@@ -50,9 +50,11 @@ function show(index, row) {
 function editSubmit() {
     proxy.$refs.editFormRef.validate((valid) => {
         if (valid) {
-            var params = "accountId=" + editForm.value.id
-                    + (editForm.value.realName ? "&realName=" + editForm.value.realName : "")
-                    + "&gender=" + (editForm.value.gender || '');
+            let params = {
+                accountId: editForm.value.id,
+                realName: editForm.value.realName,
+                gender: editForm.value.gender
+            };
             loading.value = true;
             proxy.request.post('/sys/admin/update', params).then((res) => {
                 proxy.$modal.msgSuccess(res.data.msg);
