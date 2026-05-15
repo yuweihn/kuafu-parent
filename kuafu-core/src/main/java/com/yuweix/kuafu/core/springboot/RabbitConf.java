@@ -188,8 +188,9 @@ public class RabbitConf {
             public <T> String serialize(T t) {
                 try {
                     return objectMapper.writeValueAsString(t);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                } catch (JsonProcessingException ex) {
+                    log.error("Rabbit序列化失败！Error: {}", ex.getMessage());
+                    throw new RuntimeException(ex);
                 }
             }
 
@@ -197,8 +198,9 @@ public class RabbitConf {
             public <T> T deserialize(String str, Class<T> clz) {
                 try {
                     return objectMapper.readValue(str, clz);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                } catch (JsonProcessingException ex) {
+                    log.error("Rabbit反序列化失败！Error: {}", ex.getMessage());
+                    throw new RuntimeException(ex);
                 }
             }
         };
