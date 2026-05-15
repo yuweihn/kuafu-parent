@@ -65,7 +65,11 @@ function show(aid, index, row) {
 function editSubmit() {
     proxy.$refs.editFormRef.validate((valid) => {
         if (valid) {
-            var params = "id=" + editForm.value.id + "&adminId=" + adminId.value + "&roleId=" + editForm.value.roleId;
+            let params = {
+                id: editForm.value.id,
+                adminId: adminId.value,
+                roleId: editForm.value.roleId
+            };
             loading.value = true;
             proxy.request.post('/sys/admin/role/update', params).then((res) => {
                 proxy.$modal.msgSuccess(res.data.msg);
@@ -91,7 +95,7 @@ function onRolePageChanged(pno, psize) {
     if (psize != null) {
         roleSlt.value.pageSize = psize;
     }
-    var params = {keywords: roleSlt.value.keywords, pageNo: roleSlt.value.pageNo, pageSize: roleSlt.value.pageSize};
+    let params = {keywords: roleSlt.value.keywords, pageNo: roleSlt.value.pageNo, pageSize: roleSlt.value.pageSize};
     proxy.request.get('/sys/role/list', params).then((res) => {
         roleSlt.value.result.size = res.data.data.size;
         roleSlt.value.result.list = res.data.data.list.map(item => {

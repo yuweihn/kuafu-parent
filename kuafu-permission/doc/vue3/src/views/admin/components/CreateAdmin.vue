@@ -61,9 +61,12 @@ function show() {
 function addSubmit() {
     proxy.$refs.addFormRef.validate((valid) => {
         if (valid) {
-            var params = "accountNo=" + addForm.value.accountNo + "&password=" + proxy.$md5(addForm.value.password)
-                    + (addForm.value.realName ? "&realName=" + addForm.value.realName : "")
-                    + "&gender=" + (addForm.value.gender || '');
+            let params = {
+                accountNo: addForm.value.accountNo,
+                password: proxy.$md5(addForm.value.password),
+                realName: addForm.value.realName,
+                gender: addForm.value.gender
+            };
             loading.value = true;
             proxy.request.post('/sys/admin/create', params).then((res) => {
                 proxy.$modal.msgSuccess(res.data.msg);

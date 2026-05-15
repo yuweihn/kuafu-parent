@@ -174,18 +174,19 @@ function onIconClearClick() {
 function addSubmit() {
     proxy.$refs.addFormRef.validate((valid) => {
         if (valid) {
-            var params = "_fk=u"
-                    + (addForm.value.permNo ? "&permNo=" + addForm.value.permNo : "")
-                    + (addForm.value.title ? "&title=" + addForm.value.title : "")
-                    + (addForm.value.parentId && addForm.value.parentId != 0 ? "&parentId=" + addForm.value.parentId : "")
-                    + (addForm.value.orderNum ? "&orderNum=" + addForm.value.orderNum : "")
-                    + (addForm.value.path ? "&path=" + addForm.value.path : "")
-                    + (addForm.value.component ? "&component=" + addForm.value.component : "")
-                    + (addForm.value.ifExt != null ? "&ifExt=" + addForm.value.ifExt : "")
-                    + (addForm.value.permType ? "&permType=" + addForm.value.permType : "")
-                    + (addForm.value.visible != null ? "&visible=" + addForm.value.visible : "")
-                    + (addForm.value.icon ? "&icon=" + addForm.value.icon : "")
-                    + (addForm.value.descr ? "&descr=" + addForm.value.descr : "");
+            let params = {
+                permNo: addForm.value.permNo,
+                title: addForm.value.title,
+                parentId: addForm.value.parentId && addForm.value.parentId != 0 ? addForm.value.parentId : null,
+                orderNum: addForm.value.orderNum,
+                path: addForm.value.path,
+                component: addForm.value.component,
+                ifExt: addForm.value.ifExt,
+                permType: addForm.value.permType,
+                visible: addForm.value.visible,
+                icon: addForm.value.icon,
+                descr: addForm.value.descr
+            };
             loading.value = true;
             proxy.request.post('/sys/permission/create', params).then((res) => {
                 proxy.$modal.msgSuccess(res.data.msg);
