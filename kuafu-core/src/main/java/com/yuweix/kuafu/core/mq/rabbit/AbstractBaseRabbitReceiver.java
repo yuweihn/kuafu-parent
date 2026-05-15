@@ -97,7 +97,7 @@ public abstract class AbstractBaseRabbitReceiver<T> {
 
     }
 
-    abstract void handleException(Message message, Channel channel, Exception ex);
+    protected abstract void handleException(Message message, Channel channel, Exception ex);
 
     public void setRabbitSerializer(RabbitSerializer rabbitSerializer) {
         this.rabbitSerializer = rabbitSerializer;
