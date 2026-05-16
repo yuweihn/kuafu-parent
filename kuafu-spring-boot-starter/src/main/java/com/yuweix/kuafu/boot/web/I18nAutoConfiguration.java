@@ -1,19 +1,10 @@
 package com.yuweix.kuafu.boot.web;
 
 
-import com.yuweix.kuafu.web.TextUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import com.yuweix.kuafu.web.springboot.I18nConf;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-
-import java.lang.reflect.Constructor;
+import org.springframework.context.annotation.Import;
 
 
 /**
@@ -21,34 +12,7 @@ import java.lang.reflect.Constructor;
  */
 @Configuration
 @ConditionalOnProperty(name = "kuafu.boot.i18n.enabled")
+@Import({I18nConf.class})
 public class I18nAutoConfiguration {
-	@ConditionalOnBean(name = "messageSource")
-	@ConditionalOnMissingBean
-	@Bean
-	public TextUtil textUtil(@Qualifier("messageSource") MessageSource messageSource) {
-		try {
-			Class<?> clz = Class.forName(TextUtil.class.getName());
-			Constructor<?> constructor = clz.getDeclaredConstructor();
-			constructor.setAccessible(true);
-			TextUtil textUtil = (TextUtil) constructor.newInstance();
-			textUtil.setMessageSource(messageSource);
-			return textUtil;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 
-	@ConditionalOnMissingBean(name = "localeResolver")
-	@Bean(name = "localeResolver")
-	public LocaleResolver localeResolver() {
-		return new SessionLocaleResolver();
-	}
-
-	@ConditionalOnMissingBean(name = "messageSource")
-	@Bean(name = "messageSource")
-	public MessageSource messageSource() {
-		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-		messageSource.setBasename("bundles.message");
-		return messageSource;
-	}
 }

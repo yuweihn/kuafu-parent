@@ -58,6 +58,7 @@
         <spring.redis.version>3.0.0</spring.redis.version>
         <spring.rocketmq.version>2.3.3</spring.rocketmq.version>
         <spring.version>6.0.8</spring.version>
+        <undertow.websockets.jsr.version>2.0.17.Final</undertow.websockets.jsr.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <zxing.version>3.3.0</zxing.version>
     </properties>
@@ -374,6 +375,12 @@
                 <groupId>co.elastic.clients</groupId>
                 <artifactId>elasticsearch-java</artifactId>
                 <version>${elasticsearch.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.undertow</groupId>
+                <artifactId>undertow-websockets-jsr</artifactId>
+                <version>${undertow.websockets.jsr.version}</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>

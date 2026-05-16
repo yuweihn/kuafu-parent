@@ -40,17 +40,51 @@
 			<artifactId>commons-fileupload</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.googlecode.rapid-framework</groupId>
+			<artifactId>rapid-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.activation</groupId>
+					<artifactId>activation</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.cxf</groupId>
+					<artifactId>cxf-rt-frontend-jaxws</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.cxf</groupId>
+					<artifactId>cxf-rt-transports-http</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.cxf</groupId>
+					<artifactId>cxf-rt-ws-security</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
         </dependency>
+		<dependency>
+			<groupId>io.undertow</groupId>
+			<artifactId>undertow-websockets-jsr</artifactId>
+		</dependency>
 	</dependencies>
 
 
