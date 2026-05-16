@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Import;
  * @author yuwei
  */
 @Configuration
-@ConditionalOnProperty(name = "kuafu.boot.web.webserver.enabled")
+@ConditionalOnProperty(name = "kuafu.boot.web.undertow.enabled")
 @Import({UndertowConf.class})
-public class WebServerAutoConfiguration {
+public class UndertowAutoConfiguration {
 
 }
