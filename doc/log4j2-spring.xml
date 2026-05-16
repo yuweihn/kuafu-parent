@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--status，默认是OFF，表示关闭log4j2本身的日志-->
+<configuration status="OFF">
+	<properties>
+		<property name="log.dir" value="${sys:logDir:-/opt/logs/schedule}" />
+		<property name="project.name" value="${sys:logFileName:-schedule}" />
+		<!--<property name="log.pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%p][traceId=%X{X-B3-TraceId},spanId=%X{X-B3-SpanId}][%t]-[%l]: %m%n</property>-->
+		<property name="log.pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%p][traceId=%X{traceId},spanId=%X{spanId}][%t]-[%l]: %m%n</property>
+		<property name="every.file.size">10M</property><!--日志切割的最小单位-->
+		<property name="max.file.age">5d</property><!--文件最大存活时间(单位：天)-->
+		<property name="max.file.per.day">10</property><!--单日保留的最大文件个数-->
+	</properties>
+
+	<appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<!--控制台只输出level及以上级别的信息(onMatch)，其他的直接拒绝(onMismatch)-->
+			<Filters>
+				<ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
+			<!--地球人都知道这是输出日志的格式-->
+			<PatternLayout pattern="${log.pattern}"/>
+		</Console>
+
+		<!--这个会打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+		<!--按月生成归档日志，可以使用filePattern-->
+		<RollingFile name="InfoRollingFile" fileName="${log.dir}/${project.name}.log"
+						 filePattern="${log.dir}/${project.name}_info-%d{yyyy-MM-dd}-%i.log.gz">
+			<Filters>
+				<!--<ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>-->
+				<ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
+			<PatternLayout pattern="${log.pattern}"/>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="${every.file.size}"/>
+			</Policies>
+			<DefaultRolloverStrategy max="${max.file.per.day}">
+				<Delete basePath="${log.dir}" maxDepth="10000">
+					<IfFileName glob="*_info-*.log.gz" />
+					<IfLastModified age="${max.file.age}" />
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+
+		<RollingFile name="ErrorRollingFile" fileName="${log.dir}/${project.name}_error.log"
+						 filePattern="${log.dir}/${project.name}_error-%d{yyyy-MM-dd}-%i.log.gz">
+			<Filters>
+				<ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
+			<PatternLayout pattern="${log.pattern}"/>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="${every.file.size}"/>
+			</Policies>
+			<DefaultRolloverStrategy max="${max.file.per.day}">
+				<Delete basePath="${log.dir}" maxDepth="10000">
+					<IfFileName glob="*_error-*.log.gz" />
+					<IfLastModified age="${max.file.age}" />
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+	</appenders>
+
+	<loggers>
+		<!--默认为root的logger-->
+		<root level="info">
+			<appender-ref ref="Console"/>
+			<appender-ref ref="InfoRollingFile"/>
+			<appender-ref ref="ErrorRollingFile"/>
+		</root>
+
+		<logger name="com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver" level="error"/>
+	</loggers>
+</configuration>
