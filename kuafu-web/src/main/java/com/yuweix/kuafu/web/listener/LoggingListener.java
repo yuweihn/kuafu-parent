@@ -12,8 +12,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * @author yuwei
  */
 public class LoggingListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
-	private static final String LOG_DIR = "kuafu.web.log.dir";
-	private static final String LOG_FILE_NAME = "kuafu.web.log.filename";
+	private static final String LOG_DIR = "sys.propery.log.dir";
+	private static final String LOG_FILE_NAME = "sys.propery.log.filename";
 
 
 	@Override
