@@ -1,6 +1,9 @@
 package com.yuweix.kuafu.core;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
@@ -12,6 +15,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author yuwei
  */
 public class Snowflake {
+	private static final Logger log = LoggerFactory.getLogger(Snowflake.class);
+
+
 	private static final long twepoch = 1288834974657L;
 	/**
 	 * 机器标识位数
@@ -136,8 +142,8 @@ public class Snowflake {
 					machineId = Math.abs(ipAddress.hashCode() % 32);
 				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("获取机器id异常！Error: {}", ex.getMessage(), ex);
 		}
 		return machineId;
 	}

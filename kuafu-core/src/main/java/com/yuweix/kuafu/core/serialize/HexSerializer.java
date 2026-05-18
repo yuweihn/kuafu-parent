@@ -30,22 +30,22 @@ public class HexSerializer implements Serializer {
 			oos = new ObjectOutputStream(baos);
 			oos.writeObject(t);
 			return toHexString(baos.toByteArray());
-		} catch (Exception e) {
-			log.error("Error: {}", e.getMessage(), e);
+		} catch (Exception ex) {
+			log.error("Error on serialize: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			if (oos != null) {
 				try {
 					oos.close();
-				} catch (IOException e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (IOException ex) {
+					log.error("oos.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 			if (baos != null) {
 				try {
 					baos.close();
-				} catch (IOException e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (IOException ex) {
+					log.error("baos.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -67,22 +67,22 @@ public class HexSerializer implements Serializer {
 			bais = new ByteArrayInputStream(bt);
 			ois = new ObjectInputStream(bais);
 			return (T) ois.readObject();
-		} catch (Exception e) {
-			log.error("", e);
+		} catch (Exception ex) {
+			log.error("Error on deserialize: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			if (ois != null) {
 				try {
 					ois.close();
-				} catch (IOException e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (IOException ex) {
+					log.error("ois.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 			if (bais != null) {
 				try {
 					bais.close();
-				} catch (IOException e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (IOException ex) {
+					log.error("bais.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}

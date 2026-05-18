@@ -3,13 +3,12 @@ package com.yuweix.kuafu.web;
 
 import com.yuweix.kuafu.core.Constant;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -130,8 +129,8 @@ public class Page {
 				}
 				try {
 					paramValue = URLEncoder.encode(paramValue, Constant.ENCODING_UTF_8);
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
+				} catch (UnsupportedEncodingException ex) {
+					throw new RuntimeException(ex);
 				}
 				buf.append(paramName).append("=").append(paramValue).append("&");
 			}

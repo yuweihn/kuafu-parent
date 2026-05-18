@@ -41,21 +41,22 @@ public abstract class PoiWord {
 			outputStream = new ByteArrayOutputStream();
 			document.write(outputStream);
 			return outputStream.toByteArray();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error("replaceInDoc失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (outputStream != null) {
 				try {
 					outputStream.close();
-				} catch (IOException e) {
-					log.error("", e);
+				} catch (IOException ex) {
+					log.error("outputStream.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 			if (inputStream != null) {
 				try {
 					inputStream.close();
-				} catch (IOException e) {
-					log.error("", e);
+				} catch (IOException ex) {
+					log.error("inputStream.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -103,28 +104,29 @@ public abstract class PoiWord {
 			outputStream = new ByteArrayOutputStream();
 			document.write(outputStream);
 			return outputStream.toByteArray();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error("replaceInDocx失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (outputStream != null) {
 				try {
 					outputStream.close();
-				} catch (IOException e) {
-					log.error("", e);
+				} catch (IOException ex) {
+					log.error("outputStream.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 			if (inputStream != null) {
 				try {
 					inputStream.close();
-				} catch (IOException e) {
-					log.error("", e);
+				} catch (IOException ex) {
+					log.error("inputStream.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 			if (document != null) {
 				try {
 					document.close();
-				} catch (IOException e) {
-					log.error("", e);
+				} catch (IOException ex) {
+					log.error("document.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -162,4 +164,3 @@ public abstract class PoiWord {
 		throw new IllegalArgumentException("[fileType] must be doc or docx.");
 	}
 }
-
