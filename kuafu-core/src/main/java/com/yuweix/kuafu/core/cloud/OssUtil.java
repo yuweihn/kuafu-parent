@@ -5,6 +5,8 @@ import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.auth.DefaultCredentialProvider;
 import com.aliyun.oss.model.*;
 import com.yuweix.kuafu.core.io.StreamUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -13,9 +15,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -54,8 +53,8 @@ public class OssUtil {
 						ossClient.createBucket(bucketRequest);
 					}
 				}
-			} catch (Exception e) {
-				log.error("Error on getOssClient: {}", e.getMessage());
+			} catch (Exception ex) {
+				log.error("Error on getOssClient: {}", ex.getMessage(), ex);
 			} finally {
 				ossClientLock.unlock();
 			}
@@ -87,7 +86,7 @@ public class OssUtil {
 	 * 查询Bucket下所有的key
 	 */
 	public List<String> queryBucketKeyList() {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (!getOssClient().doesBucketExist(bucketName)) {
 			return list;
 		}
@@ -121,8 +120,8 @@ public class OssUtil {
 		log.info("URL: {}", url);
 		try {
 			bis.close();
-		} catch (IOException e) {
-			log.error("", e);
+		} catch (IOException ex) {
+			log.error("bis.close失败, Error: {}", ex.getMessage(), ex);
 		}
 		return url;
 	}
@@ -147,8 +146,8 @@ public class OssUtil {
 		byte[] bytes = StreamUtil.read(in);
 		try {
 			ossObj.close();
-		} catch (IOException e) {
-			log.warn(e.getMessage());
+		} catch (IOException ex) {
+			log.error("ossObj.close失败, Error: {}", ex.getMessage(), ex);
 		}
 		return bytes;
 	}
@@ -161,8 +160,8 @@ public class OssUtil {
 		StreamUtil.write(in, out);
 		try {
 			ossObj.close();
-		} catch (IOException e) {
-			log.warn(e.getMessage());
+		} catch (IOException ex) {
+			log.error("ossObj.close失败, Error: {}", ex.getMessage(), ex);
 		}
 	}
 

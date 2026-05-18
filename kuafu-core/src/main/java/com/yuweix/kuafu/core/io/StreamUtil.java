@@ -24,15 +24,15 @@ public abstract class StreamUtil {
 				out.write(buffer, 0, len);
 			}
 			return out.toByteArray();
-		} catch (Exception e) {
-            log.error("读取流内容失败, Error: {}", e.getMessage());
+		} catch (Exception ex) {
+            log.error("读取流内容失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			if (out != null) {
 				try {
 					out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("out.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -49,8 +49,8 @@ public abstract class StreamUtil {
 				i = bis.read(buffer);
 			}
 			out.flush();
-		} catch (Exception e) {
-            log.error("写入流内容失败, Error: {}", e.getMessage());
+		} catch (Exception ex) {
+            log.error("写入流内容失败, Error: {}", ex.getMessage(), ex);
 		} finally {
 			if (bis != null) {
 				try {

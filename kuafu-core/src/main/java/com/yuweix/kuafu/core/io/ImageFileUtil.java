@@ -1,26 +1,20 @@
 package com.yuweix.kuafu.core.io;
 
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.swing.ImageIcon;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.IOException;
 
 
 /**
@@ -42,8 +36,8 @@ public abstract class ImageFileUtil extends FileUtil {
 			int width = image.getWidth(null);
 			int height = image.getHeight(null);
 			return new Dimension(width, height);
-		} catch (IOException e) {
-			log.error("", e);
+		} catch (IOException ex) {
+			log.error("measure失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			close(inputStream);
@@ -61,8 +55,8 @@ public abstract class ImageFileUtil extends FileUtil {
 			int oldWidth = oldImage.getWidth(null);
 			int oldHeight = oldImage.getHeight(null);
 			return compress0(oldImage, (int) (oldWidth * ratio), (int) (oldHeight * ratio), getImageType(imgData));
-		} catch (IOException e) {
-			log.error("", e);
+		} catch (IOException ex) {
+			log.error("compress失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			close(inputStream);
@@ -81,8 +75,8 @@ public abstract class ImageFileUtil extends FileUtil {
 			}
 			int newHeight = (newWidth * oldHeight) / oldWidth;
 			return compress0(oldImage, newWidth, newHeight, getImageType(imgData));
-		} catch (IOException e) {
-			log.error("", e);
+		} catch (IOException ex) {
+			log.error("compress失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			close(inputStream);
@@ -94,8 +88,8 @@ public abstract class ImageFileUtil extends FileUtil {
 			inputStream = new ByteArrayInputStream(imgData);
 			BufferedImage oldImage = ImageIO.read(inputStream);
 			return compress0(oldImage, newWidth, newHeight, getImageType(imgData));
-		} catch (IOException e) {
-			log.error("", e);
+		} catch (IOException ex) {
+			log.error("compress失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			close(inputStream);
@@ -120,8 +114,8 @@ public abstract class ImageFileUtil extends FileUtil {
 			outputStream = new ByteArrayOutputStream();
 			ImageIO.write(bufferedImage, formatName, outputStream);
 			return outputStream.toByteArray();
-		} catch (IOException e) {
-			log.error("", e);
+		} catch (IOException ex) {
+			log.error("compress失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			close(outputStream);
@@ -156,8 +150,8 @@ public abstract class ImageFileUtil extends FileUtil {
 			outputStream = new ByteArrayOutputStream();
 			ImageIO.write(bg, getImageType(bgImgData), outputStream);
 			return outputStream.toByteArray();
-		} catch (Exception e) {
-			log.error("", e);
+		} catch (Exception ex) {
+			log.error("merge失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			close(outputStream);
@@ -179,8 +173,8 @@ public abstract class ImageFileUtil extends FileUtil {
 			imageInputStream = ImageIO.createImageInputStream(inputStream);
 			ImageReader imageReader = ImageIO.getImageReaders(imageInputStream).next();
 			return imageReader.getFormatName();
-		} catch (Exception e) {
-			log.error("", e);
+		} catch (Exception ex) {
+			log.error("getImageType失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			close(imageInputStream);
@@ -214,8 +208,8 @@ public abstract class ImageFileUtil extends FileUtil {
 			outputStream = new ByteArrayOutputStream();
 			ImageIO.write(image, imageReader.getFormatName(), outputStream);
 			return outputStream.toByteArray();
-		} catch (Exception e) {
-			log.error("", e);
+		} catch (Exception ex) {
+			log.error("cut失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			close(outputStream);
@@ -249,8 +243,8 @@ public abstract class ImageFileUtil extends FileUtil {
 			outputStream = new ByteArrayOutputStream();
 			ImageIO.write(img, getImageType(imgData), outputStream);
 			return outputStream.toByteArray();
-		} catch (Exception e) {
-			log.error("", e);
+		} catch (Exception ex) {
+			log.error("rotate失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			close(outputStream);
@@ -261,8 +255,8 @@ public abstract class ImageFileUtil extends FileUtil {
 		if (stream != null) {
 			try {
 				stream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (IOException ex) {
+				log.error("stream.close失败, Error: {}", ex.getMessage(), ex);
 			}
 		}
 	}

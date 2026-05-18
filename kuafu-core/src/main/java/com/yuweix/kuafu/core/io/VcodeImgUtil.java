@@ -1,17 +1,17 @@
 package com.yuweix.kuafu.core.io;
 
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Random;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
 
 
 /**
@@ -19,6 +19,7 @@ import javax.imageio.stream.ImageOutputStream;
  * @author yuwei
  */
 public abstract class VcodeImgUtil {
+	private static final Logger log = LoggerFactory.getLogger(VcodeImgUtil.class);
 	private static final String DEFAULT_IMAGE_TYPE = "jpg";
 	
 
@@ -35,22 +36,22 @@ public abstract class VcodeImgUtil {
 			imageOut = ImageIO.createImageOutputStream(output);
 			ImageIO.write(image, imgType, imageOut);
 			return output.toByteArray();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException ex) {
+			log.error("createImage失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
 			if (imageOut != null) {
 				try {
 					imageOut.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("imageOut.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 			if (output != null) {
 				try {
 					output.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("output.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}

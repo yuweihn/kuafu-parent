@@ -2,20 +2,12 @@ package com.yuweix.kuafu.core.io;
 
 
 import com.yuweix.kuafu.core.DateUtil;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.File;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.io.BufferedOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 
 /**
@@ -50,29 +42,29 @@ public abstract class FileUtil extends StreamUtil {
 				}
 			} while (line != null);
 			return builder.toString();
-		} catch (Exception e) {
-			log.error("读取文件内容失败, Error: {}", e.getMessage(), e);
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error("读取文件内容失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (bf != null) {
 				try {
 					bf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("bf.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 			if (isr != null) {
 				try {
 					isr.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("isr.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 			if (fis != null) {
 				try {
 					fis.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("fis.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -118,22 +110,22 @@ public abstract class FileUtil extends StreamUtil {
 			fos = new FileOutputStream(file);
 			bos = new BufferedOutputStream(fos);
 			bos.write(content);
-		} catch (Exception e) {
-            log.error("写入文件失败, Error: {}", e.getMessage(), e);
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+            log.error("写入文件失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (bos != null) {
 				try {
 					bos.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("bos.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 			if (fos != null) {
 				try {
 					fos.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("fos.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
