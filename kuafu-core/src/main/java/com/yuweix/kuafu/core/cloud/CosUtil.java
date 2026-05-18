@@ -65,8 +65,8 @@ public class CosUtil {
 						cosClient.createBucket(bucketRequest);
 					}
 				}
-			} catch (Exception e) {
-				log.error("Error on getCosClient: {}", e.getMessage());
+			} catch (Exception ex) {
+				log.error("Error on getCosClient: {}", ex.getMessage(), ex);
 			} finally {
 				cosClientLock.unlock();
 			}
@@ -98,7 +98,7 @@ public class CosUtil {
 	 * 查询Bucket下所有的key
 	 */
 	public List<String> queryBucketKeyList() {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (!getCosClient().doesBucketExist(bucketName)) {
 			return list;
 		}
@@ -130,8 +130,8 @@ public class CosUtil {
 		log.info("URL: {}", url);
 		try {
 			bis.close();
-		} catch (IOException e) {
-			log.error("", e);
+		} catch (IOException ex) {
+			log.error("bis.close失败, Error: {}", ex.getMessage(), ex);
 		}
 		return url;
 	}
@@ -149,8 +149,8 @@ public class CosUtil {
 		byte[] bytes = StreamUtil.read(in);
 		try {
 			cosObj.close();
-		} catch (IOException e) {
-			log.warn(e.getMessage());
+		} catch (IOException ex) {
+			log.error("cosObj.close失败, Error: {}", ex.getMessage(), ex);
 		}
 		return bytes;
 	}
@@ -163,8 +163,8 @@ public class CosUtil {
 		StreamUtil.write(in, out);
 		try {
 			cosObj.close();
-		} catch (IOException e) {
-			log.warn(e.getMessage());
+		} catch (IOException ex) {
+			log.error("cosObj.close失败, Error: {}", ex.getMessage(), ex);
 		}
 	}
 

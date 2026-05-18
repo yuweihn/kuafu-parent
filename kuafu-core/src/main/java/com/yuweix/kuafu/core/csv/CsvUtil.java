@@ -1,12 +1,13 @@
 package com.yuweix.kuafu.core.csv;
 
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+
 import java.beans.PropertyDescriptor;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -15,12 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 
 /**
@@ -41,8 +36,8 @@ public abstract class CsvUtil {
 
 		try {
 			out.close();
-		} catch (IOException e) {
-			log.error("", e);
+		} catch (IOException ex) {
+			log.error("out.close失败, Error: {}", ex.getMessage(), ex);
 		}
 		return data;
 	}
@@ -55,8 +50,8 @@ public abstract class CsvUtil {
 		response.setHeader("Access-Control-Expose-Headers", "_filename");
 		try {
 			export(dataList, response.getOutputStream());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -100,21 +95,21 @@ public abstract class CsvUtil {
 				}
 				bw.newLine();
 			}
-		} catch (Exception e) {
-			log.error("", e);
+		} catch (Exception ex) {
+			log.error("导出数据时发生异常, Error: {}", ex.getMessage(), ex);
 		} finally {
 			if (bw != null) {
 				try {
 					bw.close();
-				} catch (IOException e) {
-					log.error("", e);
+				} catch (IOException ex) {
+					log.error("bw.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 			if (osw != null) {
 				try {
 					osw.close();
-				} catch (IOException e) {
-					log.error("", e);
+				} catch (IOException ex) {
+					log.error("osw.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -179,8 +174,8 @@ public abstract class CsvUtil {
 					Method getMethod = pd.getReadMethod();
 					Object o = getMethod.invoke(t);
 					list.add(o);
-				} catch (Exception e) {
-					log.error("", e);
+				} catch (Exception ex) {
+					log.error("getOutputDataList获取属性值失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
