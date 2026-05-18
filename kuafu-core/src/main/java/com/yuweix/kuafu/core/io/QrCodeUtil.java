@@ -1,11 +1,16 @@
 package com.yuweix.kuafu.core.io;
 
 
-import java.awt.BasicStroke;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Shape;
+import com.google.zxing.*;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -14,26 +19,15 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.BinaryBitmap;
-import com.google.zxing.DecodeHintType;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.MultiFormatReader;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.Result;
-import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.common.HybridBinarizer;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-
 
 /**
  * 二维码工具类
  * @author yuwei
  */
 public abstract class QrCodeUtil {
+	private static final Logger log = LoggerFactory.getLogger(QrCodeUtil.class);
+
+
 	private static final String CHARSET = "utf-8";
 	private static final String DEFAULT_IMAGE_TYPE = "jpg";
 	/**
@@ -58,7 +52,7 @@ public abstract class QrCodeUtil {
 		if (ecLevel == null) {
 			ecLevel = ErrorCorrectionLevel.H;
 		}
-		Map<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();
+		Map<EncodeHintType, Object> hints = new Hashtable<>();
 		hints.put(EncodeHintType.ERROR_CORRECTION, ecLevel);
 		hints.put(EncodeHintType.CHARACTER_SET, CHARSET);
 		hints.put(EncodeHintType.MARGIN, 0);
@@ -80,8 +74,8 @@ public abstract class QrCodeUtil {
 			 */
 			insertLogo(qrcodeImg, logoData, compressLogo);
 			return qrcodeImg;
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("生成二维码失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		}
 	}
@@ -131,14 +125,14 @@ public abstract class QrCodeUtil {
 			graph.setStroke(new BasicStroke(3f));
 			graph.draw(shape);
 			graph.dispose();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("插入Logo失败, Error: {}", ex.getMessage(), ex);
 		} finally {
 			if (logoBais != null) {
 				try {
 					logoBais.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("logoBais.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -196,14 +190,14 @@ public abstract class QrCodeUtil {
 			baos = new ByteArrayOutputStream();
 			ImageIO.write(bufImg, imgType, baos);
 			qrcodeData = baos.toByteArray();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("encode失败, Error: {}", ex.getMessage(), ex);
 		} finally {
-			if(baos != null) {
+			if (baos != null) {
 				try {
 					baos.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("baos.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -224,19 +218,19 @@ public abstract class QrCodeUtil {
 			}
 			BufferedImageLuminanceSource source = new BufferedImageLuminanceSource(image);
 			BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-			Hashtable<DecodeHintType, Object> hints = new Hashtable<DecodeHintType, Object>();
+			Hashtable<DecodeHintType, Object> hints = new Hashtable<>();
 			hints.put(DecodeHintType.CHARACTER_SET, CHARSET);
 			Result result = new MultiFormatReader().decode(bitmap, hints);
 			return result.getText();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("decode失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		} finally {
-			if(bais != null) {
+			if (bais != null) {
 				try {
 					bais.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("bais.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
