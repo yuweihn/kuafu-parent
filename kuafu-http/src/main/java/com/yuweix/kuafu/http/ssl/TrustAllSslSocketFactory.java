@@ -1,16 +1,17 @@
 package com.yuweix.kuafu.http.ssl;
 
 
-import java.security.cert.X509Certificate;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.net.ssl.SSLContext;
-
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLContext;
+import java.security.cert.X509Certificate;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -19,6 +20,8 @@ import org.apache.http.ssl.TrustStrategy;
  * @author yuwei
  */
 public class TrustAllSslSocketFactory extends SSLConnectionSocketFactory {
+	private static final Logger log = LoggerFactory.getLogger(TrustAllSslSocketFactory.class);
+
 	private static volatile TrustAllSslSocketFactory instance = null;
 	private static final String[] SUPPORTED_PROTOCOLS = new String[] {"TLSv1.1", "TLSv1.2"};
 	private static final Lock lock = new ReentrantLock();
@@ -53,8 +56,8 @@ public class TrustAllSslSocketFactory extends SSLConnectionSocketFactory {
 					return true;
 				}
 			}).build();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			log.error("创建SSLContext失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		}
 	}

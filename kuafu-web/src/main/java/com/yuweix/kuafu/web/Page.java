@@ -1,15 +1,13 @@
 package com.yuweix.kuafu.web;
 
 
-import com.yuweix.kuafu.core.Constant;
+import jakarta.servlet.http.HttpServletRequest;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 
 /**
@@ -128,12 +126,8 @@ public class Page {
 				if (paramValue == null || "".equals(paramValue)) {
 					continue;
 				}
-				try {
-					paramValue = URLEncoder.encode(paramValue, Constant.ENCODING_UTF_8);
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				}
-				buf.append(paramName).append("=").append(paramValue).append("&");
+                paramValue = URLEncoder.encode(paramValue, StandardCharsets.UTF_8);
+                buf.append(paramName).append("=").append(paramValue).append("&");
 			}
 		}
 		if (buf.substring(buf.length() - 1).equals("&")) {

@@ -65,14 +65,15 @@ public abstract class PoiExcel {
 				sheetList.add(poiSheet);
 			}
 			return sheetList;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error("readSheet失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (is != null) {
 				try {
 					is.close();
-				} catch (IOException e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (IOException ex) {
+					log.error("is.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -90,14 +91,15 @@ public abstract class PoiExcel {
 				list.add(sheet.getSheetName().trim());
 			}
 			return list;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error("getSheetNameList失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (is != null) {
 				try {
 					is.close();
-				} catch (IOException e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (IOException ex) {
+					log.error("is.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -127,14 +129,15 @@ public abstract class PoiExcel {
 				return read(sheet, clz, fieldMap);
 			}
 			return sheetList;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error("readSheet失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (is != null) {
 				try {
 					is.close();
-				} catch (IOException e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (IOException ex) {
+					log.error("is.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -151,15 +154,16 @@ public abstract class PoiExcel {
 		try {
 			is = new ByteArrayInputStream(bytes);
 			Workbook wb = WorkbookFactory.create(is);
-			return read(wb.getSheetAt(0), clz, fieldMap);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+			return read(wb.getSheetAt(sheetIdx), clz, fieldMap);
+		} catch (Exception ex) {
+			log.error("readSheet失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (is != null) {
 				try {
 					is.close();
-				} catch (IOException e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (IOException ex) {
+					log.error("is.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -196,14 +200,15 @@ public abstract class PoiExcel {
 				return getImportHeadList(sheet.getRow(0));
 			}
 			return new ArrayList<>();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception ex) {
+			log.error("getImportHeadList失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (is != null) {
 				try {
 					is.close();
-				} catch (IOException e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (IOException ex) {
+					log.error("is.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -325,8 +330,8 @@ public abstract class PoiExcel {
 
 		try {
 			out.close();
-		} catch (IOException e) {
-			log.error("Error: {}", e.getMessage(), e);
+		} catch (IOException ex) {
+			log.error("out.close失败, Error: {}", ex.getMessage(), ex);
 		}
 		return data;
 	}
@@ -339,8 +344,9 @@ public abstract class PoiExcel {
 		resp.setHeader("Access-Control-Expose-Headers", "_filename");
 		try {
 			export(clz, dataList, resp.getOutputStream());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (IOException ex) {
+			log.error("export失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		}
 	}
 
@@ -402,14 +408,14 @@ public abstract class PoiExcel {
 			}
 
 			workbook.write(out);
-		} catch (Exception e) {
-			log.error("Error: {}", e.getMessage(), e);
+		} catch (Exception ex) {
+			log.error("export失败, Error: {}", ex.getMessage(), ex);
 		} finally {
 			if (workbook != null) {
 				try {
 					workbook.close();
-				} catch (IOException e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (IOException ex) {
+					log.error("workbook.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}
@@ -505,8 +511,8 @@ public abstract class PoiExcel {
 					Method getMethod = pd.getReadMethod();
 					Object o = getMethod.invoke(t);
 					list.add(o);
-				} catch (Exception e) {
-					log.error("Error: {}", e.getMessage(), e);
+				} catch (Exception ex) {
+					log.error("getOutputDataList获取属性值失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}

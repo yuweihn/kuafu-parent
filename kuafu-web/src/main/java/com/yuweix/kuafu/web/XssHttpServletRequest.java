@@ -5,6 +5,8 @@ import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -21,6 +23,8 @@ import java.util.Map;
  * @author yuwei
  */
 public class XssHttpServletRequest extends HttpServletRequestWrapper {
+	private static final Logger log = LoggerFactory.getLogger(XssHttpServletRequest.class);
+
 	private XssEncoder xssEncoder;
 
 	public XssHttpServletRequest(HttpServletRequest request) {
@@ -135,14 +139,15 @@ public class XssHttpServletRequest extends HttpServletRequestWrapper {
 				out.write(buffer, 0, len);
 			}
 			return out.toByteArray();
-		} catch (Exception e) {
-			throw new IOException(e);
+		} catch (Exception ex) {
+			log.error("Error on read: {}", ex.getMessage(), ex);
+			throw new IOException(ex);
 		} finally {
 			if (out != null) {
 				try {
 					out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException ex) {
+					log.error("out.close失败, Error: {}", ex.getMessage(), ex);
 				}
 			}
 		}

@@ -62,8 +62,8 @@ public abstract class ActionUtil {
 		String innerIp = null;
 		try {
 			innerIp = InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			log.error("获取本机内网IP失败, Error: {}", e.getMessage(), e);
+		} catch (UnknownHostException ex) {
+			log.error("获取本机内网IP失败, Error: {}", ex.getMessage(), ex);
 		}
 		return innerIp;
 	}
@@ -77,8 +77,8 @@ public abstract class ActionUtil {
 		Enumeration<NetworkInterface> netInterfaces = null;
 		try {
 			netInterfaces = NetworkInterface.getNetworkInterfaces();
-		} catch (SocketException e) {
-			log.error("获取本机外网IP失败, Error: {}", e.getMessage(), e);
+		} catch (SocketException ex) {
+			log.error("获取本机外网IP失败, Error: {}", ex.getMessage(), ex);
 			return null;
 		}
 		InetAddress ip = null;
@@ -153,8 +153,8 @@ public abstract class ActionUtil {
 			URI effectiveURI = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), null, null, null);
 			String contextPath = effectiveURI.toString().replaceFirst("http:", "").replaceFirst("https:", "");
 			request.getServletContext().setAttribute(Constant.CONTEXT_PATH_KEY, contextPath);
-		} catch (Exception e) {
-			log.error("将站点URL存入ServletContext中失败, Error: {}", e.getMessage(), e);
+		} catch (Exception ex) {
+			log.error("将站点URL存入ServletContext中失败, Error: {}", ex.getMessage(), ex);
 		}
 	}
 
@@ -325,9 +325,9 @@ public abstract class ActionUtil {
                 os.write(buffer, 0, i);
             }
             os.flush();
-        } catch (Exception e) {
-            log.error("Http响应出错[ActionUtil.output]，Error: {}", e.getMessage(), e);
-            throw new RuntimeException(e);
+        } catch (Exception ex) {
+            log.error("Http响应出错[ActionUtil.output]，Error: {}", ex.getMessage(), ex);
+            throw new RuntimeException(ex);
         } finally {
             if (bfis != null) {
                 try {
@@ -353,9 +353,9 @@ public abstract class ActionUtil {
             headers.put("_filename", attachFileName);
             headers.put("Access-Control-Expose-Headers", "_filename");
             output(bytes, "application/octet-stream", headers);
-        } catch (Exception e) {
-            log.error("下载文件失败，Error: {}", e.getMessage(), e);
-            throw new RuntimeException(e);
+        } catch (Exception ex) {
+            log.error("下载文件失败，Error: {}", ex.getMessage(), ex);
+            throw new RuntimeException(ex);
         }
     }
 
