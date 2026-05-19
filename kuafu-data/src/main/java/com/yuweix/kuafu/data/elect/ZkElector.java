@@ -1,13 +1,13 @@
 package com.yuweix.kuafu.data.elect;
 
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -62,9 +62,9 @@ public class ZkElector extends AbstractElector {
 							}
 						});
 						latch.await(5, TimeUnit.SECONDS);
-					} catch (Exception e) {
-						log.error("", e);
-						throw new RuntimeException(e);
+					} catch (Exception ex) {
+						log.error("Can't connect zookeeper. Error: {}", ex.getMessage(), ex);
+						throw new RuntimeException(ex);
 					}
 				}
 			}
@@ -87,8 +87,8 @@ public class ZkElector extends AbstractElector {
 				String path = getZk().create(key, node.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
 				log.info("Create server node ({} => {})", path, node);
 				return node;
-			} catch (Exception e) {
-				log.error("{}", e.getMessage());
+			} catch (Exception ex) {
+				log.error("Create server node error: {}", ex.getMessage(), ex);
 			}
 		}
 		return getNodeValue(key);
@@ -108,8 +108,8 @@ public class ZkElector extends AbstractElector {
 		}
 		try {
 			zk.delete(key, -1);
-		} catch (InterruptedException | KeeperException e) {
-			log.warn("", e);
+		} catch (InterruptedException | KeeperException ex) {
+			log.error("Delete server node error: {}", ex.getMessage(), ex);
 		}
 	}
 
@@ -124,8 +124,8 @@ public class ZkElector extends AbstractElector {
 				return null;
 			}
 			val = getZk().getData(key, false, stat);
-		} catch (Exception e) {
-			log.warn("get " + key + " error, ", e);
+		} catch (Exception ex) {
+			log.error("Get node value error: {}, key: {}", ex.getMessage(), key, ex);
 		}
 		return val == null ? null : new String(val);
 	}
@@ -135,8 +135,8 @@ public class ZkElector extends AbstractElector {
 		if (zk != null) {
 			try {
 				zk.close();
-			} catch (InterruptedException e) {
-				log.error("", e);
+			} catch (InterruptedException ex) {
+				log.error("Close zookeeper error: {}", ex.getMessage(), ex);
 			}
 			zk = null;
 		}

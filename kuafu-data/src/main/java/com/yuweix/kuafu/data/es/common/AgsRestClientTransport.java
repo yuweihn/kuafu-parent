@@ -28,8 +28,8 @@ public class AgsRestClientTransport extends RestClientTransport {
 			field.set(null, ContentType.APPLICATION_JSON);
 
 			modifiers.setInt(field, field.getModifiers() & Modifier.FINAL);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			throw new RuntimeException(e);
+		} catch (NoSuchFieldException | IllegalAccessException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 

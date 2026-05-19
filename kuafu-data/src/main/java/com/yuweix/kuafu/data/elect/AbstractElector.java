@@ -38,8 +38,8 @@ public abstract class AbstractElector implements Elector {
 	private static String getLocalInnerIP() {
 		try {
 			return InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
+		} catch (UnknownHostException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 }

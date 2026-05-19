@@ -51,8 +51,8 @@ public abstract class ReactiveUtil {
 		String innerIp = null;
 		try {
 			innerIp = InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			log.error("获取本机内网IP失败, Error: {}", e.getMessage(), e);
+		} catch (UnknownHostException ex) {
+			log.error("获取本机内网IP失败, Error: {}", ex.getMessage(), ex);
 		}
 		return innerIp;
 	}

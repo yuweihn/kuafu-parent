@@ -31,8 +31,8 @@ public class TextMessageListener implements SessionAwareMessageListener<Message>
 		try {
 			ActiveMQTextMessage msg = (ActiveMQTextMessage) message;
 			receiver.receive(msg.getDestination().getPhysicalName(), msg.getText());
-		} catch (Exception e) {
-			log.error("==>", e);
+		} catch (Exception ex) {
+			log.error("消息处理失败: {}", ex.getMessage(), ex);
 		}
 	}
 }

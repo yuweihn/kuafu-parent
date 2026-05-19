@@ -73,8 +73,8 @@ public abstract class CacheableDao<T extends Serializable, PK extends Serializab
 		if (field != null) {
 			try {
 				id = (PK) field.get(t);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
 			}
 		}
 

@@ -73,7 +73,7 @@ public abstract class AbstractThreadPoolTask<T> extends AbstractTask {
 	}
 
 	protected void handleThreadFutureException(Throwable t) {
-		log.error("{}", t.getMessage());
+		log.error("handleThreadFutureException: {}", t.getMessage());
 	}
 	protected void failure(List<T> failList) {
 
