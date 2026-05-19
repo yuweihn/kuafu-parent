@@ -1,14 +1,14 @@
 package com.yuweix.kuafu.core.exception;
 
 
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 
 /**
@@ -22,6 +22,8 @@ public class ExceptionHandler implements HandlerExceptionResolver {
 	private ExceptionViewResolver viewResolver;
 	private Map<Class<?>, String> errorMsgMap;
 	private boolean showExceptionName;
+	/** 当配置中存在异常对应的提示消息时，是否优先使用配置消息而非异常原始消息 */
+	private boolean preferConfiguredMessage = false;
 
 
 	public void setViewResolver(ExceptionViewResolver viewResolver) {
@@ -36,6 +38,10 @@ public class ExceptionHandler implements HandlerExceptionResolver {
 		this.showExceptionName = showExceptionName;
 	}
 
+	public void setPreferConfiguredMessage(boolean preferConfiguredMessage) {
+		this.preferConfiguredMessage = preferConfiguredMessage;
+	}
+
 	@Override
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response
 			, Object handler, Exception ex) {
@@ -46,13 +52,16 @@ public class ExceptionHandler implements HandlerExceptionResolver {
 	private String showMessage(Exception ex) {
 		Class<? extends Exception> aClz = ex.getClass();
 		String msg = ex.getMessage();
-		String defaultMsg = errorMsgMap == null ? null : errorMsgMap.get(aClz);
+		String configuredMsg = errorMsgMap == null ? null : errorMsgMap.get(aClz);
 
+		if (preferConfiguredMessage && configuredMsg != null && !"".equals(configuredMsg)) {
+			return showExceptionName ? aClz.getName() + ": " + configuredMsg : configuredMsg;
+		}
 		if (msg != null && !"".equals(msg)) {
 			return showExceptionName ? aClz.getName() + ": " + msg : msg;
 		}
-		if (defaultMsg != null && !"".equals(defaultMsg)) {
-			return showExceptionName ? aClz.getName() + ": " + defaultMsg : defaultMsg;
+		if (configuredMsg != null && !"".equals(configuredMsg)) {
+			return showExceptionName ? aClz.getName() + ": " + configuredMsg : configuredMsg;
 		}
 		return aClz.getName();
 	}
