@@ -1,18 +1,17 @@
 package com.yuweix.kuafu.sequence.dao;
 
 
-import java.util.Map;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.yuweix.kuafu.sequence.bean.SequenceHolder;
 import com.yuweix.kuafu.sequence.dao.lb.IRule;
 import com.yuweix.kuafu.sequence.dao.lb.RoundRobinRule;
 import com.yuweix.kuafu.sequence.exception.SequenceException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
+
+import java.util.Map;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -63,8 +62,8 @@ public abstract class AbstractGroupSequenceDao extends AbstractSequenceDao {
 				}
 				rule = (IRule) ruleClass.getDeclaredConstructor().newInstance();
 				rule.setSegmentCount(segCount);
-			} catch (Exception e) {
-				throw new SequenceException(e);
+			} catch (Exception ex) {
+				throw new SequenceException(ex);
 			}
 		}
 	}
@@ -111,8 +110,9 @@ public abstract class AbstractGroupSequenceDao extends AbstractSequenceDao {
 			long newValue = adjustOldValue + ((long) segCount * getInnerStep());
 			try {
 				updateSeqValue(segment, seqName, oldValue, newValue);
-			} catch(Exception e) {
-				log.error("", e);
+			} catch(Exception ex) {
+				log.error("Failed to update the value of {}. segment: {}, oldValue: {}, newValue: {}. Error: {}"
+						, seqName, segment, oldValue, newValue, ex.getMessage(), ex);
 				continue;
 			}
 
@@ -155,8 +155,8 @@ public abstract class AbstractGroupSequenceDao extends AbstractSequenceDao {
 					}
 				});
 				return future.get(maxWaitMillis, TimeUnit.MILLISECONDS);
-			} catch (Exception e) {
-				log.error("", e);
+			} catch (Exception ex) {
+				log.error("Failed to select seq value from {}. Error: {}", seqName, ex.getMessage(), ex);
 				if (excludedSegment.size() < segCount - 1) {
 					excludedSegment.put(segment, new AtomicInteger(0));
 					log.error("Temporarily remove the data source with index {}, and try again after {} times.", segment, maxSkipCount);
