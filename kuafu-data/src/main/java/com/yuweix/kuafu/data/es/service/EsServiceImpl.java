@@ -84,8 +84,8 @@ public class EsServiceImpl implements EsService {
 			client = esConnector.acquire();
 			ExistsRequest req = ExistsRequest.of(f -> f.index(index));
 			return client.indices().exists(req).value();
-		} catch (Exception e) {
-			log.error("isIndexExists(indexName: {}), error: {} ", index, e.toString());
+		} catch (Exception ex) {
+			log.error("isIndexExists(indexName: {}), error: {} ", index, ex.getMessage(), ex);
 			return false;
 		} finally {
 			esConnector.release(client);

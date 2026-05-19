@@ -187,7 +187,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 			}
 			return out.toByteArray();
 		} catch (Exception e) {
-            log.error("读取流内容失败, Error: {}", e.getMessage());
+			log.error("读取流内容失败, Error: {}", e.getMessage() , e);
 			throw new RuntimeException(e);
 		} finally {
 			if (out != null) {

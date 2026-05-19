@@ -9,6 +9,8 @@ import org.springframework.util.Assert;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -115,9 +117,9 @@ public abstract class MonitorUtil {
 	private static Map<String, String> readCpuForLinux() {
 		InputStreamReader inputs = null;
 		BufferedReader buffer = null;
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		try {
-			inputs = new InputStreamReader(new FileInputStream("/proc/stat"));
+			inputs = new InputStreamReader(Files.newInputStream(Paths.get("/proc/stat")));
 			buffer = new BufferedReader(inputs);
 			String line = "";
 			while (true) {
@@ -127,7 +129,7 @@ public abstract class MonitorUtil {
 				}
 				if (line.startsWith("cpu")) {
 					StringTokenizer tokenizer = new StringTokenizer(line);
-					List<String> temp = new ArrayList<String>();
+					List<String> temp = new ArrayList<>();
 					while (tokenizer.hasMoreElements()) {
 						String value = tokenizer.nextToken();
 						temp.add(value);
@@ -278,11 +280,11 @@ public abstract class MonitorUtil {
 	}
 
 	private static Memory getMemUsageForLinux() {
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		InputStreamReader inputs = null;
 		BufferedReader buffer = null;
 		try {
-			inputs = new InputStreamReader(new FileInputStream("/proc/meminfo"));
+			inputs = new InputStreamReader(Files.newInputStream(Paths.get("/proc/meminfo")));
 			buffer = new BufferedReader(inputs);
 			String line = "";
 			while (true) {
@@ -390,7 +392,7 @@ public abstract class MonitorUtil {
 				int m = 0;
 				strArray = str.split(" ");
 				for (String tmp : strArray) {
-					if (tmp.trim().length() == 0) {
+					if (tmp.trim().isEmpty()) {
 						continue;
 					}
 					++m;

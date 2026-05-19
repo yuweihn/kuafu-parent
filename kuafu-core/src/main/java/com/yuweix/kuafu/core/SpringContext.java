@@ -94,7 +94,7 @@ public class SpringContext implements ApplicationContextAware {
 	public static<T> T getBeanIgnoreNull(String beanName) {
 		try {
 			return (T) applicationContext.getBean(beanName);
-		} catch (NoSuchBeanDefinitionException e) {
+		} catch (NoSuchBeanDefinitionException ex) {
 			return null;
 		}
 	}
@@ -105,7 +105,7 @@ public class SpringContext implements ApplicationContextAware {
 	public static<T> T getBeanIgnoreNull(Class<T> clz) {
 		try {
 			return applicationContext.getBean(clz);
-		} catch (NoSuchBeanDefinitionException e) {
+		} catch (NoSuchBeanDefinitionException ex) {
 			return null;
 		}
 	}
@@ -116,7 +116,7 @@ public class SpringContext implements ApplicationContextAware {
 	public static<T> T getBeanIgnoreNull(String name, Class<T> clz) {
 		try {
 			return applicationContext.getBean(name, clz);
-		} catch (NoSuchBeanDefinitionException e) {
+		} catch (NoSuchBeanDefinitionException ex) {
 			return null;
 		}
 	}
