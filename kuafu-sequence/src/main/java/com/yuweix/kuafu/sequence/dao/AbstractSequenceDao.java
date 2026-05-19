@@ -118,8 +118,8 @@ public abstract class AbstractSequenceDao implements SequenceDao {
 		if (rs != null) {
 			try {
 				rs.close();
-			} catch (Exception e) {
-				log.error("Could not close JDBC ResultSet", e);
+			} catch (Exception ex) {
+				log.error("Could not close JDBC ResultSet. Error: {}", ex.getMessage(), ex);
 			}
 		}
 	}
@@ -127,8 +127,8 @@ public abstract class AbstractSequenceDao implements SequenceDao {
 		if (stmt != null) {
 			try {
 				stmt.close();
-			} catch (Exception e) {
-				log.error("Could not close JDBC Statement", e);
+			} catch (Exception ex) {
+				log.error("Could not close JDBC Statement. Error: {}", ex.getMessage(), ex);
 			}
 		}
 	}
@@ -136,8 +136,8 @@ public abstract class AbstractSequenceDao implements SequenceDao {
 		if (conn != null) {
 			try {
 				conn.close();
-			} catch (Exception e) {
-				log.error("Could not close JDBC Connection", e);
+			} catch (Exception ex) {
+				log.error("Could not close JDBC Connection. Error: {}", ex.getMessage(), ex);
 			}
 		}
 	}
@@ -169,8 +169,8 @@ public abstract class AbstractSequenceDao implements SequenceDao {
 				log.debug("Insert initial value {} to {}.", initValue, seqName);
 			}
 			return affectedRows;
-		} catch (Exception e) {
-			throw new SequenceException("Failed to assign init value " + initValue + " to " + seqName, e);
+		} catch (Exception ex) {
+			throw new SequenceException("Failed to assign init value " + initValue + " to " + seqName, ex);
 		} finally {
 			closeStatement(stmt);
 			closeConnection(conn);
@@ -197,8 +197,8 @@ public abstract class AbstractSequenceDao implements SequenceDao {
 				throw new SequenceException("Failed to update the value of " + seqName + " from " + oldValue + " to " + newValue);
 			}
 			return affectedRows;
-		} catch (Exception e) {
-			throw new SequenceException(e);
+		} catch (Exception ex) {
+			throw new SequenceException(ex);
 		} finally {
 			closeStatement(stmt);
 			closeConnection(conn);
@@ -221,8 +221,8 @@ public abstract class AbstractSequenceDao implements SequenceDao {
 			rs = stmt.executeQuery();
 			boolean hasNext = rs.next();
 			return hasNext ? rs.getLong(1) : null;
-		} catch (Exception e) {
-			log.error("", e);
+		} catch (Exception ex) {
+			log.error("Failed to select seq value from {}. Error: {}", seqName, ex.getMessage(), ex);
 			return null;
 		} finally {
 			closeResultSet(rs);

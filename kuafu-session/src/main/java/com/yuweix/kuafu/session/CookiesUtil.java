@@ -81,13 +81,13 @@ public abstract class CookiesUtil {
 	public static void invalidate(HttpServletRequest request, HttpServletResponse response) {
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
-			for(int i = 0; i < cookies.length; i++) {
-				Cookie cookie = new Cookie(cookies[i].getName(), null);
-				cookie.setValue("");
-				cookie.setMaxAge(0);
-				cookie.setPath("/");
-				response.addCookie(cookie);
-			}
+            for (Cookie value : cookies) {
+                Cookie cookie = new Cookie(value.getName(), null);
+                cookie.setValue("");
+                cookie.setMaxAge(0);
+                cookie.setPath("/");
+                response.addCookie(cookie);
+            }
 		}
 	}
 }
