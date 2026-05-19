@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -34,54 +33,49 @@ import java.util.Set;
 @Configuration
 @ConditionalOnProperty(name = "kuafu.boot.exception.enabled")
 public class ExceptionAutoConfiguration {
-	@Value("${kuafu.exception.error-code:}")
-	private String errorCode;
-
-	/**
-	 * 兼容Spring Boot的ErrorController，处理/error请求
-	 */
-	@Controller
+	@Configuration
 	@ConditionalOnProperty(name = "kuafu.boot.exception.handler.enabled", matchIfMissing = true)
-	public static class KuafuErrorController implements ErrorController {
+	protected static class ErrorControllerConfiguration {
 		@Value("${kuafu.exception.error-code:}")
 		private String errorCode;
 
-		@RequestMapping("/error")
-		@ResponseBody
-		public String error(HttpServletResponse response) {
-			int status = response.getStatus();
-			HttpStatus httpStatus = HttpStatus.valueOf(status);
+		@Controller
+		public class ErrorController {
+			@RequestMapping(value = { "/error", "/error/**" })
+			@ResponseBody
+			public String toErrorPage(HttpServletResponse response) {
+				int status = response.getStatus();
+				HttpStatus httpStatus = HttpStatus.valueOf(status);
 
-			Response<String, Void> resp = new Response<>(errorCode == null || "".equals(errorCode) ? "" + status : errorCode
-					, httpStatus.getReasonPhrase() + "[" + status + "]");
-			return JsonUtil.toJson(resp);
+				Response<String, Void> resp = new Response<>(errorCode == null || "".equals(errorCode) ? "" + status : errorCode
+						, httpStatus.getReasonPhrase() + "[" + status + "]");
+				return JsonUtil.toJson(resp);
+			}
 		}
-	}
 
-	@ConditionalOnProperty(name = "kuafu.boot.exception.handler.enabled", matchIfMissing = true)
-	@ConditionalOnMissingBean(ExceptionViewResolver.class)
-	@Bean
-	public ExceptionViewResolver exceptionViewResolver() {
-		return new ExceptionViewResolver() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public ModelAndView createView(String content) {
-				AbstractView view = new AbstractView() {
-					@Override
-					protected void renderMergedOutputModel(Map<String, Object> map, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-						resp.setContentType("application/json; charset=" + StandardCharsets.UTF_8);
-						try (ServletOutputStream out = resp.getOutputStream()) {
+		@ConditionalOnMissingBean(ExceptionViewResolver.class)
+		@Bean
+		public ExceptionViewResolver exceptionViewResolver() {
+			return new ExceptionViewResolver() {
+				@SuppressWarnings("unchecked")
+				@Override
+				public ModelAndView createView(String content) {
+					AbstractView view = new AbstractView() {
+						@Override
+						protected void renderMergedOutputModel(Map<String, Object> map, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+							resp.setContentType("application/json; charset=" + StandardCharsets.UTF_8);
+							ServletOutputStream out = resp.getOutputStream();
 							out.write(JsonUtil.toJson(map).getBytes(StandardCharsets.UTF_8));
 							out.flush();
 						}
-					}
-				};
-				String text = JsonUtil.toJson(new Response<String, Void>(errorCode == null || "".equals(errorCode) ? "500" : errorCode, content));
-				Map<String, Object> attributes = JsonUtil.toObject(text, Map.class);
-				view.setAttributesMap(attributes);
-				return new ModelAndView(view);
-			}
-		};
+					};
+					String text = JsonUtil.toJson(new Response<String, Void>(errorCode == null || "".equals(errorCode) ? "500" : errorCode, content));
+					Map<String, Object> attributes = JsonUtil.toObject(text, Map.class);
+					view.setAttributesMap(attributes);
+					return new ModelAndView(view);
+				}
+			};
+		}
 	}
 
 	@ConditionalOnMissingBean(ClassMessagePair.class)
