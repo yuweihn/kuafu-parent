@@ -4,6 +4,7 @@ package com.yuweix.kuafu.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -308,5 +309,15 @@ public abstract class StrUtil {
 			}
 		}
 		return targets;
+	}
+
+	public static boolean ping(String host, int timeout) {
+		try {
+			boolean status = InetAddress.getByName(host).isReachable(timeout);
+			return status;
+		} catch (Exception ex) {
+			log.error("Ping error: {}, host: {}, timeout: {}", ex.getMessage(), host, timeout);
+			return false;
+		}
 	}
 }
