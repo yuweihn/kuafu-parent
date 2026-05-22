@@ -311,6 +311,11 @@ public abstract class StrUtil {
 		return targets;
 	}
 
+	/**
+	 * @param host
+	 * @param timeout the time, in milliseconds, before the call aborts
+	 * @return
+	 */
 	public static boolean ping(String host, int timeout) {
 		try {
 			boolean status = InetAddress.getByName(host).isReachable(timeout);
