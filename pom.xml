@@ -33,6 +33,7 @@
         <jakarta.annotation.api.version>2.1.1</jakarta.annotation.api.version>
         <jakarta.jms.api.version>3.1.0</jakarta.jms.api.version>
         <jedis.version>2.9.0</jedis.version>
+        <jasypt.version>1.9.3</jasypt.version>
         <lettuce.version>6.1.10.RELEASE</lettuce.version>
         <maven.compiler.encoding>utf-8</maven.compiler.encoding>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
@@ -381,6 +382,12 @@
                 <groupId>io.undertow</groupId>
                 <artifactId>undertow-websockets-jsr</artifactId>
                 <version>${undertow.websockets.jsr.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jasypt</groupId>
+                <artifactId>jasypt</artifactId>
+                <version>${jasypt.version}</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>
