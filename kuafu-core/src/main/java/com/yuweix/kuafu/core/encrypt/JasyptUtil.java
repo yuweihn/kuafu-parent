@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.core;
+package com.yuweix.kuafu.core.encrypt;
 
 
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
