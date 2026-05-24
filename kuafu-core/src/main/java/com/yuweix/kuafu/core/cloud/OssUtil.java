@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * 阿里云OSS文件工具类
  * @author yuwei
  */
-public class OssUtil {
+public class OssUtil implements AutoCloseable {
 	private static final Logger log = LoggerFactory.getLogger(OssUtil.class);
 
 	private final String endpoint;
@@ -254,5 +254,10 @@ public class OssUtil {
 		} finally {
 			ossClientLock.unlock();
 		}
+	}
+
+	@Override
+	public void close() {
+		shutdown();
 	}
 }
