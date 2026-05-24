@@ -12,6 +12,8 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +43,9 @@ import java.util.Map;
  */
 @EnableTransactionManagement(proxyTargetClass = true)
 public class MybatisConf {
+	private static final Logger log = LoggerFactory.getLogger(MybatisConf.class);
+
+
 	@ConditionalOnProperty(name = "kuafu.datasource.default.enabled", matchIfMissing = true)
 	@ConditionalOnMissingBean(name = "dataSource")
 	@Bean(name = "dataSource", initMethod = "init", destroyMethod = "close")
@@ -122,11 +127,19 @@ public class MybatisConf {
 	@ConditionalOnMissingBean(name = "mapperLocations")
 	@Bean(name = "mapperLocations")
 	public Resource[] mapperLocations(@Value("${kuafu.mybatis.mapper.location-pattern:}") String locationPattern) throws IOException {
-		if (locationPattern == null || "".equals(locationPattern)) {
+		if (locationPattern == null || locationPattern.isEmpty()) {
+			log.warn("未配置 MyBatis Mapper 文件路径，请检查 kuafu.mybatis.mapper.location-pattern");
 			return new Resource[0];
 		}
-		ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		return resolver.getResources(locationPattern);
+		try {
+			ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+			Resource[] resources = resolver.getResources(locationPattern);
+			log.info("加载到 {} 个 Mapper 文件", resources.length);
+			return resources;
+		} catch (IOException e) {
+			log.error("加载 Mapper 文件失败: {}", locationPattern, e);
+			return new Resource[0];
+		}
 	}
 
 	@ConditionalOnMissingBean(name = "basePackage")
@@ -172,9 +185,9 @@ public class MybatisConf {
 	@Bean(name = "mapperScannerConf")
 	public MapperScannerConfigurer mapperScannerConf(@Qualifier("basePackage") String basePackage) {
 		MapperScannerConfigurer conf = new MapperScannerConfigurer();
-//		conf.setSqlSessionFactoryBeanName("sqlSessionFactory");
+		conf.setSqlSessionFactoryBeanName("sqlSessionFactory");
 		conf.setSqlSessionTemplateBeanName("sqlSessionTemplate");
-		conf.setBasePackage(basePackage);
+		conf.setBasePackage(basePackage != null ? basePackage : "");
 		return conf;
 	}
 
