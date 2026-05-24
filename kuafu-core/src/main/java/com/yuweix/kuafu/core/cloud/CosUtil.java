@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -24,7 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * 腾讯云COS文件工具类
  * @author yuwei
  */
-public class CosUtil {
+public class CosUtil implements AutoCloseable {
 	private static final Logger log = LoggerFactory.getLogger(CosUtil.class);
 	private String secretId;
 	private String secretKey;
@@ -39,15 +40,18 @@ public class CosUtil {
 	public CosUtil(String secretId, String secretKey, String region, String bucketName) {
 		this(secretId, secretKey, region, null, bucketName);
 	}
+
 	public CosUtil(String secretId, String secretKey, String region, String protocol, String bucketName) {
-		this.secretId = secretId;
-		this.secretKey = secretKey;
-		this.region = region;
-		if (protocol == null || "".equals(protocol)) {
+		this.secretId = Objects.requireNonNull(secretId, "secretId cannot be null");
+		this.secretKey = Objects.requireNonNull(secretKey, "secretKey cannot be null");
+		this.region = Objects.requireNonNull(region, "region cannot be null");
+
+		if (protocol == null || protocol.isEmpty()) {
 			protocol = "http";
 		}
+
 		this.endpoint = protocol + "://" + bucketName + ".cos." + region + ".myqcloud.com";
-		this.bucketName = bucketName;
+		this.bucketName = Objects.requireNonNull(bucketName, "bucketName cannot be null");
 	}
 
 	private COSClient getCosClient() {
@@ -67,6 +71,7 @@ public class CosUtil {
 				}
 			} catch (Exception ex) {
 				log.error("Error on getCosClient: {}", ex.getMessage(), ex);
+				throw new RuntimeException("初始化COS客户端失败", ex);
 			} finally {
 				cosClientLock.unlock();
 			}
@@ -82,15 +87,22 @@ public class CosUtil {
 			return;
 		}
 
-		synchronized (this) {
-			List<String> keyList = queryBucketKeyList();
-			if (keyList != null && keyList.size() > 0) {
-				for (String key: keyList) {
-					//先删除bucket下的文件
-					getCosClient().deleteObject(bucketName, key);
+		List<String> keyList = queryBucketKeyList();
+		if (keyList != null && !keyList.isEmpty()) {
+			for (String key : keyList) {
+				try {
+					deleteFile(key);
+				} catch (Exception e) {
+					log.error("删除文件失败, key: {}, error: {}", key, e.getMessage());
 				}
 			}
+		}
+
+		try {
 			getCosClient().deleteBucket(bucketName);
+		} catch (Exception e) {
+			log.error("删除bucket失败: {}, error: {}", bucketName, e.getMessage());
+			throw new RuntimeException("删除bucket失败", e);
 		}
 	}
 
@@ -98,19 +110,26 @@ public class CosUtil {
 	 * 查询Bucket下所有的key
 	 */
 	public List<String> queryBucketKeyList() {
+		Objects.requireNonNull(bucketName, "bucketName cannot be null");
+
 		List<String> list = new ArrayList<>();
 		if (!getCosClient().doesBucketExist(bucketName)) {
 			return list;
 		}
 
-		ObjectListing objListing = getCosClient().listObjects(bucketName);
-		List<COSObjectSummary> summaryList = objListing.getObjectSummaries();
-		if (summaryList == null || summaryList.size() <= 0) {
-			return list;
-		}
+		try {
+			ObjectListing objListing = getCosClient().listObjects(bucketName);
+			List<COSObjectSummary> summaryList = objListing.getObjectSummaries();
+			if (summaryList == null || summaryList.isEmpty()) {
+				return list;
+			}
 
-		for (COSObjectSummary summary: summaryList) {
-			list.add(summary.getKey());
+			for (COSObjectSummary summary : summaryList) {
+				list.add(summary.getKey());
+			}
+		} catch (Exception e) {
+			log.error("查询bucket对象列表失败: {}, error: {}", bucketName, e.getMessage());
+			throw new RuntimeException("查询bucket对象列表失败", e);
 		}
 		return list;
 	}
@@ -121,19 +140,28 @@ public class CosUtil {
 	 * @param key                 如：prd/readme.txt
 	 */
 	public String uploadFile(byte[] content, String key) {
+		Objects.requireNonNull(content, "content cannot be null");
+		Objects.requireNonNull(key, "key cannot be null");
 		log.info("COS upload file: key[{}]", key);
-		ByteArrayInputStream bis = new ByteArrayInputStream(content);
-		ObjectMetadata objMeta = new ObjectMetadata();
-		objMeta.setContentLength(bis.available());
-		getCosClient().putObject(bucketName, key, bis, objMeta);
-		String url = endpoint + "/" + key;
-		log.info("URL: {}", url);
-		try {
-			bis.close();
+		try (ByteArrayInputStream bis = new ByteArrayInputStream(content)) {
+			ObjectMetadata objMeta = new ObjectMetadata();
+			objMeta.setContentLength(content.length);
+			getCosClient().putObject(bucketName, key, bis, objMeta);
+
+			String url = buildFileUrl(key);
+			log.info("URL: {}", url);
+			return url;
 		} catch (IOException ex) {
-			log.error("bis.close失败, Error: {}", ex.getMessage(), ex);
+			log.error("上传文件失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException("上传文件到COS失败", ex);
 		}
-		return url;
+	}
+
+	/**
+	 * 构建文件访问URL
+	 */
+	private String buildFileUrl(String key) {
+		return endpoint + "/" + key;
 	}
 
 	/**
@@ -141,30 +169,57 @@ public class CosUtil {
 	 * @param key
 	 */
 	public byte[] downloadFile(String key) {
-		COSObject cosObj = getCosClient().getObject(new GetObjectRequest(bucketName, key));
-		InputStream in;
-		if (cosObj == null || (in = cosObj.getObjectContent()) == null) {
-			return null;
-		}
-		byte[] bytes = StreamUtil.read(in);
+		Objects.requireNonNull(key, "key cannot be null");
+		log.info("COS下载文件: key[{}]", key);
+		COSObject cosObj = null;
 		try {
-			cosObj.close();
-		} catch (IOException ex) {
-			log.error("cosObj.close失败, Error: {}", ex.getMessage(), ex);
+			cosObj = getCosClient().getObject(new GetObjectRequest(bucketName, key));
+			if (cosObj == null || cosObj.getObjectContent() == null) {
+				log.error("COS文件不存在或内容为空: {}", key);
+				return null;
+			}
+			byte[] data = StreamUtil.read(cosObj.getObjectContent());
+			log.info("COS下载成功, key: {}, size: {} bytes", key, data.length);
+			return data;
+		} catch (Exception e) {
+			log.error("COS下载文件失败, key: {}, error: {}", key, e.getMessage(), e);
+			throw new RuntimeException("从COS下载文件失败", e);
+		} finally {
+			closeQuietly(cosObj);
 		}
-		return bytes;
 	}
 	public void downloadFile(String key, OutputStream out) {
-		COSObject cosObj = getCosClient().getObject(new GetObjectRequest(bucketName, key));
-		InputStream in;
-		if (cosObj == null || (in = cosObj.getObjectContent()) == null) {
+		Objects.requireNonNull(key, "key cannot be null");
+		Objects.requireNonNull(out, "output stream cannot be null");
+
+		log.info("COS下载文件到流: key[{}]", key);
+
+		COSObject cosObj = null;
+		try {
+			cosObj = getCosClient().getObject(new GetObjectRequest(bucketName, key));
+			if (cosObj == null || cosObj.getObjectContent() == null) {
+				log.error("COS下载文件到流, COS文件不存在或内容为空: {}", key);
+				return;
+			}
+			InputStream in = cosObj.getObjectContent();
+			StreamUtil.write(in, out);
+			log.info("COS下载文件到流成功: {}", key);
+		} catch (Exception e) {
+			log.error("COS下载文件到流失败, key: {}, error: {}", key, e.getMessage(), e);
+			throw new RuntimeException("从COS下载文件失败", e);
+		} finally {
+			closeQuietly(cosObj);
+		}
+	}
+
+	private void closeQuietly(COSObject cosObj) {
+		if (cosObj == null) {
 			return;
 		}
-		StreamUtil.write(in, out);
 		try {
 			cosObj.close();
-		} catch (IOException ex) {
-			log.error("cosObj.close失败, Error: {}", ex.getMessage(), ex);
+		} catch (IOException e) {
+			log.error("关闭COS对象失败: {}", e.getMessage());
 		}
 	}
 
@@ -173,6 +228,34 @@ public class CosUtil {
 	 * @param key
 	 */
 	public void deleteFile(String key) {
-		getCosClient().deleteObject(bucketName, key);
+		Objects.requireNonNull(key, "key cannot be null");
+		log.info("COS删除文件: key[{}]", key);
+		try {
+			getCosClient().deleteObject(bucketName, key);
+			log.info("COS删除文件成功: {}", key);
+		} catch (Exception ex) {
+			log.error("COS删除文件失败, key: {}, error: {}", key, ex.getMessage(), ex);
+			throw new RuntimeException("从COS删除文件失败", ex);
+		}
+	}
+
+	public void shutdown() {
+		if (cosClient == null) {
+			return;
+		}
+		cosClientLock.lock();
+		try {
+			if (cosClient != null) {
+				cosClient.shutdown();
+				cosClient = null;
+			}
+		} finally {
+			cosClientLock.unlock();
+		}
+	}
+
+	@Override
+	public void close() {
+		shutdown();
 	}
 }
