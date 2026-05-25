@@ -263,6 +263,16 @@ public abstract class DateUtil {
 	}
 
 	/**
+	 * 获取星期几
+	 * Calendar中星期日是1，星期一是2，...，星期六是7
+	 */
+	public static int getDayOfWeek(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.DAY_OF_WEEK);
+	}
+
+	/**
 	 * 取得指定日期的第二天
 	 * @param date
 	 * @return
