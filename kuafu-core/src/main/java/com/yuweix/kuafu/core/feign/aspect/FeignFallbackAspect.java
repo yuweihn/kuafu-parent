@@ -39,8 +39,10 @@ public class FeignFallbackAspect {
         Method method = ((MethodSignature) point.getSignature()).getMethod();
         try {
             log.info("Method: {}, Params: {}", method.getDeclaringClass().getSimpleName() + "." + method.getName(), point.getArgs());
+            long startTimeMillis = System.currentTimeMillis();
             Object result = point.proceed();
-            log.info("Result: {}", JsonUtil.toJson(result));
+            long endTimeMillis = System.currentTimeMillis();
+            log.info("Result: {}, TimeCost: {}", JsonUtil.toJson(result),  (endTimeMillis - startTimeMillis) + "ms");
             return result;
         } catch (Exception ex) {
             log.error("Feign调用异常，Error: {}", ex.getMessage());
