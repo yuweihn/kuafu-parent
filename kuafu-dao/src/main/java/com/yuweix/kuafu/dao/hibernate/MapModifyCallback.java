@@ -3,7 +3,7 @@ package com.yuweix.kuafu.dao.hibernate;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.query.NativeQuery;
+import org.hibernate.query.MutationQuery;
 
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public class MapModifyCallback extends AbstractIntegerCallback {
 
 	@Override
 	public Integer doInHibernate(Session session) throws HibernateException {
-		NativeQuery<Integer> query = session.createNativeQuery(sql, Integer.class);
+		MutationQuery query = session.createNativeMutationQuery(sql);
 		assembleParams(query, params);
 		return query.executeUpdate();
 	}

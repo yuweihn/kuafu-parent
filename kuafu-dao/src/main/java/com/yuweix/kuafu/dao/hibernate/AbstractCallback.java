@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.dao.hibernate;
 
 
-import org.hibernate.query.NativeQuery;
+import org.hibernate.query.CommonQueryContract;
 import org.springframework.orm.hibernate5.HibernateCallback;
 
 import java.util.Collection;
@@ -12,7 +12,7 @@ import java.util.Map;
  * @author yuwei
  */
 public abstract class AbstractCallback<T> implements HibernateCallback<T> {
-	protected void assembleParams(NativeQuery<?> query, Map<String, Object> params) {
+	protected void assembleParams(CommonQueryContract query, Map<String, Object> params) {
 		if (params == null || params.size() <= 0) {
 			return;
 		}
@@ -27,7 +27,7 @@ public abstract class AbstractCallback<T> implements HibernateCallback<T> {
 		}
 	}
 
-	protected void assembleParams(NativeQuery<?> query, Object[] params) {
+	protected void assembleParams(CommonQueryContract query, Object[] params) {
 		if (params == null || params.length <= 0) {
 			return;
 		}
