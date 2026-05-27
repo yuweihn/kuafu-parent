@@ -20,7 +20,7 @@ public class IndexModifyCallback extends AbstractIntegerCallback {
 
 	@Override
 	public Integer doInHibernate(Session session) throws HibernateException {
-		NativeQuery<Integer> query = session.createNativeQuery(sql, Integer.class);
+		NativeQuery<?> query = session.createNativeQuery(sql);
 		assembleParams(query, params);
 		return query.executeUpdate();
 	}
