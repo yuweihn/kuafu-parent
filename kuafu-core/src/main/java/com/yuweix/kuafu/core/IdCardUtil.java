@@ -126,8 +126,8 @@ public abstract class IdCardUtil {
 		try {
 			Date birthDate = new SimpleDateFormat("yyMMdd").parse(birthday);
 			cal.setTime(birthDate);
-		} catch (Exception e) {
-			log.error("", e);
+		} catch (Exception ex) {
+			log.error("convert15To18获取出生年月日出错, Error: {}", ex.getMessage(), ex);
 			return null;
 		}
 		/**
@@ -217,7 +217,7 @@ public abstract class IdCardUtil {
 			Date birthday = new SimpleDateFormat("yyMMdd").parse(birthCode);
 			return birthday.before(new Date());
 		} catch (Exception e) {
-			log.error("", e);
+			log.error("check15获取出生年月日出错, Error: {}", e.getMessage(), e);
 			return false;
 		}
 	}
@@ -302,7 +302,7 @@ public abstract class IdCardUtil {
 			}
 			return iArr;
 		} catch (NumberFormatException e) {
-			log.error("", e);
+			log.error("convertCharToInt转换数字出错, Error: {}", e.getMessage(), e);
 			return null;
 		}
 	}

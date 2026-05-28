@@ -172,14 +172,14 @@ public class SysPermissionController {
 				try {
 					bw.close();
 				} catch (IOException e) {
-					log.error("", e);
+					log.error("bw.close失败, Error: {}", e.getMessage(), e);
 				}
 			}
 			if (osw != null) {
 				try {
 					osw.close();
 				} catch (IOException e) {
-					log.error("", e);
+					log.error("osw.close失败, Error: {}", e.getMessage(), e);
 				}
 			}
 		}
