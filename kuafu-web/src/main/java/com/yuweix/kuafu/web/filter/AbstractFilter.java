@@ -202,8 +202,8 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		String url = request.getRequestURL().toString();
 		try {
 			url = URLDecoder.decode(url, Constant.ENCODING_UTF_8);
-		} catch (UnsupportedEncodingException e) {
-			log.error("", e);
+		} catch (UnsupportedEncodingException ex) {
+			log.error("URLDecoder.decode error: {}", ex.getMessage(), ex);
 		}
 		String contentType = request.getContentType();
 		Map<String, String[]> params = request.getParameterMap();
