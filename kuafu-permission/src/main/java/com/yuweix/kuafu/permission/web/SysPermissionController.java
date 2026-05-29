@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.permission.web;
 
 
+import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.DateUtil;
 import com.yuweix.kuafu.core.JsonUtil;
 import com.yuweix.kuafu.core.Response;
@@ -21,12 +22,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
@@ -147,42 +142,15 @@ public class SysPermissionController {
 	@Permission(value = "sys.permission.export")
 	@RequestMapping(value = "/sys/permission/export", method = POST)
 	@ResponseBody
-	public void doExport(HttpServletResponse response) throws Exception {
-		PermissionExportDTO exportDto = sysPermissionService.getPermissionExportDto();
+	public void doExport() {
+		PermissionExportDTO exportDTO = sysPermissionService.getPermissionExportDto();
+		String str = exportDTO == null ? "" : JsonUtil.toJson(exportDTO);
+		byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
 
-		String fileName = URLEncoder.encode(properties.getAppName() + ".permission." + DateUtil.formatDate(new Date(), "yyyyMMddHHmmss") + ".json", "utf-8");
-		response.setContentType("application/octet-stream");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Content-disposition", "attachment;filename=" + fileName);
-		response.setHeader("_filename", fileName);
-		response.setHeader("Access-Control-Expose-Headers", "_filename");
-
-		ServletOutputStream out = response.getOutputStream();
-		OutputStreamWriter osw = null;
-		BufferedWriter bw = null;
-		try {
-			String str = exportDto == null ? "" : JsonUtil.toJson(exportDto);
-			osw = new OutputStreamWriter(out, StandardCharsets.UTF_8);
-			bw = new BufferedWriter(osw);
-			bw.append(str);
-		} catch (Exception ex) {
-			log.error("导出权限时发生异常, Error: {}", ex.getMessage(), ex);
-		} finally {
-			if (bw != null) {
-				try {
-					bw.close();
-				} catch (IOException e) {
-					log.error("bw.close失败, Error: {}", e.getMessage(), e);
-				}
-			}
-			if (osw != null) {
-				try {
-					osw.close();
-				} catch (IOException e) {
-					log.error("osw.close失败, Error: {}", e.getMessage(), e);
-				}
-			}
-		}
+		String rawFileName = String.format("%s.permission.%s.json"
+				, properties.getAppName(), DateUtil.formatDate(new Date(), "yyyyMMddHHmmss"));
+		log.info("导出权限数据，文件名: {}, 数据大小: {} bytes", rawFileName, bytes.length);
+		ActionUtil.download(bytes, rawFileName);
 	}
 
 	/**
