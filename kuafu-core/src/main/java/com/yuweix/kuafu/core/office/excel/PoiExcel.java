@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.core.office.excel;
 
 
+import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.JsonUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFCell;
@@ -15,6 +16,8 @@ import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -24,6 +27,8 @@ import java.util.*;
  */
 public abstract class PoiExcel {
 	private static final Logger log = LoggerFactory.getLogger(PoiExcel.class);
+
+	private static final String XLSX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 	private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	private static final int DEFAULT_FONT_HEIGHT = 20;
 
@@ -332,11 +337,21 @@ public abstract class PoiExcel {
 	}
 
 	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, HttpServletResponse resp) {
-		resp.setContentType("application/vnd.ms-excel");
+		export(clz, dataList, fileName, XLSX_CONTENT_TYPE, resp);
+	}
+	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
+		String encodedFileName = null;
+		try {
+			encodedFileName = URLEncoder.encode(fileName.trim(), StandardCharsets.UTF_8.name());
+		} catch (UnsupportedEncodingException ex) {
+			log.error("导出时URLEncoder.encode()失败，Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
+		}
+
+		resp.setContentType(contentType);
 		resp.setCharacterEncoding("utf-8");
-		resp.setHeader("Content-disposition", "attachment;filename=" + fileName);
-		resp.setHeader("_filename", fileName);
-		resp.setHeader("Access-Control-Expose-Headers", "_filename");
+		resp.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"; filename*=UTF-8''" + encodedFileName);
+		ActionUtil.addExposeHeader(resp, "_filename", encodedFileName);
 		try {
 			export(clz, dataList, resp.getOutputStream());
 		} catch (IOException ex) {
@@ -405,6 +420,7 @@ public abstract class PoiExcel {
 			workbook.write(out);
 		} catch (Exception ex) {
 			log.error("export失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (workbook != null) {
 				try {

@@ -341,7 +341,7 @@ public abstract class ActionUtil {
         }
 
         Map<String, String> headers = new HashMap<>();
-		headers.put("Content-Disposition", "attachment;filename=\"" + encodedFileName + "\";filename*=utf-8''" + encodedFileName);
+		headers.put("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"; filename*=UTF-8''" + encodedFileName);
 		addExposeHeader("_filename", encodedFileName);
 		output(bytes, "application/octet-stream", headers);
     }
