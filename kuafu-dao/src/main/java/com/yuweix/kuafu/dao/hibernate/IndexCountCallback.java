@@ -3,7 +3,7 @@ package com.yuweix.kuafu.dao.hibernate;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.query.SelectionQuery;
+import org.hibernate.query.NativeQuery;
 
 
 /**
@@ -20,7 +20,7 @@ public class IndexCountCallback extends AbstractIntegerCallback {
 
 	@Override
 	public Integer doInHibernate(Session session) throws HibernateException {
-		SelectionQuery<?> query = session.createSelectionQuery(sql);
+		NativeQuery<Integer> query = session.createNativeQuery(sql, Integer.class);
 		assembleParams(query, params);
 		return Integer.parseInt(query.uniqueResult().toString());
 	}
