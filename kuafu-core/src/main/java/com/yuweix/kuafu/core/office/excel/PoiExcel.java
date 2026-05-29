@@ -47,18 +47,21 @@ public abstract class PoiExcel {
 	public static<T> List<PoiSheet<T>> readSheet(byte[] bytes, Class<T> clz) {
 		List<PoiSheet<T>> sheetList = new ArrayList<>();
 
+		if (bytes == null || bytes.length == 0 || clz == null) {
+			return sheetList;
+		}
 		Map<String, String> fieldMap = getTitleFieldMap(clz);
 		if (fieldMap == null || fieldMap.size() <= 0) {
 			return sheetList;
 		}
-		InputStream is = null;
-		try {
-			is = new ByteArrayInputStream(bytes);
-			Workbook wb = WorkbookFactory.create(is);
-			int sheetCount = wb.getNumberOfSheets();
+
+		try (InputStream is = new ByteArrayInputStream(bytes);
+		     Workbook workbook = WorkbookFactory.create(is)) {
+			int sheetCount = workbook.getNumberOfSheets();
 			for (int i = 0; i < sheetCount; i++) {
-				Sheet sheet = wb.getSheetAt(i);
+				Sheet sheet = workbook.getSheetAt(i);
 				List<T> sheetDataList = read(sheet, clz, fieldMap);
+
 				PoiSheet<T> poiSheet = new PoiSheet<>();
 				poiSheet.setSheetName(sheet.getSheetName());
 				poiSheet.setList(sheetDataList);
@@ -68,14 +71,6 @@ public abstract class PoiExcel {
 		} catch (Exception ex) {
 			log.error("readSheet失败, Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException ex) {
-					log.error("is.close失败, Error: {}", ex.getMessage(), ex);
-				}
-			}
 		}
 	}
 
