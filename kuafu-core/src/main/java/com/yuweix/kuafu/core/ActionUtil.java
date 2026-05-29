@@ -13,9 +13,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -296,67 +293,50 @@ public abstract class ActionUtil {
 	 * contentType 不含字符集
 	 */
 	public static void output(byte[] bytes, String contentType, Map<String, String> headers) {
-        if (bytes == null) {
-            log.warn("响应内容为空");
-            return;
-        }
-        HttpServletResponse resp = getResponse();
-        assert resp != null;
-        ByteArrayInputStream bis = null;
-        BufferedInputStream bfis = null;
+		if (bytes == null) {
+			log.error("响应内容为空");
+			throw new RuntimeException("响应内容为空");
+		}
+		HttpServletResponse resp = getResponse();
+		if (resp == null) {
+			log.error("HttpServletResponse为空，无法输出");
+			throw new RuntimeException("HttpServletResponse为空，无法输出");
+		}
 
-        resp.setContentType(contentType + "; charset=" + Constant.ENCODING_UTF_8);
-        resp.setCharacterEncoding(Constant.ENCODING_UTF_8);
-        resp.setHeader("Cache-Control", "no-cache, no-store");
-        resp.setHeader("Pragma", "no-cache");
-        resp.setDateHeader("Expires", 0);
-        if (headers != null) {
-            for (Map.Entry<String, String> entry: headers.entrySet()) {
-                resp.setHeader(entry.getKey(), entry.getValue());
-            }
-        }
+		resp.setCharacterEncoding(Constant.ENCODING_UTF_8);
+		if (contentType != null) {
+			if (!contentType.toLowerCase(Locale.ROOT).contains("charset")) {
+				resp.setContentType(contentType + "; charset=" + Constant.ENCODING_UTF_8);
+			} else {
+				resp.setContentType(contentType);
+			}
+		}
+		resp.setContentLengthLong(bytes.length);
+		resp.setHeader("Cache-Control", "no-cache, no-store");
+		resp.setHeader("Pragma", "no-cache");
+		resp.setDateHeader("Expires", 0);
+		if (headers != null) {
+			for (Map.Entry<String, String> entry: headers.entrySet()) {
+				resp.setHeader(entry.getKey(), entry.getValue());
+			}
+		}
 
-        try {
-            bis = new ByteArrayInputStream(bytes);
-            bfis = new BufferedInputStream(bis);
-            OutputStream os = resp.getOutputStream();
-            byte[] buffer = new byte[1024];
-            for(int i = bfis.read(buffer); i != -1; i = bfis.read(buffer)) {
-                os.write(buffer, 0, i);
-            }
-            os.flush();
-        } catch (Exception ex) {
-            log.error("Http响应出错[ActionUtil.output]，Error: {}", ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } finally {
-            if (bfis != null) {
-                try {
-                    bfis.close();
-                } catch (IOException ignored) {
-                }
-            }
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-    }
+		try (OutputStream os = resp.getOutputStream()) {
+			os.write(bytes);
+			os.flush();
+		} catch (Exception ex) {
+			log.error("Http响应出错[ActionUtil.output]，Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
+		}
+	}
 
     public static void download(byte[] bytes, String fileName) {
-        try {
-            String attachFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+		String encodedFileName = URLEncoder.encode(fileName.trim(), StandardCharsets.UTF_8);
 
-            Map<String, String> headers = new HashMap<>();
-            headers.put("Content-Disposition", "attachment;filename=" + attachFileName);
-            headers.put("_filename", attachFileName);
-            headers.put("Access-Control-Expose-Headers", "_filename");
-            output(bytes, "application/octet-stream", headers);
-        } catch (Exception ex) {
-            log.error("下载文件失败，Error: {}", ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        }
+		Map<String, String> headers = new HashMap<>();
+		headers.put("Content-Disposition", "attachment;filename=\"" + encodedFileName + "\";filename*=utf-8''" + encodedFileName);
+		addExposeHeader("_filename", encodedFileName);
+		output(bytes, "application/octet-stream", headers);
     }
 
 	/**

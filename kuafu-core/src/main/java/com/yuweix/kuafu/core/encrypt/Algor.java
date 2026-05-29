@@ -7,9 +7,13 @@ package com.yuweix.kuafu.core.encrypt;
 public enum Algor {
 	MD5("MD5"),
 	SHA1("SHA-1"),
+	SHA256("SHA-256"),
 	DES("DES");
 
+
 	private String code;
+
+
 	Algor(String code) {
 		this.code = code;
 	}

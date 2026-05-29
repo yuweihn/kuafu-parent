@@ -4,12 +4,15 @@ package com.yuweix.kuafu.core.encrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.Objects;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Arrays;
+import java.util.Objects;
 
 
 /**
@@ -18,28 +21,39 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public abstract class SecurityUtil {
 	private static final Logger log = LoggerFactory.getLogger(SecurityUtil.class);
+
 	private static final String SECURITY_KEY = "sfdfyu8**((^$$$SDSDhHJlSDDsdsvcx234ex,,,cjv.xckv...";
 	private static final char[] HEX_DIGIT = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-	private static final String UTF_8 = "utf-8";
+	private static final Charset UTF_8 = StandardCharsets.UTF_8;
+	private static final String AES_ALGORITHM = "AES/CBC/PKCS5Padding";
+	private static final int AES_KEY_LENGTH = 16;
+	private static final int IV_LENGTH = 16;
 
 
 	public static String getMd5(String str) {
-		return getMd5(str, UTF_8);
+		return getMd5(str, UTF_8.name());
 	}
 	public static String getMd5(String str, String charset) {
 		return getSecurityByAlgor(Algor.MD5.getCode(), str, charset);
 	}
 
 	public static String getSha1(String str) {
-		return getSha1(str, UTF_8);
+		return getSha1(str, UTF_8.name());
 	}
 	public static String getSha1(String str, String charset) {
 		return getSecurityByAlgor(Algor.SHA1.getCode(), str, charset);
 	}
 
+	public static String getSha256(String str) {
+		return getSha256(str, UTF_8.name());
+	}
+	public static String getSha256(String str, String charset) {
+		return getSecurityByAlgor(Algor.SHA256.getCode(), str, charset);
+	}
+
 	public static String getSecurityByAlgor(String algor, String str, String charset) {
 		try {
-			byte[] tmp = str.getBytes(charset == null ? UTF_8 : charset);
+			byte[] tmp = str.getBytes(charset == null ? UTF_8.name() : charset);
 			MessageDigest mdTemp = MessageDigest.getInstance(algor);
 			mdTemp.update(tmp);
 			byte[] md = mdTemp.digest();
@@ -94,9 +108,13 @@ public abstract class SecurityUtil {
 
 	private static String encrypt(String word) {
 		try {
-			Cipher encrypt = Cipher.getInstance(Algor.DES.getCode());
-			encrypt.init(1, buildDESKey(getMd5(SECURITY_KEY)));
-			return bytesToHexStr(encrypt.doFinal(word.getBytes(StandardCharsets.UTF_8)));
+			byte[] keyBytes = buildAESKey(getMd5(SECURITY_KEY));
+			byte[] iv = Arrays.copyOf(keyBytes, IV_LENGTH);
+			SecretKey key = new SecretKeySpec(keyBytes, "AES");
+
+			Cipher cipher = Cipher.getInstance(AES_ALGORITHM);
+			cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
+			return bytesToHexStr(cipher.doFinal(word.getBytes(UTF_8)));
 		} catch (Exception ex) {
 			log.error("encrypt>>>Error: {}", ex.getMessage(), ex);
 			return null;
@@ -105,22 +123,28 @@ public abstract class SecurityUtil {
 
 	private static String decrypt(String word) {
 		try {
-			Cipher decrypt = Cipher.getInstance(Algor.DES.getCode());
-			decrypt.init(2, buildDESKey(getMd5(SECURITY_KEY)));
-			return new String(decrypt.doFinal(Objects.requireNonNull(hexStrToBytes(word))), StandardCharsets.UTF_8);
+			byte[] input = hexStrToBytes(word);
+			if (input == null) {
+				return null;
+			}
+			byte[] keyBytes = buildAESKey(getMd5(SECURITY_KEY));
+			byte[] iv = Arrays.copyOf(keyBytes, IV_LENGTH);
+			SecretKey key = new SecretKeySpec(keyBytes, "AES");
+
+			Cipher cipher = Cipher.getInstance(AES_ALGORITHM);
+			cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
+			return new String(cipher.doFinal(input), UTF_8);
 		} catch (Exception ex) {
 			log.error("decrypt>>>Error: {}", ex.getMessage(), ex);
 			return null;
 		}
 	}
 
-	private static SecretKey buildDESKey(String value) {
-		byte[] bval = value.getBytes(StandardCharsets.UTF_8);
-		byte[] bt = new byte[8];
-		for (int i = 0; (i < bt.length) && (i < bval.length); i++) {
-			bt[i] = bval[i];
-		}
-		return new SecretKeySpec(bt, Algor.DES.getCode());
+	private static byte[] buildAESKey(String md5Hex) {
+		byte[] raw = md5Hex.getBytes(UTF_8);
+		byte[] key = new byte[AES_KEY_LENGTH];
+		System.arraycopy(raw, 0, key, 0, Math.min(raw.length, AES_KEY_LENGTH));
+		return key;
 	}
 
 	/**
@@ -129,14 +153,17 @@ public abstract class SecurityUtil {
 	 * @return
 	 */
 	public static byte[] hexStrToBytes(String value) {
-		if (value.length() < 1) {
+		if (value == null || value.isEmpty() || value.length() % 2 != 0) {
 			return null;
 		}
 		byte[] result = new byte[value.length() / 2];
-		for (int i = 0; i < value.length() / 2; i++) {
-			int high = Integer.parseInt(value.substring(i * 2, i * 2 + 1), 16);
-			int low = Integer.parseInt(value.substring(i * 2 + 1, i * 2 + 2), 16);
-			result[i] = (byte) (high * 16 + low);
+		for (int i = 0; i < result.length; i++) {
+			int high = Character.digit(value.charAt(i * 2), 16);
+			int low = Character.digit(value.charAt(i * 2 + 1), 16);
+			if (high == -1 || low == -1) {
+				return null;
+			}
+			result[i] = (byte) ((high << 4) | low);
 		}
 		return result;
 	}
@@ -147,13 +174,16 @@ public abstract class SecurityUtil {
 	 * @return
 	 */
 	public static String bytesToHexStr(byte[] value) {
-		StringBuilder builder = new StringBuilder("");
+		if (value == null) {
+			return "";
+		}
+		StringBuilder builder = new StringBuilder(value.length * 2);
 		for (byte b : value) {
 			String hex = Integer.toHexString(b & 0xFF);
 			if (hex.length() == 1) {
-				hex = '0' + hex;
+				builder.append('0');
 			}
-			builder.append(hex.toLowerCase());
+			builder.append(hex);
 		}
 		return builder.toString();
 	}
