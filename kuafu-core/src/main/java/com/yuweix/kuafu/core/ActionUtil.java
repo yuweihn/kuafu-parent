@@ -331,19 +331,23 @@ public abstract class ActionUtil {
 		}
 	}
 
-    public static void download(byte[] bytes, String fileName) {
+	public static void download(byte[] bytes, String fileName) {
+		download(bytes, fileName, "application/octet-stream");
+	}
+    public static void download(byte[] bytes, String fileName, String contentType) {
+		String trimmedFileName = fileName.trim();
         String encodedFileName = null;
         try {
-            encodedFileName = URLEncoder.encode(fileName.trim(), StandardCharsets.UTF_8.name());
+            encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException ex) {
 			log.error("下载文件时URLEncoder.encode()失败，Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
         }
 
         Map<String, String> headers = new HashMap<>();
-		headers.put("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"; filename*=UTF-8''" + encodedFileName);
+		headers.put("Content-Disposition", "attachment; filename=\"" + trimmedFileName + "\"; filename*=UTF-8''" + encodedFileName);
 		addExposeHeader("_filename", encodedFileName);
-		output(bytes, "application/octet-stream", headers);
+		output(bytes, contentType, headers);
     }
 
 	/**

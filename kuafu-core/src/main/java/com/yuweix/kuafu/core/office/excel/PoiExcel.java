@@ -340,9 +340,10 @@ public abstract class PoiExcel {
 		export(clz, dataList, fileName, XLSX_CONTENT_TYPE, resp);
 	}
 	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
+		String trimmedFileName = fileName.trim();
 		String encodedFileName = null;
 		try {
-			encodedFileName = URLEncoder.encode(fileName.trim(), StandardCharsets.UTF_8.name());
+			encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8.name());
 		} catch (UnsupportedEncodingException ex) {
 			log.error("导出时URLEncoder.encode()失败，Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
@@ -350,7 +351,7 @@ public abstract class PoiExcel {
 
 		resp.setContentType(contentType);
 		resp.setCharacterEncoding("utf-8");
-		resp.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"; filename*=UTF-8''" + encodedFileName);
+		resp.setHeader("Content-Disposition", "attachment; filename=\"" + trimmedFileName + "\"; filename*=UTF-8''" + encodedFileName);
 		ActionUtil.addExposeHeader(resp, "_filename", encodedFileName);
 		try {
 			export(clz, dataList, resp.getOutputStream());
