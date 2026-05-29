@@ -340,11 +340,12 @@ public abstract class PoiExcel {
 		export(clz, dataList, fileName, XLSX_CONTENT_TYPE, resp);
 	}
 	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
-		String encodedFileName = URLEncoder.encode(fileName.trim(), StandardCharsets.UTF_8);
+		String trimmedFileName = fileName.trim();
+		String encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8);
 
 		resp.setContentType(contentType);
 		resp.setCharacterEncoding("utf-8");
-		resp.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"; filename*=UTF-8''" + encodedFileName);
+		resp.setHeader("Content-Disposition", "attachment; filename=\"" + trimmedFileName + "\"; filename*=UTF-8''" + encodedFileName);
 		ActionUtil.addExposeHeader(resp, "_filename", encodedFileName);
 		try {
 			export(clz, dataList, resp.getOutputStream());

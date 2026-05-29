@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.core.csv;
 
 
+import com.yuweix.kuafu.core.ActionUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,6 +25,8 @@ import java.util.Map;
  */
 public abstract class CsvUtil {
 	private static final Logger log = LoggerFactory.getLogger(CsvUtil.class);
+
+	private static final String CSV_CONTENT_TYPE = "text/csv";
 
 
 	/**
@@ -42,14 +46,19 @@ public abstract class CsvUtil {
 		return data;
 	}
 
-	public static<T> void export(List<T> dataList, HttpServletResponse response, String fileName) {
-		response.setContentType("application/csv");
-		response.setCharacterEncoding("utf-8");
-		response.setHeader("Content-disposition", "attachment;filename=" + fileName);
-		response.setHeader("_filename", fileName);
-		response.setHeader("Access-Control-Expose-Headers", "_filename");
+	public static<T> void export(List<T> dataList, String fileName, HttpServletResponse resp) {
+		export(dataList, fileName, CSV_CONTENT_TYPE, resp);
+	}
+	public static<T> void export(List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
+		String trimmedFileName = fileName.trim();
+		String encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8);
+
+		resp.setContentType(contentType);
+		resp.setCharacterEncoding("utf-8");
+		resp.setHeader("Content-Disposition", "attachment;filename=\"" + trimmedFileName + "\";filename*=UTF-8''" + encodedFileName);
+		ActionUtil.addExposeHeader(resp, "_filename", encodedFileName);
 		try {
-			export(dataList, response.getOutputStream());
+			export(dataList, resp.getOutputStream());
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -97,6 +106,7 @@ public abstract class CsvUtil {
 			}
 		} catch (Exception ex) {
 			log.error("导出数据时发生异常, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		} finally {
 			if (bw != null) {
 				try {
