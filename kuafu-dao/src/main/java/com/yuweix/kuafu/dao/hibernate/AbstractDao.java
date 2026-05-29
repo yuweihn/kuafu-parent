@@ -1,17 +1,16 @@
 package com.yuweix.kuafu.dao.hibernate;
 
 
+import com.yuweix.kuafu.sharding.annotation.Shard;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Resource;
-
-import com.yuweix.kuafu.sharding.annotation.Shard;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 
 /**
@@ -143,6 +142,13 @@ public abstract class AbstractDao<T extends Serializable, PK extends Serializabl
 	 * @param params
 	 * @return
 	 */
+	protected List<T> query(String sql, List<Object> params) {
+		Object[] objects = null;
+		if (params != null && !params.isEmpty()) {
+			objects = params.toArray();
+		}
+		return new IndexCallback<>(sql, clz, objects).doInHibernate(getSession());
+	}
 	protected List<T> query(String sql, Object[] params) {
 		return new IndexCallback<>(sql, clz, params).doInHibernate(getSession());
 	}
@@ -177,6 +183,13 @@ public abstract class AbstractDao<T extends Serializable, PK extends Serializabl
 	 * @param pageSize
 	 * @return
 	 */
+	protected List<T> query(String sql, List<Object> params, int pageNo, int pageSize) {
+		Object[] objects = null;
+		if (params != null && !params.isEmpty()) {
+			objects = params.toArray();
+		}
+		return new IndexCallback<>(sql, clz, pageNo, pageSize, objects).doInHibernate(getSession());
+	}
 	protected List<T> query(String sql, Object[] params, int pageNo, int pageSize) {
 		return new IndexCallback<>(sql, clz, pageNo, pageSize, params).doInHibernate(getSession());
 	}
@@ -206,6 +219,14 @@ public abstract class AbstractDao<T extends Serializable, PK extends Serializabl
 	 * @param params
 	 * @return
 	 */
+	protected int queryCount(String sql, List<Object> params) {
+		Object[] objects = null;
+		if (params != null && !params.isEmpty()) {
+			objects = params.toArray();
+		}
+		Integer cnt = new IndexCountCallback(sql, objects).doInHibernate(getSession());
+		return cnt == null ? 0 : cnt;
+	}
 	protected int queryCount(String sql, Object[] params) {
 		Integer cnt = new IndexCountCallback(sql, params).doInHibernate(getSession());
 		return cnt == null ? 0 : cnt;
@@ -229,6 +250,10 @@ public abstract class AbstractDao<T extends Serializable, PK extends Serializabl
 	 * @param params
 	 * @return
 	 */
+	protected T queryForObject(String sql, List<Object> params) {
+		List<T> list = query(sql, params);
+		return list == null || list.size() <= 0 ? null : list.get(0);
+	}
 	protected T queryForObject(String sql, Object[] params) {
 		List<T> list = query(sql, params);
 		return list == null || list.size() <= 0 ? null : list.get(0);
@@ -252,8 +277,22 @@ public abstract class AbstractDao<T extends Serializable, PK extends Serializabl
 	protected List<Map<String, Object>> queryForMapList(String sql, int pageNo, int pageSize) {
 		return queryForMapList(sql, (Object[]) null, pageNo, pageSize);
 	}
+	protected List<Map<String, Object>> queryForMapList(String sql, List<Object> params, int pageNo, int pageSize) {
+		Object[] objects = null;
+		if (params != null && !params.isEmpty()) {
+			objects = params.toArray();
+		}
+		return new IndexCallback(sql, Map.class, pageNo, pageSize, objects).doInHibernate(getSession());
+	}
 	protected List<Map<String, Object>> queryForMapList(String sql, Object[] params, int pageNo, int pageSize) {
 		return new IndexCallback(sql, Map.class, pageNo, pageSize, params).doInHibernate(getSession());
+	}
+	protected List<Map<String, Object>> queryForMapList(String sql, List<Object> params) {
+		Object[] objects = null;
+		if (params != null && !params.isEmpty()) {
+			objects = params.toArray();
+		}
+		return new IndexCallback(sql, Map.class, objects).doInHibernate(getSession());
 	}
 	protected List<Map<String, Object>> queryForMapList(String sql, Object[] params) {
 		return new IndexCallback(sql, Map.class, params).doInHibernate(getSession());
@@ -275,6 +314,14 @@ public abstract class AbstractDao<T extends Serializable, PK extends Serializabl
 	 * @param params
 	 * @return
 	 */
+	protected int execute(String sql, List<Object> params) {
+		Object[] objects = null;
+		if (params != null && !params.isEmpty()) {
+			objects = params.toArray();
+		}
+		Integer cnt = new IndexModifyCallback(sql, objects).doInHibernate(getSession());
+		return cnt == null ? 0 : cnt;
+	}
 	protected int execute(String sql, Object[] params) {
 		Integer cnt = new IndexModifyCallback(sql, params).doInHibernate(getSession());
 		return cnt == null ? 0 : cnt;
