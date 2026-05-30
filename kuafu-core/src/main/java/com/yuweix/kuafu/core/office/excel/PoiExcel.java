@@ -324,16 +324,13 @@ public abstract class PoiExcel {
 	 * @param dataList 数据
 	 */
 	public static<T> byte[] export(Class<T> clz, List<T> dataList) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		export(clz, dataList, out);
-		byte[] data = out.toByteArray();
-
-		try {
-			out.close();
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			export(clz, dataList, out);
+			return out.toByteArray();
 		} catch (IOException ex) {
-			log.error("out.close失败, Error: {}", ex.getMessage(), ex);
+			log.error("export失败, Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		}
-		return data;
 	}
 
 	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, HttpServletResponse resp) {
@@ -361,13 +358,8 @@ public abstract class PoiExcel {
 	 */
 	public static<T> void export(Class<T> clz, List<T> dataList, OutputStream out) {
 		log.info("list size: {}", dataList == null ? 0 : dataList.size());
-		SXSSFWorkbook workbook = null;
-		try {
-			workbook = new SXSSFWorkbook();
+		try (SXSSFWorkbook workbook = new SXSSFWorkbook()) {
 			workbook.setCompressTempFiles(true);
-			/**
-			 * 表头样式
-			 */
 			CellStyle titleStyle = workbook.createCellStyle();
 			titleStyle.setAlignment(HorizontalAlignment.CENTER);
 			Font titleFont = workbook.createFont();
@@ -380,26 +372,19 @@ public abstract class PoiExcel {
 			SXSSFSheet sheet = workbook.createSheet();
 			sheet.trackAllColumnsForAutoSizing();
 
-			/**
-			 * 输出头部
-			 **/
 			List<String> headList = dataList != null && !dataList.isEmpty()
 					? getExportHeadList(dataList.get(0))
 					: getExportHeadList(clz);
 			SXSSFRow headRow = sheet.createRow(0);
 			for (int i = 0; i < headList.size(); i++) {
-				String head = headList.get(i);
 				SXSSFCell cell = headRow.createCell(i);
-				cell.setCellValue(head);
+				cell.setCellValue(headList.get(i));
 				cell.setCellStyle(titleStyle);
-				sheet.autoSizeColumn(i, true);
 			}
 
+			int columnCount = headList.size();
 			if (dataList != null && !dataList.isEmpty()) {
 				List<String> keyList = getExportKeyList(dataList.get(0));
-				/**
-				 * 输出数据部分
-				 **/
 				for (int i = 0; i < dataList.size(); i++) {
 					T t = dataList.get(i);
 					SXSSFRow dataRow = sheet.createRow(i + 1);
@@ -407,23 +392,18 @@ public abstract class PoiExcel {
 					for (int j = 0; j < dList.size(); j++) {
 						SXSSFCell cell = dataRow.createCell(j);
 						setCellValue(cell, dList.get(j));
-						sheet.autoSizeColumn(j, true);
 					}
 				}
+			}
+
+			for (int i = 0; i < columnCount; i++) {
+				sheet.autoSizeColumn(i, true);
 			}
 
 			workbook.write(out);
 		} catch (Exception ex) {
 			log.error("export失败, Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
-		} finally {
-			if (workbook != null) {
-				try {
-					workbook.close();
-				} catch (IOException ex) {
-					log.error("workbook.close失败, Error: {}", ex.getMessage(), ex);
-				}
-			}
 		}
 	}
 
@@ -486,15 +466,18 @@ public abstract class PoiExcel {
 		} else {
 			Field[] fields = t.getClass().getDeclaredFields();
 			if (fields != null && fields.length > 0) {
-				for (Field field: fields) {
-					ExcelKey excelKeyAno = field.getAnnotation(ExcelKey.class);
-					if (excelKeyAno != null) {
-						list.add(field.getName());
+				List<Field> annotatedFields = new ArrayList<>();
+				for (Field field : fields) {
+					if (field.getAnnotation(ExcelKey.class) != null) {
+						annotatedFields.add(field);
 					}
+				}
+				annotatedFields.sort(Comparator.comparingInt(f -> f.getAnnotation(ExcelKey.class).order()));
+				for (Field field : annotatedFields) {
+					list.add(field.getName());
 				}
 			}
 		}
-
 		return list;
 	}
 
