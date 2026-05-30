@@ -2,7 +2,6 @@ package com.yuweix.kuafu.core.csv;
 
 
 import com.yuweix.kuafu.core.ActionUtil;
-import com.yuweix.kuafu.core.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -12,7 +11,6 @@ import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,43 +28,22 @@ public abstract class CsvUtil {
 	private static final String CSV_CONTENT_TYPE = "text/csv";
 
 
+	public static<T> void export(List<T> dataList, String fileName, HttpServletResponse resp) {
+		export(dataList, fileName, CSV_CONTENT_TYPE, resp);
+	}
+	public static<T> void export(List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
+		byte[] bytes = export(dataList);
+		ActionUtil.output(bytes, fileName, contentType, null, resp);
+	}
+
 	/**
 	 * 导出数据
 	 * @param dataList 数据
 	 */
 	public static<T> byte[] export(List<T> dataList) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		export(dataList, out);
-		byte[] data = out.toByteArray();
-
-		try {
-			out.close();
-		} catch (IOException ex) {
-			log.error("out.close失败, Error: {}", ex.getMessage(), ex);
-		}
-		return data;
-	}
-
-	public static<T> void export(List<T> dataList, String fileName, HttpServletResponse resp) {
-		export(dataList, fileName, CSV_CONTENT_TYPE, resp);
-	}
-	public static<T> void export(List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
-		String trimmedFileName = fileName.trim();
-		String encodedFileName = null;
-		try {
-			encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8.name());
-		} catch (UnsupportedEncodingException ex) {
-			log.error("导出时URLEncoder.encode()失败，Error: {}", ex.getMessage(), ex);
-			throw new RuntimeException(ex);
-		}
-		String asciiFileName = FileUtil.buildAsciiFileName(trimmedFileName);
-
-		resp.setContentType(contentType);
-		resp.setCharacterEncoding("utf-8");
-		resp.setHeader("Content-Disposition", "attachment;filename=\"" + asciiFileName + "\";filename*=UTF-8''" + encodedFileName);
-		ActionUtil.addExposeHeader(resp, "_filename", encodedFileName);
-		try {
-			export(dataList, resp.getOutputStream());
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			export(dataList, out);
+			return out.toByteArray();
 		} catch (IOException ex) {
 			log.error("export失败, Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
