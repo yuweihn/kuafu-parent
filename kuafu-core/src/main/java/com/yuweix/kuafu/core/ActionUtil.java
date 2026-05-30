@@ -26,6 +26,11 @@ import java.util.*;
 public abstract class ActionUtil {
 	private static final Logger log = LoggerFactory.getLogger(ActionUtil.class);
 
+	public static final String APPLICATION_JSON = "application/json";
+	public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+	public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
+	public static final String TEXT_HTML = "text/html";
+
 
 	/**
 	 * 获得客户端IP
@@ -282,18 +287,15 @@ public abstract class ActionUtil {
 		}
 	}
 
-    public static void output(byte[] bytes) {
-        output(bytes, "text/html");
-    }
-
-	public static void output(byte[] bytes, String contentType) {
-		output(bytes, contentType, null);
+	public static void output(byte[] bytes, String fileName) {
+		output(bytes, fileName, APPLICATION_OCTET_STREAM);
 	}
 
-	/**
-	 * contentType 不含字符集
-	 */
-	public static void output(byte[] bytes, String contentType, Map<String, String> headers) {
+	public static void output(byte[] bytes, String fileName, String contentType) {
+		output(bytes, fileName, contentType, null);
+	}
+
+	public static void output(byte[] bytes, String fileName, String contentType, Map<String, String> headers) {
         if (bytes == null) {
             log.error("响应内容为空");
 			throw new RuntimeException("响应内容为空");
@@ -302,6 +304,15 @@ public abstract class ActionUtil {
 		if (resp == null) {
 			log.error("HttpServletResponse为空，无法输出");
 			throw new RuntimeException("HttpServletResponse为空，无法输出");
+		}
+
+		String trimmedFileName = fileName.trim();
+		String encodedFileName = null;
+		try {
+			encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8.name());
+		} catch (UnsupportedEncodingException ex) {
+			log.error("下载文件时URLEncoder.encode()失败，Error: {}", ex.getMessage(), ex);
+			throw new RuntimeException(ex);
 		}
 
 		resp.setCharacterEncoding(Constant.ENCODING_UTF_8);
@@ -321,6 +332,8 @@ public abstract class ActionUtil {
                 resp.setHeader(entry.getKey(), entry.getValue());
 			}
 		}
+		resp.setHeader("Content-Disposition", "attachment; filename=\"" + trimmedFileName + "\"; filename*=UTF-8''" + encodedFileName);
+		addExposeHeader("_filename", encodedFileName);
 
 		try (OutputStream os = resp.getOutputStream()) {
 			os.write(bytes);
@@ -330,25 +343,6 @@ public abstract class ActionUtil {
 			throw new RuntimeException(ex);
 		}
 	}
-
-	public static void download(byte[] bytes, String fileName) {
-		download(bytes, fileName, "application/octet-stream");
-	}
-    public static void download(byte[] bytes, String fileName, String contentType) {
-		String trimmedFileName = fileName.trim();
-        String encodedFileName = null;
-        try {
-            encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException ex) {
-			log.error("下载文件时URLEncoder.encode()失败，Error: {}", ex.getMessage(), ex);
-			throw new RuntimeException(ex);
-        }
-
-        Map<String, String> headers = new HashMap<>();
-		headers.put("Content-Disposition", "attachment; filename=\"" + trimmedFileName + "\"; filename*=UTF-8''" + encodedFileName);
-		addExposeHeader("_filename", encodedFileName);
-		output(bytes, contentType, headers);
-    }
 
 	/**
 	 * 转发到指定URL
