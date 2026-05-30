@@ -2,6 +2,7 @@ package com.yuweix.kuafu.core.csv;
 
 
 import com.yuweix.kuafu.core.ActionUtil;
+import com.yuweix.kuafu.core.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -58,10 +59,11 @@ public abstract class CsvUtil {
 			log.error("导出时URLEncoder.encode()失败，Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
 		}
+		String asciiFileName = FileUtil.buildAsciiFileName(trimmedFileName);
 
 		resp.setContentType(contentType);
 		resp.setCharacterEncoding("utf-8");
-		resp.setHeader("Content-Disposition", "attachment;filename=\"" + trimmedFileName + "\";filename*=UTF-8''" + encodedFileName);
+		resp.setHeader("Content-Disposition", "attachment;filename=\"" + asciiFileName + "\";filename*=UTF-8''" + encodedFileName);
 		ActionUtil.addExposeHeader(resp, "_filename", encodedFileName);
 		try {
 			export(dataList, resp.getOutputStream());

@@ -3,6 +3,7 @@ package com.yuweix.kuafu.core.office.excel;
 
 import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.io.FileUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
@@ -345,10 +346,11 @@ public abstract class PoiExcel {
 			log.error("导出时URLEncoder.encode()失败，Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
 		}
+		String asciiFileName = FileUtil.buildAsciiFileName(trimmedFileName);
 
 		resp.setContentType(contentType);
 		resp.setCharacterEncoding("utf-8");
-		resp.setHeader("Content-Disposition", "attachment; filename=\"" + trimmedFileName + "\"; filename*=UTF-8''" + encodedFileName);
+		resp.setHeader("Content-Disposition", "attachment; filename=\"" + asciiFileName + "\"; filename*=UTF-8''" + encodedFileName);
 		ActionUtil.addExposeHeader(resp, "_filename", encodedFileName);
 		try {
 			export(clz, dataList, resp.getOutputStream());

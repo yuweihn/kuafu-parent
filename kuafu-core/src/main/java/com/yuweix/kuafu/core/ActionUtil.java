@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.core;
 
 
+import com.yuweix.kuafu.core.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -332,7 +333,8 @@ public abstract class ActionUtil {
                 resp.setHeader(entry.getKey(), entry.getValue());
 			}
 		}
-		resp.setHeader("Content-Disposition", "attachment; filename=\"" + trimmedFileName + "\"; filename*=UTF-8''" + encodedFileName);
+		String asciiFileName = FileUtil.buildAsciiFileName(trimmedFileName);
+		resp.setHeader("Content-Disposition", "attachment; filename=\"" + asciiFileName + "\"; filename*=UTF-8''" + encodedFileName);
 		addExposeHeader("_filename", encodedFileName);
 
 		try (OutputStream os = resp.getOutputStream()) {
