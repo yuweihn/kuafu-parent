@@ -344,7 +344,7 @@ public abstract class PoiExcel {
 	 */
 	public static<T> void export(Class<T> clz, List<T> dataList, OutputStream out) {
 		log.info("list size: {}", dataList == null ? 0 : dataList.size());
-		try (SXSSFWorkbook workbook = new SXSSFWorkbook()) {
+		try (SXSSFWorkbook workbook = new SXSSFWorkbook(-1)) {
 			workbook.setCompressTempFiles(true);
 			CellStyle titleStyle = workbook.createCellStyle();
 			titleStyle.setAlignment(HorizontalAlignment.CENTER);
