@@ -378,7 +378,7 @@ public abstract class PoiExcel {
 			}
 
 			for (int i = 0; i < columnCount; i++) {
-				sheet.autoSizeColumn(i);
+				sheet.autoSizeColumn(i, true);
 			}
 
 			workbook.write(out);
