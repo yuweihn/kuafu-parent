@@ -9,6 +9,9 @@ import java.util.regex.Pattern;
  * @author yuwei
  */
 public abstract class BankCardUtil {
+	private static final Pattern BANK_NO_PATTERN = Pattern.compile("^[0-9]{6,}$");
+
+
 	/**
 	 * 根据Luhn算法，校验银行卡格式
 	 * Luhn算法被用于最后一位为校验码的一串数字的校验，通过如下规则计算校验码的正确性：
@@ -26,7 +29,7 @@ public abstract class BankCardUtil {
 	 */
 	public static boolean check(String bankNo) {
 		// 第一步： 首先通过正则判断，是不是全由数字组成
-		if (!Pattern.matches("^[0-9]{6,}$", bankNo)) {
+		if (bankNo == null || !BANK_NO_PATTERN.matcher(bankNo).matches()) {
 			return false;
 		}
 		// 第二步： 将银行卡字符串,倒序转换为int数组：如 "478531",转换为[1,3,5,8,7,4]
