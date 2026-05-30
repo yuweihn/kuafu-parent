@@ -382,6 +382,36 @@ public abstract class PoiExcel {
 				}
 			}
 
+			// 在 autoSizeColumn 之前添加手动列宽计算
+			for (int i = 0; i < columnCount; i++) {
+				int maxWidth = 0;
+
+				// 遍历所有行，找到最宽的单元格
+				for (int r = 0; r <= sheet.getLastRowNum(); r++) {
+					Row row = sheet.getRow(r);
+					if (row == null) continue;
+
+					Cell cell = row.getCell(i);
+					if (cell == null) continue;
+
+					String content = cell.toString();
+					if (content != null && !content.isEmpty()) {
+						// 估算宽度：每个字符约 256 个单位
+						int contentWidth = content.length() * 256;
+						// 中文字符需要更宽
+						for (char c : content.toCharArray()) {
+							if (c > 127) {  // 非 ASCII 字符
+								contentWidth += 256;  // 额外增加宽度
+							}
+						}
+						maxWidth = Math.max(maxWidth, contentWidth);
+					}
+				}
+				// 设置列宽（添加一些padding）
+				if (maxWidth > 0) {
+					sheet.setColumnWidth(i, maxWidth + 1024);  // 加 1024 作为 padding
+				}
+			}
 			for (int i = 0; i < columnCount; i++) {
 				sheet.autoSizeColumn(i, true);
 			}
