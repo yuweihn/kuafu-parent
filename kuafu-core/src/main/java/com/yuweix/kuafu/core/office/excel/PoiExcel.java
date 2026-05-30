@@ -3,7 +3,6 @@ package com.yuweix.kuafu.core.office.excel;
 
 import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.JsonUtil;
-import com.yuweix.kuafu.core.io.FileUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFCell;
@@ -17,8 +16,6 @@ import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -319,6 +316,13 @@ public abstract class PoiExcel {
 		return null;
 	}
 
+	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, HttpServletResponse resp) {
+		export(clz, dataList, fileName, XLSX_CONTENT_TYPE, resp);
+	}
+	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
+		byte[] bytes = export(clz, dataList);
+		ActionUtil.output(bytes, fileName, contentType, null, resp);
+	}
 
 	/**
 	 * 导出数据
@@ -328,26 +332,6 @@ public abstract class PoiExcel {
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			export(clz, dataList, out);
 			return out.toByteArray();
-		} catch (IOException ex) {
-			log.error("export失败, Error: {}", ex.getMessage(), ex);
-			throw new RuntimeException(ex);
-		}
-	}
-
-	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, HttpServletResponse resp) {
-		export(clz, dataList, fileName, XLSX_CONTENT_TYPE, resp);
-	}
-	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
-		String trimmedFileName = fileName.trim();
-		String encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8);
-		String asciiFileName = FileUtil.buildAsciiFileName(trimmedFileName);
-
-		resp.setContentType(contentType);
-		resp.setCharacterEncoding("utf-8");
-		resp.setHeader("Content-Disposition", "attachment; filename=\"" + asciiFileName + "\"; filename*=UTF-8''" + encodedFileName);
-		ActionUtil.addExposeHeader(resp, "_filename", encodedFileName);
-		try {
-			export(clz, dataList, resp.getOutputStream());
 		} catch (IOException ex) {
 			log.error("export失败, Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);

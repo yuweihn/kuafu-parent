@@ -296,11 +296,14 @@ public abstract class ActionUtil {
 	}
 
 	public static void output(byte[] bytes, String fileName, String contentType, Map<String, String> headers) {
+		output(bytes, fileName, contentType, headers, getResponse());
+	}
+
+	public static void output(byte[] bytes, String fileName, String contentType, Map<String, String> headers, HttpServletResponse resp) {
 		if (bytes == null) {
 			log.error("响应内容为空");
 			throw new RuntimeException("响应内容为空");
 		}
-		HttpServletResponse resp = getResponse();
 		if (resp == null) {
 			log.error("HttpServletResponse为空，无法输出");
 			throw new RuntimeException("HttpServletResponse为空，无法输出");
