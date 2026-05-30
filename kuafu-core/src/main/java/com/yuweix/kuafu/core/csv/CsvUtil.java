@@ -60,6 +60,7 @@ public abstract class CsvUtil {
 		try {
 			export(dataList, resp.getOutputStream());
 		} catch (IOException ex) {
+			log.error("export失败, Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
 		}
 	}
