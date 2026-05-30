@@ -164,4 +164,17 @@ public abstract class FileUtil extends StreamUtil {
 		}
 		return path;
 	}
+
+	public static String buildAsciiFileName(String fileName) {
+		if (fileName == null) {
+			return null;
+		}
+		fileName = fileName.trim();
+		StringBuilder sb = new StringBuilder(fileName.length());
+		for (int i = 0; i < fileName.length(); i++) {
+			char c = fileName.charAt(i);
+			sb.append(c <= 0x7F ? c : '_');
+		}
+		return sb.toString();
+	}
 }

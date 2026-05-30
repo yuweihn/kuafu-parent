@@ -2,6 +2,7 @@ package com.yuweix.kuafu.core.csv;
 
 
 import com.yuweix.kuafu.core.ActionUtil;
+import com.yuweix.kuafu.core.io.FileUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +53,11 @@ public abstract class CsvUtil {
 	public static<T> void export(List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
 		String trimmedFileName = fileName.trim();
 		String encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8);
+		String asciiFileName = FileUtil.buildAsciiFileName(trimmedFileName);
 
 		resp.setContentType(contentType);
 		resp.setCharacterEncoding("utf-8");
-		resp.setHeader("Content-Disposition", "attachment;filename=\"" + trimmedFileName + "\";filename*=UTF-8''" + encodedFileName);
+		resp.setHeader("Content-Disposition", "attachment;filename=\"" + asciiFileName + "\";filename*=UTF-8''" + encodedFileName);
 		ActionUtil.addExposeHeader(resp, "_filename", encodedFileName);
 		try {
 			export(dataList, resp.getOutputStream());
