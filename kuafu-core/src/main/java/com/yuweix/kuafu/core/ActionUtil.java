@@ -268,23 +268,33 @@ public abstract class ActionUtil {
 
 	public static void addExposeHeader(String key, String val) {
 		HttpServletResponse resp = getResponse();
-		assert resp != null;
 		addExposeHeader(resp, key, val);
 	}
 	public static void addExposeHeader(HttpServletResponse response, String key, String val) {
+		if (response == null || key == null || key.trim().isEmpty()) {
+			return;
+		}
+		key = key.trim();
 		response.setHeader(key, val);
 
-		Collection<String> headers = response.getHeaders(Constant.ACCESS_CONTROL_EXPOSE_HEADERS);
-		if (headers == null || headers.isEmpty()) {
-			response.setHeader(Constant.ACCESS_CONTROL_EXPOSE_HEADERS, key);
-		} else {
-			StringBuilder builder = new StringBuilder("");
-			for (String header : headers) {
-				builder.append(header).append(",");
-			}
-			builder.append(key);
-			response.setHeader(Constant.ACCESS_CONTROL_EXPOSE_HEADERS, builder.toString());
+		String exposeHeaderKey = Constant.ACCESS_CONTROL_EXPOSE_HEADERS;
+		Collection<String> existingHeaders = response.getHeaders(exposeHeaderKey);
+
+		if (existingHeaders == null || existingHeaders.isEmpty()) {
+			response.setHeader(exposeHeaderKey, key);
+			return;
 		}
+
+		String combinedHeaders = String.join(",", existingHeaders);
+		Set<String> headerSet = new LinkedHashSet<>(Arrays.asList(combinedHeaders.split(",")));
+
+		headerSet.removeIf(h -> h.trim().isEmpty());
+		if (headerSet.contains(key)) {
+			return;
+		}
+
+		headerSet.add(key);
+		response.setHeader(exposeHeaderKey, String.join(",", headerSet));
 	}
 
 	public static void output(byte[] bytes, String fileName) {
@@ -332,7 +342,7 @@ public abstract class ActionUtil {
 		}
 		String asciiFileName = FileUtil.buildAsciiFileName(trimmedFileName);
 		resp.setHeader("Content-Disposition", "attachment; filename=\"" + asciiFileName + "\"; filename*=UTF-8''" + encodedFileName);
-		addExposeHeader("_filename", encodedFileName);
+		addExposeHeader(resp, "_filename", encodedFileName);
 
 		try (OutputStream os = resp.getOutputStream()) {
 			os.write(bytes);
