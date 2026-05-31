@@ -364,6 +364,13 @@ public abstract class PoiExcel {
 			}
 
 			int columnCount = headList.size();
+			int[] maxColumnWidths = new int[columnCount];
+			Arrays.fill(maxColumnWidths, 0);
+
+			for (int i = 0; i < headList.size(); i++) {
+				maxColumnWidths[i] = headList.get(i).getBytes().length * 256;
+			}
+
 			if (dataList != null && !dataList.isEmpty()) {
 				List<String> keyList = getExportKeyList(dataList.get(0));
 				for (int i = 0; i < dataList.size(); i++) {
@@ -372,13 +379,28 @@ public abstract class PoiExcel {
 					List<Object> dList = getExportDataList(keyList, t);
 					for (int j = 0; j < dList.size(); j++) {
 						Cell cell = dataRow.createCell(j);
-						setCellValue(cell, dList.get(j));
+						Object value = dList.get(j);
+						setCellValue(cell, value);
+
+						int contentLength = getValueLength(value);
+						int cellWidth = contentLength * 256;
+						if (cellWidth > maxColumnWidths[j]) {
+							maxColumnWidths[j] = cellWidth;
+						}
 					}
 				}
 			}
 
 			for (int i = 0; i < columnCount; i++) {
-				sheet.autoSizeColumn(i, true);
+				int minWidth = 15 * 256;
+				int maxWidth = 50 * 256;
+				int calculatedWidth = maxColumnWidths[i] + 512;
+
+				if (calculatedWidth < minWidth) {
+					sheet.setColumnWidth(i, minWidth);
+				} else {
+					sheet.setColumnWidth(i, Math.min(calculatedWidth, maxWidth));
+				}
 			}
 
 			workbook.write(out);
@@ -386,6 +408,22 @@ public abstract class PoiExcel {
 			log.error("export失败, Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
 		}
+	}
+	private static int getValueLength(Object value) {
+		if (value == null) {
+			return 0;
+		}
+		String str = value.toString();
+		if (str == null || str.isEmpty()) {
+			return 0;
+		}
+		int length = str.length();
+		for (char c : str.toCharArray()) {
+			if (c > 255) {
+				length++;
+			}
+		}
+		return length;
 	}
 
 	private static<T> List<String> getExportHeadList(T t) {
