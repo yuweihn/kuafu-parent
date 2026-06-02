@@ -19,7 +19,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.listener.RetryListenerSupport;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ import java.util.List;
  */
 public class RabbitConf {
     private static final Logger log = LoggerFactory.getLogger(RabbitConf.class);
+
 
     @ConditionalOnMissingBean(BindingSetting.class)
     @Bean
@@ -130,6 +134,24 @@ public class RabbitConf {
         backOffPolicy.setMaxInterval(maxInterval);
         backOffPolicy.setMultiplier(multiplier);
         retryTemplate.setBackOffPolicy(backOffPolicy);
+
+        retryTemplate.registerListener(new RetryListenerSupport() {
+            @Override
+            public <T, E extends Throwable> void onError(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
+                log.error("Rabbit消息处理重试，第{}次尝试，错误信息: {}", context.getRetryCount(), throwable.getMessage(), throwable);
+            }
+
+            @Override
+            public <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
+                if (context.getRetryCount() > 0) {
+                    if (throwable != null) {
+                        log.error("Rabbit消息处理最终失败，共重试{}次", context.getRetryCount(), throwable);
+                    } else {
+                        log.info("Rabbit消息处理成功，经过{}次重试", context.getRetryCount());
+                    }
+                }
+            }
+        });
         return retryTemplate;
     }
 

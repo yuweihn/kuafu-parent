@@ -7,10 +7,15 @@ import com.yuweix.kuafu.core.mq.rocket.RocketRetryTemplate;
 import com.yuweix.kuafu.core.mq.rocket.RocketSender;
 import com.yuweix.kuafu.core.mq.rocket.RocketSerializer;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.listener.RetryListenerSupport;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 
 
@@ -18,6 +23,9 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
  * @author yuwei
  */
 public class RocketConf {
+    private static final Logger log = LoggerFactory.getLogger(RocketConf.class);
+
+
     @ConditionalOnMissingBean(RocketSerializer.class)
     @Bean
     public RocketSerializer rocketSerializer() {
@@ -56,6 +64,24 @@ public class RocketConf {
         backOffPolicy.setMaxInterval(maxInterval);
         backOffPolicy.setMultiplier(multiplier);
         retryTemplate.setBackOffPolicy(backOffPolicy);
+
+        retryTemplate.registerListener(new RetryListenerSupport() {
+            @Override
+            public <T, E extends Throwable> void onError(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
+                log.error("Rocket消息处理重试，第{}次尝试，错误信息: {}", context.getRetryCount(), throwable.getMessage(), throwable);
+            }
+
+            @Override
+            public <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
+                if (context.getRetryCount() > 0) {
+                    if (throwable != null) {
+                        log.error("Rocket消息处理最终失败，共重试{}次", context.getRetryCount(), throwable);
+                    } else {
+                        log.info("Rocket消息处理成功，经过{}次重试", context.getRetryCount());
+                    }
+                }
+            }
+        });
         return retryTemplate;
     }
 
