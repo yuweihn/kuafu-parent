@@ -13,7 +13,9 @@ import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -533,7 +535,10 @@ public abstract class PoiExcel {
 		} else if (value instanceof Boolean) {
 			cell.setCellValue(value != null && Boolean.parseBoolean(value.toString()));
 		} else if (value instanceof Date) {
-			cell.setCellValue(value == null ? "" : new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(value));
+			// 使用 DateTimeFormatter 替代 SimpleDateFormat
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT);
+			LocalDateTime localDateTime = LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
+			cell.setCellValue(value == null ? "" : localDateTime.format(formatter));
 		} else {
 			cell.setCellValue(value == null ? "" : value.toString());
 		}

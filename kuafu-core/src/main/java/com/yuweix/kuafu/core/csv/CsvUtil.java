@@ -12,7 +12,9 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -69,7 +71,7 @@ public abstract class CsvUtil {
 
 			osw = new OutputStreamWriter(out, StandardCharsets.UTF_8);
 			bw = new BufferedWriter(osw);
-			
+
 			/**
 			 * 输出头部
 			 **/
@@ -156,7 +158,7 @@ public abstract class CsvUtil {
 	private static<T> List<Object> getOutputDataList(List<String> keyList, T t) {
 		Assert.notEmpty(keyList, "[keyList] must not be empty.");
 		List<Object> list = new ArrayList<>();
-		
+
 		if (Map.class.isAssignableFrom(t.getClass())) {
 			Map<?, ?> map = (Map<?, ?>) t;
 			for (String key: keyList) {
@@ -183,7 +185,10 @@ public abstract class CsvUtil {
 			return "";
 		}
 		if (value instanceof Date) {
-			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value);
+			// 使用 DateTimeFormatter 替代 SimpleDateFormat
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime localDateTime = LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
+			return localDateTime.format(formatter);
 		}
 		return value.toString();
 	}

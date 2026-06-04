@@ -1,9 +1,9 @@
 package com.yuweix.kuafu.core;
 
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -131,13 +131,15 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static String formatDate(Date date, String pattern) {
-		return new SimpleDateFormat(pattern).format(date);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter);
 	}
 	public static String formatDateIgnoreE(Date date, String pattern) {
 		if (date == null) {
 			return null;
 		}
-		return new SimpleDateFormat(pattern).format(date);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+		return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).format(formatter);
 	}
 
 	/**
@@ -147,18 +149,20 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static Date parseDate(String dateStr, String pattern) {
-		DateFormat df = new SimpleDateFormat(pattern);
 		try {
-			return df.parse(dateStr);
-		} catch (ParseException e) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
+			return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	public static Date parseDateIgnoreE(String dateStr, String pattern) {
-		DateFormat df = new SimpleDateFormat(pattern);
 		try {
-			return df.parse(dateStr);
-		} catch (ParseException e) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
+			return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+		} catch (Exception e) {
 			return null;
 		}
 	}
@@ -329,11 +333,11 @@ public abstract class DateUtil {
 		int y1 = getYear(date1);
 		int m1 = getMonth(date1);
 		int d1 = getDay(date1);
-		
+
 		int y2 = getYear(date2);
 		int m2 = getMonth(date2);
 		int d2 = getDay(date2);
-		
+
 		return (y1 == y2) && (m1 == m2) && (d1 == d2);
 	}
 
@@ -374,9 +378,9 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static int getDayDiff(Date date1, Date date2) {
-		date1 = parseDate(formatDate(date1, PATTERN_DATE4), PATTERN_DATE4);
-		date2 = parseDate(formatDate(date2, PATTERN_DATE4), PATTERN_DATE4);
-		long dif = (date2.getTime() - date1.getTime()) / (1000L * 60 * 60 * 24);
+		LocalDateTime ld1 = LocalDateTime.ofInstant(date1.toInstant(), ZoneId.systemDefault());
+		LocalDateTime ld2 = LocalDateTime.ofInstant(date2.toInstant(), ZoneId.systemDefault());
+		long dif = java.time.temporal.ChronoUnit.DAYS.between(ld1.toLocalDate(), ld2.toLocalDate());
 		return (int) dif;
 	}
 
