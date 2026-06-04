@@ -34,6 +34,7 @@ public class DefaultRabbitSender implements RabbitSender, Confirmable {
         send(exchange, null, message);
     }
 
+    @Override
     public void send(String exchange, String routeKey, Object message) {
         try {
             String messageId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
