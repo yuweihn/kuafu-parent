@@ -21,6 +21,10 @@ public class FastJsonDateFilter implements ValueFilter {
         this.defaultDateFormat = defaultDateFormat;
     }
 
+    public void setDefaultDateFormat(String defaultDateFormat) {
+        this.defaultDateFormat = defaultDateFormat;
+    }
+
     @Override
     public Object apply(Object object, String name, Object value) {
         if (!(value instanceof Date)) {
