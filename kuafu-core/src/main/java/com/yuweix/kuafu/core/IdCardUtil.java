@@ -1,15 +1,13 @@
 package com.yuweix.kuafu.core;
 
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 
 /**
@@ -18,6 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class IdCardUtil {
 	private static final Logger log = LoggerFactory.getLogger(IdCardUtil.class);
+
 	/** 中国公民一代身份证号码长度。 */
 	private static final int CHINA_ID_NO_1_LENGTH = 15;
 	/** 中国公民二代身份证号码长度。 */
@@ -124,7 +123,10 @@ public abstract class IdCardUtil {
 		String birthday = cardNo.substring(6, 12);
 		Calendar cal = Calendar.getInstance();
 		try {
-			Date birthDate = new SimpleDateFormat("yyMMdd").parse(birthday);
+			// 使用 DateTimeFormatter 替代 SimpleDateFormat
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
+			LocalDate localDate = LocalDate.parse(birthday, formatter);
+			Date birthDate = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 			cal.setTime(birthDate);
 		} catch (Exception ex) {
 			log.error("convert15To18获取出生年月日出错, Error: {}", ex.getMessage(), ex);
@@ -214,7 +216,10 @@ public abstract class IdCardUtil {
 		}
 		String birthCode = cardNo.substring(6, 12);
 		try {
-			Date birthday = new SimpleDateFormat("yyMMdd").parse(birthCode);
+			// 使用 DateTimeFormatter 替代 SimpleDateFormat
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
+			LocalDate localDate = LocalDate.parse(birthCode, formatter);
+			Date birthday = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 			return birthday.before(new Date());
 		} catch (Exception e) {
 			log.error("check15获取出生年月日出错, Error: {}", e.getMessage(), e);

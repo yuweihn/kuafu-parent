@@ -12,7 +12,9 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -183,7 +185,10 @@ public abstract class CsvUtil {
 			return "";
 		}
 		if (value instanceof Date) {
-			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value);
+			// 使用 DateTimeFormatter 替代 SimpleDateFormat
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime localDateTime = LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
+			return localDateTime.format(formatter);
 		}
 		return value.toString();
 	}
