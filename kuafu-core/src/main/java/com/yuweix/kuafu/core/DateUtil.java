@@ -121,7 +121,7 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static String formatDate(Date date) {
-		return new SimpleDateFormat(PATTERN_DATE1).format(date);
+		return formatDate(date, PATTERN_DATE1);
 	}
 
 	/**
@@ -131,6 +131,12 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static String formatDate(Date date, String pattern) {
+		return new SimpleDateFormat(pattern).format(date);
+	}
+	public static String formatDateIgnoreE(Date date, String pattern) {
+		if (date == null) {
+			return null;
+		}
 		return new SimpleDateFormat(pattern).format(date);
 	}
 
