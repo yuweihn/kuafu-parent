@@ -4,9 +4,6 @@ package com.yuweix.kuafu.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -123,10 +120,7 @@ public abstract class IdCardUtil {
 		String birthday = cardNo.substring(6, 12);
 		Calendar cal = Calendar.getInstance();
 		try {
-			// 使用 DateTimeFormatter 替代 SimpleDateFormat
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
-			LocalDate localDate = LocalDate.parse(birthday, formatter);
-			Date birthDate = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			Date birthDate = DateUtil.parseDate(birthday, "yyMMdd");
 			cal.setTime(birthDate);
 		} catch (Exception ex) {
 			log.error("convert15To18获取出生年月日出错, Error: {}", ex.getMessage(), ex);
@@ -216,10 +210,7 @@ public abstract class IdCardUtil {
 		}
 		String birthCode = cardNo.substring(6, 12);
 		try {
-			// 使用 DateTimeFormatter 替代 SimpleDateFormat
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
-			LocalDate localDate = LocalDate.parse(birthCode, formatter);
-			Date birthday = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			Date birthday = DateUtil.parseDate(birthCode, "yyMMdd");
 			return birthday.before(new Date());
 		} catch (Exception e) {
 			log.error("check15获取出生年月日出错, Error: {}", e.getMessage(), e);
