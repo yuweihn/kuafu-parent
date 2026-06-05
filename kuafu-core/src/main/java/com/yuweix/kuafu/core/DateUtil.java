@@ -131,15 +131,11 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static String formatDate(Date date, String pattern) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter);
-	}
-	public static String formatDateIgnoreE(Date date, String pattern) {
 		if (date == null) {
 			return null;
 		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-		return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).format(formatter);
+		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter);
 	}
 
 	/**
