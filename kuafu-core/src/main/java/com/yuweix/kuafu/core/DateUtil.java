@@ -7,12 +7,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
  * @author yuwei
  */
 public abstract class DateUtil {
+	private static final ConcurrentHashMap<String, DateTimeFormatter> FORMATTER_CACHE = new ConcurrentHashMap<>();
+	private static ZoneId DEFAULT_ZONE = ZoneId.systemDefault();
+
 	/**
 	 * yyyy-MM
 	 */
@@ -105,6 +109,9 @@ public abstract class DateUtil {
 	public static final int UNIT_SECOND = 7;
 
 
+	public static void refreshTimeZone(ZoneId zoneId) {
+		DEFAULT_ZONE = zoneId;
+	}
 
 	/**
 	 * 获取当前年份
@@ -113,6 +120,10 @@ public abstract class DateUtil {
 	public static int getCurYear() {
 		Calendar cal = Calendar.getInstance();
 		return cal.get(Calendar.YEAR);
+	}
+
+	private static DateTimeFormatter getFormatter(String pattern) {
+		return FORMATTER_CACHE.computeIfAbsent(pattern, DateTimeFormatter::ofPattern);
 	}
 
 	/**
@@ -131,11 +142,12 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static String formatDate(Date date, String pattern) {
-		if (date == null) {
+		if (date == null || pattern == null || pattern.isEmpty()) {
 			return null;
 		}
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter);
+		DateTimeFormatter formatter = getFormatter(pattern);
+		LocalDateTime localDateTime = LocalDateTime.ofInstant(date.toInstant(), DEFAULT_ZONE);
+		return localDateTime.format(formatter);
 	}
 
 	/**
@@ -146,18 +158,18 @@ public abstract class DateUtil {
 	 */
 	public static Date parseDate(String dateStr, String pattern) {
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+			DateTimeFormatter formatter = getFormatter(pattern);
 			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
-			return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+			return Date.from(localDateTime.atZone(DEFAULT_ZONE).toInstant());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	public static Date parseDateIgnoreE(String dateStr, String pattern) {
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+			DateTimeFormatter formatter = getFormatter(pattern);
 			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
-			return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+			return Date.from(localDateTime.atZone(DEFAULT_ZONE).toInstant());
 		} catch (Exception e) {
 			return null;
 		}
@@ -374,8 +386,8 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static int getDayDiff(Date date1, Date date2) {
-		LocalDateTime ld1 = LocalDateTime.ofInstant(date1.toInstant(), ZoneId.systemDefault());
-		LocalDateTime ld2 = LocalDateTime.ofInstant(date2.toInstant(), ZoneId.systemDefault());
+		LocalDateTime ld1 = LocalDateTime.ofInstant(date1.toInstant(), DEFAULT_ZONE);
+		LocalDateTime ld2 = LocalDateTime.ofInstant(date2.toInstant(), DEFAULT_ZONE);
 		long dif = java.time.temporal.ChronoUnit.DAYS.between(ld1.toLocalDate(), ld2.toLocalDate());
 		return (int) dif;
 	}

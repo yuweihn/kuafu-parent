@@ -4,9 +4,6 @@ package com.yuweix.kuafu.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -110,51 +107,48 @@ public abstract class IdCardUtil {
 	 * @return 18位身份编码
 	 */
 	private static String convert15To18(String cardNo) {
-		if (cardNo == null || cardNo.length() != CHINA_ID_NO_1_LENGTH) {
-			return null;
-		}
-		if (!isNum(cardNo)) {
-			return null;
-		}
+        if (cardNo == null || cardNo.length() != CHINA_ID_NO_1_LENGTH) {
+            return null;
+        }
+        if (!isNum(cardNo)) {
+            return null;
+        }
 
-		/**
-		 * 获取出生年月日
-		 */
-		String birthday = cardNo.substring(6, 12);
-		Calendar cal = Calendar.getInstance();
-		try {
-			// 使用 DateTimeFormatter 替代 SimpleDateFormat
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
-			LocalDate localDate = LocalDate.parse(birthday, formatter);
-			Date birthDate = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-			cal.setTime(birthDate);
-		} catch (Exception ex) {
-			log.error("convert15To18获取出生年月日出错, Error: {}", ex.getMessage(), ex);
-			return null;
-		}
-		/**
-		 * 获取出生年(完整表现形式,如：2010)
-		 */
-		String sYear = String.valueOf(cal.get(Calendar.YEAR));
-		String idCard18 = cardNo.substring(0, 6) + sYear + cardNo.substring(8);
-		/**
-		 * 转换字符数组
-		 */
-		char[] cArr = idCard18.toCharArray();
-		if (cArr == null) {
-			return null;
-		}
-		int[] iCard = convertCharToInt(cArr);
-		int iSum17 = getPowerSum(iCard);
-		/**
-		 * 获取校验位
-		 */
-		String sVal = getCheckCode18(iSum17);
-		if (sVal == null || sVal.length() <= 0) {
-			return null;
-		}
-		return idCard18 + sVal;
-	}
+        /**
+         * 获取出生年月日
+         */
+        String birthday = cardNo.substring(6, 12);
+        Calendar cal = Calendar.getInstance();
+        try {
+            Date birthDate = DateUtil.parseDate(birthday, "yyMMdd");
+            cal.setTime(birthDate);
+        } catch (Exception ex) {
+            log.error("convert15To18获取出生年月日出错, Error: {}", ex.getMessage(), ex);
+            return null;
+        }
+        /**
+         * 获取出生年(完整表现形式,如：2010)
+         */
+        String sYear = String.valueOf(cal.get(Calendar.YEAR));
+        String idCard18 = cardNo.substring(0, 6) + sYear + cardNo.substring(8);
+        /**
+         * 转换字符数组
+         */
+        char[] cArr = idCard18.toCharArray();
+        if (cArr == null) {
+            return null;
+        }
+        int[] iCard = convertCharToInt(cArr);
+        int iSum17 = getPowerSum(iCard);
+        /**
+         * 获取校验位
+         */
+        String sVal = getCheckCode18(iSum17);
+        if (sVal == null || sVal.length() <= 0) {
+            return null;
+        }
+        return idCard18 + sVal;
+    }
 
 	/**
 	 * 检查身份证是否合法
@@ -209,17 +203,14 @@ public abstract class IdCardUtil {
 		if (!isNum(cardNo)) {
 			return false;
 		}
-		
+
 		String proCode = cardNo.substring(0, 2);
 		if (cityCodes.get(proCode) == null) {
 			return false;
 		}
 		String birthCode = cardNo.substring(6, 12);
 		try {
-			// 使用 DateTimeFormatter 替代 SimpleDateFormat
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
-			LocalDate localDate = LocalDate.parse(birthCode, formatter);
-			Date birthday = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			Date birthday = DateUtil.parseDate(birthCode, "yyMMdd");
 			return birthday.before(new Date());
 		} catch (Exception e) {
 			log.error("check15获取出生年月日出错, Error: {}", e.getMessage(), e);
