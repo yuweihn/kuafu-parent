@@ -161,9 +161,28 @@ public abstract class DateUtil {
 		if (dateStr == null || dateStr.isEmpty() || pattern == null || pattern.isEmpty()) {
 			return null;
 		}
-		DateTimeFormatter formatter = getFormatter(pattern);
-		LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
-		return Date.from(localDateTime.atZone(zone).toInstant());
+		try {
+			DateTimeFormatter formatter = getFormatter(pattern);
+			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
+			return Date.from(localDateTime.atZone(zone).toInstant());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public static Date parseDateIgnoreE(String dateStr, String pattern) {
+		return parseDateIgnoreE(dateStr, pattern, Constant.DEFAULT_ZONE);
+	}
+	public static Date parseDateIgnoreE(String dateStr, String pattern, ZoneId zone) {
+		if (dateStr == null || dateStr.isEmpty() || pattern == null || pattern.isEmpty()) {
+			return null;
+		}
+		try {
+			DateTimeFormatter formatter = getFormatter(pattern);
+			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
+			return Date.from(localDateTime.atZone(zone).toInstant());
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	/**
