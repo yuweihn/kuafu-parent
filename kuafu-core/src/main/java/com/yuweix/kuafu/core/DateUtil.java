@@ -158,25 +158,12 @@ public abstract class DateUtil {
 		return parseDate(dateStr, pattern, Constant.DEFAULT_ZONE);
 	}
 	public static Date parseDate(String dateStr, String pattern, ZoneId zone) {
-		try {
-			DateTimeFormatter formatter = getFormatter(pattern);
-			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
-			return Date.from(localDateTime.atZone(zone).toInstant());
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	public static Date parseDateIgnoreE(String dateStr, String pattern) {
-		return parseDateIgnoreE(dateStr, pattern, Constant.DEFAULT_ZONE);
-	}
-	public static Date parseDateIgnoreE(String dateStr, String pattern, ZoneId zone) {
-		try {
-			DateTimeFormatter formatter = getFormatter(pattern);
-			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
-			return Date.from(localDateTime.atZone(zone).toInstant());
-		} catch (Exception e) {
+		if (dateStr == null || dateStr.isEmpty() || pattern == null || pattern.isEmpty()) {
 			return null;
 		}
+		DateTimeFormatter formatter = getFormatter(pattern);
+		LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
+		return Date.from(localDateTime.atZone(zone).toInstant());
 	}
 
 	/**
