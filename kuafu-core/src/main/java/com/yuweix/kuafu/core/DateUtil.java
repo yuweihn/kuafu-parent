@@ -158,25 +158,12 @@ public abstract class DateUtil {
 		return parseDate(dateStr, pattern, Constant.DEFAULT_ZONE);
 	}
 	public static Date parseDate(String dateStr, String pattern, ZoneId zone) {
-		try {
-			DateTimeFormatter formatter = getFormatter(pattern);
-			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
-			return Date.from(localDateTime.atZone(zone).toInstant());
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	public static Date parseDateIgnoreE(String dateStr, String pattern) {
-		return parseDateIgnoreE(dateStr, pattern, Constant.DEFAULT_ZONE);
-	}
-	public static Date parseDateIgnoreE(String dateStr, String pattern, ZoneId zone) {
-		try {
-			DateTimeFormatter formatter = getFormatter(pattern);
-			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
-			return Date.from(localDateTime.atZone(zone).toInstant());
-		} catch (Exception e) {
+		if (dateStr == null || dateStr.isEmpty() || pattern == null || pattern.isEmpty()) {
 			return null;
 		}
+		DateTimeFormatter formatter = getFormatter(pattern);
+		LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
+		return Date.from(localDateTime.atZone(zone).toInstant());
 	}
 
 	/**
@@ -345,11 +332,11 @@ public abstract class DateUtil {
 		int y1 = getYear(date1);
 		int m1 = getMonth(date1);
 		int d1 = getDay(date1);
-		
+
 		int y2 = getYear(date2);
 		int m2 = getMonth(date2);
 		int d2 = getDay(date2);
-		
+
 		return (y1 == y2) && (m1 == m2) && (d1 == d2);
 	}
 
