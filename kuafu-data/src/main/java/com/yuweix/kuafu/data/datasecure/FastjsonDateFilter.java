@@ -12,12 +12,12 @@ import java.util.Date;
 /**
  * @author yuwei
  */
-public class FastJsonDateFilter implements ValueFilter {
+public class FastjsonDateFilter implements ValueFilter {
     private String defaultDateFormat = "yyyy-MM-dd HH:mm:ss";
 
-    public FastJsonDateFilter() {
+    public FastjsonDateFilter() {
     }
-    public FastJsonDateFilter(String defaultDateFormat) {
+    public FastjsonDateFilter(String defaultDateFormat) {
         this.defaultDateFormat = defaultDateFormat;
     }
 
