@@ -3,6 +3,9 @@ package com.yuweix.kuafu.core;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+
 
 /**
  * @author yuwei
@@ -16,7 +19,8 @@ public class Constant {
 	public static final String IMG_TYPE_JPG = ".jpg";
 	public static final int DEFAULT_HTTP_PORT = 80;
 	public static final int DEFAULT_HTTPS_PORT = 443;
-	
+	public static final ZoneId DEFAULT_ZONE = ZoneOffset.ofHours(8);
+
 	/**
 	 * 每页默认显示条数
 	 */
