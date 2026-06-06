@@ -51,7 +51,7 @@ public abstract class JacksonUtil {
 		try {
 			return mapper.writeValueAsString(obj);
 		} catch (JsonProcessingException ex) {
-            log.error("Object cannot be processed. Error: {}", ex.getMessage());
+            log.error("Object cannot be processed. Error: {}", ex.getMessage(), ex);
             return null;
 		}
 	}
