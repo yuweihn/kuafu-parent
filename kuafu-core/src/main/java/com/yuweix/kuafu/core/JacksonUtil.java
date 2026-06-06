@@ -12,14 +12,11 @@ import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 
@@ -28,20 +25,19 @@ import java.util.TimeZone;
  */
 public abstract class JacksonUtil {
     private static final Logger log = LoggerFactory.getLogger(JacksonUtil.class);
+
     private static final ObjectMapper mapper = new ObjectMapper();
+    private static PolymorphicTypeValidator typeValidator;
 
     static {
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
-        mapper.registerModule(javaTimeModule);
+        mapper.registerModule(new JavaTimeModule());
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         mapper.setTimeZone(TimeZone.getTimeZone(Constant.DEFAULT_TIME_ZONE));
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // 配置类型验证器以支持安全的多态类型处理
-        PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder().allowIfBaseType(Object.class).build();
+        typeValidator = BasicPolymorphicTypeValidator.builder().allowIfBaseType(Object.class).build();
         // 启用默认类型信息，用于序列化和反序列化时保留类型信息
         mapper.activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.NON_FINAL);
     }
@@ -59,15 +55,14 @@ public abstract class JacksonUtil {
             return null;
         }
     }
-    public static Object toObject(String text) {
+    public static<T> T toObject(String text) {
         if (text == null || text.isEmpty()) {
-            log.error("JSON string cannot be null or empty");
             return null;
         }
         try {
-            return mapper.readValue(text, Object.class);
-        } catch (JsonProcessingException ex) {
-            log.error("JSON string cannot be parsed. Error: {}", ex.getMessage());
+            return mapper.readValue(text, new TypeReference<T>() {});
+        } catch (Exception ex) {
+            log.error("JSON string cannot be parsed. Error: {}", ex.getMessage(), ex);
             return null;
         }
     }
@@ -84,7 +79,7 @@ public abstract class JacksonUtil {
             JavaType javaType = TypeFactory.defaultInstance().constructType(type);
             return mapper.readValue(text, javaType);
         } catch (JsonProcessingException ex) {
-            log.error("JSON string cannot be parsed to type {}. Error: {}", type, ex.getMessage());
+            log.error("JSON string cannot be parsed to type {}. Error: {}", type, ex.getMessage(), ex);
             return null;
         }
     }
@@ -100,7 +95,7 @@ public abstract class JacksonUtil {
         try {
             return mapper.readValue(text, type);
         } catch (JsonProcessingException ex) {
-            log.error("JSON string cannot be parsed to type {}. Error: {}", type, ex.getMessage());
+            log.error("JSON string cannot be parsed to type {}. Error: {}", type, ex.getMessage(), ex);
             return null;
         }
     }
@@ -116,7 +111,7 @@ public abstract class JacksonUtil {
         try {
             return mapper.readValue(text, clz);
         } catch (JsonProcessingException ex) {
-            log.error("JSON string cannot be parsed to clz {}. Error: {}", clz, ex.getMessage());
+            log.error("JSON string cannot be parsed to clz {}. Error: {}", clz, ex.getMessage(), ex);
             return null;
         }
     }
