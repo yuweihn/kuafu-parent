@@ -137,7 +137,7 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static String formatDate(Date date, String pattern) {
-		return formatDate(date, pattern, Constant.DEFAULT_ZONE);
+		return formatDate(date, pattern, Constant.DEFAULT_ZONE_ID);
 	}
 	public static String formatDate(Date date, String pattern, ZoneId zone) {
 		if (date == null || pattern == null || pattern.isEmpty()) {
@@ -155,7 +155,7 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static Date parseDate(String dateStr, String pattern) {
-		return parseDate(dateStr, pattern, Constant.DEFAULT_ZONE);
+		return parseDate(dateStr, pattern, Constant.DEFAULT_ZONE_ID);
 	}
 	public static Date parseDate(String dateStr, String pattern, ZoneId zone) {
 		if (dateStr == null || dateStr.isEmpty() || pattern == null || pattern.isEmpty()) {
@@ -170,7 +170,7 @@ public abstract class DateUtil {
 		}
 	}
 	public static Date parseDateIgnoreE(String dateStr, String pattern) {
-		return parseDateIgnoreE(dateStr, pattern, Constant.DEFAULT_ZONE);
+		return parseDateIgnoreE(dateStr, pattern, Constant.DEFAULT_ZONE_ID);
 	}
 	public static Date parseDateIgnoreE(String dateStr, String pattern, ZoneId zone) {
 		if (dateStr == null || dateStr.isEmpty() || pattern == null || pattern.isEmpty()) {
@@ -396,7 +396,7 @@ public abstract class DateUtil {
 	 * @return
 	 */
 	public static int getDayDiff(Date date1, Date date2) {
-		return getDayDiff(date1, date2, Constant.DEFAULT_ZONE);
+		return getDayDiff(date1, date2, Constant.DEFAULT_ZONE_ID);
 	}
 	public static int getDayDiff(Date date1, Date date2, ZoneId zone) {
 		LocalDateTime ld1 = LocalDateTime.ofInstant(date1.toInstant(), zone);

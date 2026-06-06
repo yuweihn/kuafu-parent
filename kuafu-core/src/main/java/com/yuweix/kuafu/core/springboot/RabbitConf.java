@@ -3,6 +3,7 @@ package com.yuweix.kuafu.core.springboot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yuweix.kuafu.core.Constant;
 import com.yuweix.kuafu.core.SpringContext;
 import com.yuweix.kuafu.core.mq.rabbit.*;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 
 /**
@@ -205,6 +207,7 @@ public class RabbitConf {
     @Bean
     public RabbitSerializer rabbitSerializer() {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setTimeZone(TimeZone.getTimeZone(Constant.DEFAULT_TIME_ZONE));
         return new RabbitSerializer() {
             @Override
             public <T> String serialize(T t) {

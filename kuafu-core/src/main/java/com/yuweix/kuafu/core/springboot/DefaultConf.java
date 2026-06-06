@@ -1,6 +1,10 @@
 package com.yuweix.kuafu.core.springboot;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.yuweix.kuafu.core.Constant;
 import com.yuweix.kuafu.core.SpringContext;
 import com.yuweix.kuafu.core.serialize.FastSerializer;
@@ -10,6 +14,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 
 import java.lang.reflect.Constructor;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 
 /**
@@ -55,5 +61,18 @@ public class DefaultConf {
             }
         }
         return serializer;
+    }
+
+    @ConditionalOnMissingBean(ObjectMapper.class)
+    @Bean
+    public ObjectMapper objectMapper(@Value("${kuafu.json.jackson.time-zone:Asia/Shanghai}") String timeZone
+            , @Value("${kuafu.json.jackson.date-format:yyyy-MM-dd HH:mm:ss}") String dateFormat) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setTimeZone(TimeZone.getTimeZone(timeZone));
+        objectMapper.setDateFormat(new SimpleDateFormat(dateFormat));
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return objectMapper;
     }
 }
