@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.permission.springboot;
 
 
+import com.yuweix.kuafu.core.JsonUtil;
 import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.permission.web.interceptor.PermissionCheckInterceptor;
 import com.yuweix.kuafu.sequence.base.SequenceBean;
@@ -49,8 +50,8 @@ public class PermissionConf {
 		if (serializer == null) {
 			return null;
 		}
-		serializer.addAccept("com.yuweix.kuafu.permission.dto");
-		serializer.addAccept("com.yuweix.kuafu.permission.model");
+		JsonUtil.Context.addAccept("com.yuweix.kuafu.permission.dto");
+		JsonUtil.Context.addAccept("com.yuweix.kuafu.permission.model");
 		return null;
 	}
 
