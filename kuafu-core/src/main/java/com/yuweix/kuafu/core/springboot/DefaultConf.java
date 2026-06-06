@@ -66,10 +66,9 @@ public class DefaultConf {
 
     @ConditionalOnMissingBean(ObjectMapper.class)
     @Bean
-    public ObjectMapper objectMapper(@Value("${kuafu.json.jackson.time-zone:Asia/Shanghai}") String timeZone
-            , @Value("${kuafu.json.jackson.date-format:yyyy-MM-dd HH:mm:ss}") String dateFormat) {
+    public ObjectMapper objectMapper(@Value("${kuafu.json.jackson.time-zone:Asia/Shanghai}") String timeZone) {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.setTimeZone(TimeZone.getTimeZone(Constant.DEFAULT_TIME_ZONE));
+        mapper.setTimeZone(TimeZone.getTimeZone(timeZone));
         mapper.setDateFormat(new com.fasterxml.jackson.databind.util.StdDateFormat());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
