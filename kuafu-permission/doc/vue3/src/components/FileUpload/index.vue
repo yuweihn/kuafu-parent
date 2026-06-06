@@ -1,6 +1,7 @@
 <template>
 	<!--文件上传界面-->
 	<el-dialog :title="title" v-model="formVisible" :close-on-click-modal="modal" :width="width" append-to-body draggable>
+		<div v-loading="loading">
 		<el-form :model="frm" label-width="80px" :rules="formRules" ref="frmRef">
 			<el-form-item :label="fileLabel" prop="done">
 				<el-upload :action="actionUrl" :list-type="fileType" :http-request="uploadFile"
@@ -15,7 +16,8 @@
 		</el-form>
 		<div slot="footer" class="dialog-footer">
 			<el-button @click.native="formVisible = false">取消</el-button>
-			<el-button type="primary" @click.native="completeUpload" :loading="loading">完成</el-button>
+			<el-button type="primary" @click.native="completeUpload">完成</el-button>
+		</div>
 		</div>
 	</el-dialog>
 </template>
@@ -98,6 +100,7 @@ function show(k, eparams) {
     fileList.value = [];
     resp.value = null;
     formVisible.value = true;
+    loading.value = false;
 }
 function close() {
     proxy.$refs['frmRef'].resetFields();
@@ -127,8 +130,10 @@ function uploadFile(req) {
             formData.append(key, extParams.value[key]);
         }
     }
+    loading.value = true;
     resp.value = null;
     proxy.request.post(req.action, formData).then((res) => {
+        loading.value = false;
         let resData = null;
         emit("change", key.value, res, data => {
             resData = data;
@@ -139,7 +144,7 @@ function uploadFile(req) {
         }
         proxy.$refs.frmRef.validate((valid) => {});
     }).catch((err) => {
-
+        loading.value = false;
     });
 }
 //完成并返回
@@ -198,5 +203,5 @@ defineExpose({
 
 eg.      <file-upload ref="fileUpload" :title="'上传文件'" :fileLabel="'文件'" :fileTips="'请选择文件，文件不要超过2MB'"
                      :accept="''" :maxSize="2097152" :fileErr="'请选择文件'" :fileType="'text'"
-                     :actionUrl="'/file/upload'" v-on:change="onUploadChanged" v-on:complete="onUploadCompleted" />
+                     :actionUrl="'/file/upload'" v-on:before="onBeforeImport" v-on:change="onUploadChanged" v-on:complete="onUploadCompleted" />
 -->

@@ -1,6 +1,7 @@
 <template>
 	<!--文件上传界面-->
 	<el-dialog :title="title" v-model="formVisible" :close-on-click-modal="modal" :width="width" append-to-body draggable>
+		<div v-loading="loading">
 		<el-form :model="frm" label-width="80px" ref="frmRef">
 			<el-form-item :label="fileLabel">
 				<el-upload :action="actionUrl" :list-type="fileType" :http-request="uploadFile" :file-list="fileList"
@@ -12,6 +13,7 @@
 				</el-upload>
 			</el-form-item>
 		</el-form>
+		</div>
 	</el-dialog>
 </template>
 
@@ -60,6 +62,7 @@ const {proxy} = getCurrentInstance();
 
 const key = ref(null);
 const formVisible = ref(false);
+const loading = ref(false);
 const frm = ref({});
 const extParams = ref({});     //调接口时需要的额外的参数
 const fileList = ref([]);
@@ -74,6 +77,7 @@ function show(k, eparams) {
         extParams.value = eparams;
     }
     formVisible.value = true;
+    loading.value = false;
 }
 function preUpload(file) {
     if (file.size > proxy.maxSize) {
@@ -92,12 +96,17 @@ function uploadFile(req) {
             formData.append(key, extParams.value[key]);
         }
     }
+    loading.value = true;
+    emit("before", key.value);
     proxy.request.post(req.action, formData).then((res) => {
         proxy.$refs['frmRef'].resetFields();
         fileList.value = [];
         formVisible.value = false;
+        loading.value = false;
         emit("change", key.value, res);
-    }).catch((err) => {});
+    }).catch((err) => {
+        emit("error", key.value, err);
+    });
 }
 //数字除法
 function div(arg1, arg2) {
@@ -139,5 +148,5 @@ defineExpose({
 父组件可以自定义change事件，用于解析文件上传的后台响应数据。
 eg.      <file-upload ref="fileUpload" :title="'上传文件'" :fileLabel="'文件'" :fileTips="'请选择文件，文件不要超过2MB'"
                      :accept="''" :maxSize="2097152" :fileType="'text'"
-                     :actionUrl="'/file/upload'" v-on:change="onUploadChanged" />
+                     :actionUrl="'/file/upload'" v-on:before="onBeforeImport" v-on:change="onUploadChanged" />
 -->
