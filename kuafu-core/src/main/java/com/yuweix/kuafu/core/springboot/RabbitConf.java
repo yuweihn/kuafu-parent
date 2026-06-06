@@ -1,9 +1,7 @@
 package com.yuweix.kuafu.core.springboot;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yuweix.kuafu.core.Constant;
+import com.yuweix.kuafu.core.JacksonUtil;
 import com.yuweix.kuafu.core.SpringContext;
 import com.yuweix.kuafu.core.mq.rabbit.*;
 import org.slf4j.Logger;
@@ -28,7 +26,6 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 
 
 /**
@@ -205,31 +202,16 @@ public class RabbitConf {
 
     @ConditionalOnMissingBean(RabbitSerializer.class)
     @Bean
-    public RabbitSerializer rabbitSerializer(@Autowired(required = false) ObjectMapper objectMapper) {
-        if (objectMapper == null) {
-            objectMapper = new ObjectMapper();
-            objectMapper.setTimeZone(TimeZone.getTimeZone(Constant.DEFAULT_TIME_ZONE));
-        }
-        final ObjectMapper finalObjectMapper = objectMapper;
+    public RabbitSerializer rabbitSerializer() {
         return new RabbitSerializer() {
             @Override
             public <T> String serialize(T t) {
-                try {
-                    return finalObjectMapper.writeValueAsString(t);
-                } catch (JsonProcessingException ex) {
-                    log.error("Rabbit序列化失败！Error: {}", ex.getMessage());
-                    throw new RuntimeException(ex);
-                }
+                return JacksonUtil.toJson(t);
             }
 
             @Override
             public <T> T deserialize(String str, Class<T> clz) {
-                try {
-                    return finalObjectMapper.readValue(str, clz);
-                } catch (JsonProcessingException ex) {
-                    log.error("Rabbit反序列化失败！Error: {}", ex.getMessage());
-                    throw new RuntimeException(ex);
-                }
+                return JacksonUtil.toObject(str, clz);
             }
         };
     }
