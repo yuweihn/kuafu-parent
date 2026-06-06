@@ -1,6 +1,7 @@
 <template>
 	<!--文件上传界面-->
 	<el-dialog :title="title" :visible.sync="formVisible" :close-on-click-modal="modal" :width="width" append-to-body v-drag>
+		<div v-loading="loading">
 		<el-form :model="frm" label-width="80px" ref="frmRef">
 			<el-form-item :label="fileLabel">
 				<el-upload :action="actionUrl" :list-type="fileType" :http-request="uploadFile" :file-list="fileList"
@@ -10,6 +11,7 @@
 				</el-upload>
 			</el-form-item>
 		</el-form>
+		</div>
 	</el-dialog>
 </template>
 
@@ -59,6 +61,7 @@ export default {
             key: null,
 
             formVisible: false,
+            loading: false,
             frm: {},
             extParams: {},     //调接口时需要的额外的参数
             fileList: []      //要上传的文件列表
@@ -68,6 +71,7 @@ export default {
         show(key, extParams) {
             this.key = key;
             this.formVisible = true;
+            this.loading = false;
             this.frm = {};
             if (extParams) {
               this.extParams = extParams;
@@ -79,6 +83,7 @@ export default {
             this.$refs['frmRef'].resetFields();
             this.fileList = [];
             this.formVisible = false;
+            this.loading = false;
         },
         preUpload(file) {
             if (file.size > this.maxSize) {
@@ -98,13 +103,17 @@ export default {
                 }
             }
             var that = this;
+            that.loading = true;
+            that.$emit("before", this.key);
             that.$axios.post(req.action, formData).then((res) => {
                 that.$refs['frmRef'].resetFields();
                 that.fileList = [];
                 that.formVisible = false;
+                that.loading = false;
                 that.$emit("change", this.key, res);
             }).catch((err) => {
                 that.$message.error(err.message);
+                that.$emit("error", this.key, err);
             });
         },
 
@@ -150,6 +159,6 @@ export default {
  * 父组件可以自定义change事件，用于解析文件上传的后台响应数据。
  * eg.      <file-upload ref="fileUpload" :title="'上传文件'" :fileLabel="'文件'" :fileTips="'请选择文件，文件不要超过2MB'"
  *                      :accept="''" :maxSize="2097152" :fileType="'text'"
- *                      :actionUrl="this.$global.baseUrl + '/file/upload'" v-on:change="onUploadChanged" />
+ *                      :actionUrl="this.$global.baseUrl + '/file/upload'" v-on:before="onBeforeImport" v-on:change="onUploadChanged" />
  **/
 
