@@ -205,14 +205,17 @@ public class RabbitConf {
 
     @ConditionalOnMissingBean(RabbitSerializer.class)
     @Bean
-    public RabbitSerializer rabbitSerializer() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setTimeZone(TimeZone.getTimeZone(Constant.DEFAULT_TIME_ZONE));
+    public RabbitSerializer rabbitSerializer(@Autowired(required = false) ObjectMapper objectMapper) {
+        if (objectMapper == null) {
+            objectMapper = new ObjectMapper();
+            objectMapper.setTimeZone(TimeZone.getTimeZone(Constant.DEFAULT_TIME_ZONE));
+        }
+        final ObjectMapper finalObjectMapper = objectMapper;
         return new RabbitSerializer() {
             @Override
             public <T> String serialize(T t) {
                 try {
-                    return objectMapper.writeValueAsString(t);
+                    return finalObjectMapper.writeValueAsString(t);
                 } catch (JsonProcessingException ex) {
                     log.error("Rabbit序列化失败！Error: {}", ex.getMessage());
                     throw new RuntimeException(ex);
@@ -222,7 +225,7 @@ public class RabbitConf {
             @Override
             public <T> T deserialize(String str, Class<T> clz) {
                 try {
-                    return objectMapper.readValue(str, clz);
+                    return finalObjectMapper.readValue(str, clz);
                 } catch (JsonProcessingException ex) {
                     log.error("Rabbit反序列化失败！Error: {}", ex.getMessage());
                     throw new RuntimeException(ex);
