@@ -1,6 +1,7 @@
 <template>
 	<!--文件上传界面-->
 	<el-dialog :title="title" :visible.sync="formVisible" :close-on-click-modal="modal" :width="width" append-to-body v-drag>
+		<div v-loading="loading">
 		<el-form :model="frm" label-width="80px" :rules="formRules" ref="frm">
 			<el-form-item :label="fileLabel" prop="done">
 				<el-upload :action="actionUrl" :list-type="fileType" :http-request="uploadFile"
@@ -13,7 +14,8 @@
 		</el-form>
 		<div slot="footer" class="dialog-footer">
 			<el-button @click.native="formVisible = false">取消</el-button>
-			<el-button type="primary" @click.native="completeUpload" :loading="loading">完成</el-button>
+			<el-button type="primary" @click.native="completeUpload">完成</el-button>
+		</div>
 		</div>
 	</el-dialog>
 </template>
@@ -91,6 +93,7 @@ export default {
         show(key, extParams) {
             this.key = key;
             this.formVisible = true;
+            this.loading = false;
             this.frm = {
                 done: null
             };
@@ -131,8 +134,10 @@ export default {
                 }
             }
             var that = this;
+            that.loading = true;
             that.resp = null;
             that.$axios.post(req.action, formData).then((res) => {
+                that.loading = false;
                 var resData;
                 that.$emit("change", this.key, res, data => {
                     resData = data;
@@ -144,6 +149,7 @@ export default {
                 that.$refs.frm.validate((valid) => {});
             }).catch((err) => {
                 that.$message.error(err.message);
+                that.loading = false;
             });
         },
 
@@ -205,6 +211,6 @@ export default {
  *
  * eg.      <file-upload ref="fileUpload" :title="'上传文件'" :fileLabel="'文件'" :fileTips="'请选择文件，文件不要超过2MB'"
  *                      :accept="''" :maxSize="2097152" :fileErr="'请选择文件'" :fileType="'text'"
- *                      :actionUrl="this.$global.baseUrl + '/file/upload'" v-on:change="onUploadChanged" v-on:complete="onUploadCompleted" />
+ *                      :actionUrl="this.$global.baseUrl + '/file/upload'" v-on:before="onBeforeImport" v-on:change="onUploadChanged" v-on:complete="onUploadCompleted" />
  **/
 
