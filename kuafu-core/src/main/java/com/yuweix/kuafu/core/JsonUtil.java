@@ -6,6 +6,8 @@ import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.TypeReference;
 import com.alibaba.fastjson2.filter.Filter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -16,6 +18,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author yuwei
  */
 public abstract class JsonUtil {
+    private static final Logger log = LoggerFactory.getLogger(JsonUtil.class);
+
     public static class Context {
         private static final List<String> AUTO_TYPES = new CopyOnWriteArrayList<>();
         private static Filter AUTO_TYPE_FILTER;
@@ -50,17 +54,27 @@ public abstract class JsonUtil {
         if (t == null) {
             return null;
         }
-        return JSON.toJSONString(t, JSONWriter.Feature.WriteClassName);
+        try {
+            return JSON.toJSONString(t, JSONWriter.Feature.WriteClassName);
+        } catch (Exception ex) {
+            log.error("序列化失败. Error: {}", ex.getMessage(), ex);
+            return null;
+        }
     }
 
     public static<T> T deserialize(String str) {
         if (str == null) {
             return null;
         }
-        if (Context.AUTO_TYPE_FILTER == null) {
-            return JSON.parseObject(str, new TypeReference<T>() {});
-        } else {
-            return JSON.parseObject(str, new TypeReference<T>() {}, Context.AUTO_TYPE_FILTER);
+        try {
+            if (Context.AUTO_TYPE_FILTER == null) {
+                return JSON.parseObject(str, new TypeReference<T>() {});
+            } else {
+                return JSON.parseObject(str, new TypeReference<T>() {}, Context.AUTO_TYPE_FILTER);
+            }
+        } catch (Exception ex) {
+            log.error("JSON string cannot be parsed. str: {}. Error: {}", str, ex.getMessage(), ex);
+            return null;
         }
     }
 }
