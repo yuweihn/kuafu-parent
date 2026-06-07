@@ -4,6 +4,8 @@ package com.yuweix.kuafu.session;
 import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.session.cache.SessionCache;
 import com.yuweix.kuafu.session.conf.SessionConf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import javax.servlet.ServletContext;
@@ -18,6 +20,8 @@ import java.util.*;
  */
 @SuppressWarnings("deprecation")
 public class CacheHttpSession implements HttpSession {
+	private static final Logger log = LoggerFactory.getLogger(CacheHttpSession.class);
+
 	private final String id;
 	/**
 	 * session是否已失效
@@ -259,7 +263,12 @@ public class CacheHttpSession implements HttpSession {
 		}
 
 		Serializer serializer = SessionConf.getInstance().getSerializer();
-		sessionAttribute = serializer.deserialize(SessionConf.getInstance().getCache().get(fullSessionId));
+		String attrStr = SessionConf.getInstance().getCache().get(fullSessionId);
+		try {
+			sessionAttribute = serializer.deserialize(attrStr);
+		} catch (Exception ex) {
+			log.error("Session属性反序列化失败. str: {}. Error: {}", attrStr, ex.getMessage(), ex);
+		}
 		if (sessionAttribute == null) {
 			removeSessionFromCache();
 			sessionAttribute = new SessionAttribute();
