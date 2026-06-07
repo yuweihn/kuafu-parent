@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.core.mq.rocket;
 
 
-import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.core.MdcUtil;
 import jakarta.annotation.Resource;
 import org.apache.rocketmq.common.message.Message;

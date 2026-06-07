@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.data.datasecure;
+package com.yuweix.kuafu.core.serialize.fastjson;
 
 
 import com.alibaba.fastjson2.annotation.JSONField;

@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.permission.dto;
 
 
-import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.core.encrypt.SecurityUtil;
 
 import java.io.Serializable;

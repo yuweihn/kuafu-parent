@@ -2,6 +2,7 @@ package com.yuweix.kuafu.web.filter;
 
 
 import com.yuweix.kuafu.core.*;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;

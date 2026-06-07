@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.http.request;
 
 
-import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.http.*;
 import com.yuweix.kuafu.http.response.ErrorHttpResponse;
 import com.yuweix.kuafu.http.response.HttpResponse;

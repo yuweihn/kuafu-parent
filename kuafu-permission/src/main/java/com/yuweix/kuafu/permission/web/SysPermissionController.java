@@ -3,7 +3,7 @@ package com.yuweix.kuafu.permission.web;
 
 import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.DateUtil;
-import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.permission.annotations.Permission;
 import com.yuweix.kuafu.permission.common.PermissionUtil;

@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.data.datasecure;
+package com.yuweix.kuafu.core.serialize.jackson;
 
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Jackson脱敏过滤器
- * 对标注了{@link Sensitive}注解的String字段在序列化时自动脱敏
+ * 对标注了{@link com.yuweix.kuafu.core.serialize.Sensitive}注解的String字段在序列化时自动脱敏
  * @author yuwei
  */
 public class JacksonSensitiveFilter extends BeanSerializerModifier {
@@ -26,7 +26,7 @@ public class JacksonSensitiveFilter extends BeanSerializerModifier {
             if (writer.getType().getRawClass() == String.class) {
                 Field field = getField(beanDesc.getBeanClass(), writer.getName());
                 if (field != null) {
-                    Sensitive sensitive = field.getAnnotation(Sensitive.class);
+                    com.yuweix.kuafu.core.serialize.Sensitive sensitive = field.getAnnotation(com.yuweix.kuafu.core.serialize.Sensitive.class);
                     if (sensitive != null) {
                         String regex = sensitive.regex();
                         String replacement = sensitive.replacement();

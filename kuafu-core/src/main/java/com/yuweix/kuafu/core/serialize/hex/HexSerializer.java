@@ -1,6 +1,7 @@
-package com.yuweix.kuafu.core.serialize;
+package com.yuweix.kuafu.core.serialize.hex;
 
 
+import com.yuweix.kuafu.core.serialize.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,8 @@
-package com.yuweix.kuafu.core.serialize;
+package com.yuweix.kuafu.core.serialize.jackson;
 
 
-import com.yuweix.kuafu.core.JacksonUtil;
+import com.yuweix.kuafu.core.serialize.JacksonUtil;
+import com.yuweix.kuafu.core.serialize.Serializer;
 
 
 /**
