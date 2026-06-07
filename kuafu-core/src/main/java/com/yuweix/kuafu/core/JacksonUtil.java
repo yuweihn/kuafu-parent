@@ -27,8 +27,6 @@ public abstract class JacksonUtil {
     private static final Logger log = LoggerFactory.getLogger(JacksonUtil.class);
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static PolymorphicTypeValidator typeValidator;
-
     static {
         mapper.registerModule(new JavaTimeModule());
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
@@ -37,7 +35,7 @@ public abstract class JacksonUtil {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // 配置类型验证器以支持安全的多态类型处理
-        typeValidator = BasicPolymorphicTypeValidator.builder().allowIfBaseType(Object.class).build();
+        PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder().allowIfBaseType(Object.class).build();
         // 启用默认类型信息，用于序列化和反序列化时保留类型信息
         mapper.activateDefaultTyping(typeValidator, ObjectMapper.DefaultTyping.NON_FINAL);
     }
