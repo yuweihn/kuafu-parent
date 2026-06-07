@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.core.springboot;
 
 
-import com.yuweix.kuafu.core.JacksonUtil;
+import com.yuweix.kuafu.core.serialize.JacksonUtil;
 import com.yuweix.kuafu.core.SpringContext;
 import com.yuweix.kuafu.core.mq.rabbit.*;
 import org.slf4j.Logger;

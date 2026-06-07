@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.data.datasecure;
+package com.yuweix.kuafu.core.serialize;
 
 
 import java.lang.annotation.Retention;

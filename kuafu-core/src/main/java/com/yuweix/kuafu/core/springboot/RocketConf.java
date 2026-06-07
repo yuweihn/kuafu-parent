@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.core.springboot;
 
 
-import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.core.mq.rocket.DefaultRocketSender;
 import com.yuweix.kuafu.core.mq.rocket.RocketRetryTemplate;
 import com.yuweix.kuafu.core.mq.rocket.RocketSender;

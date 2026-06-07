@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.yuweix.kuafu.core.Constant;
 import com.yuweix.kuafu.core.SpringContext;
-import com.yuweix.kuafu.core.serialize.FastSerializer;
+import com.yuweix.kuafu.core.serialize.fastjson.FastSerializer;
 import com.yuweix.kuafu.core.serialize.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

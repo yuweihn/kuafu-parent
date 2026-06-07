@@ -2,6 +2,7 @@ package com.yuweix.kuafu.web.filter;
 
 
 import com.yuweix.kuafu.core.*;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;

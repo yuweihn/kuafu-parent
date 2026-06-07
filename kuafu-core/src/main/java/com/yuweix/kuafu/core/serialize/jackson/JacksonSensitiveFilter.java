@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.data.datasecure;
+package com.yuweix.kuafu.core.serialize.jackson;
 
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.yuweix.kuafu.core.serialize.Sensitive;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

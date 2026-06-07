@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.boot.exception;
 
 
-import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.core.exception.ExceptionHandler;
 import com.yuweix.kuafu.core.exception.ExceptionViewResolver;

@@ -2,6 +2,7 @@ package com.yuweix.kuafu.core;
 
 
 import com.sun.management.OperatingSystemMXBean;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;

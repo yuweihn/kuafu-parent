@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.data.datasecure;
+package com.yuweix.kuafu.core.serialize.fastjson;
 
 
 import com.alibaba.fastjson2.filter.ValueFilter;
@@ -13,6 +13,6 @@ public class FastjsonSensitiveFilter implements ValueFilter {
         if (!(value instanceof String)) {
             return value;
         }
-        return SensitiveUtil.shield(object, name, value);
+        return com.yuweix.kuafu.core.serialize.SensitiveUtil.shield(object, name, value);
     }
 }

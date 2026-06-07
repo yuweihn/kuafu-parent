@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.core;
+package com.yuweix.kuafu.core.serialize;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.yuweix.kuafu.core.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

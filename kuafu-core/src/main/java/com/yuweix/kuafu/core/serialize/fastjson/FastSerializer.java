@@ -1,7 +1,8 @@
-package com.yuweix.kuafu.core.serialize;
+package com.yuweix.kuafu.core.serialize.fastjson;
 
 
-import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
+import com.yuweix.kuafu.core.serialize.Serializer;
 
 
 /**

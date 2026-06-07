@@ -1,7 +1,7 @@
 package com.yuweix.kuafu.core.feign.aspect;
 
 
-import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.core.Response;
 import com.yuweix.kuafu.core.SpringContext;
 import com.yuweix.kuafu.core.feign.annotations.FallbackPlus;

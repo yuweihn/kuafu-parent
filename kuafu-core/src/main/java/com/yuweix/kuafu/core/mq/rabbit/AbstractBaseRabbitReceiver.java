@@ -2,7 +2,7 @@ package com.yuweix.kuafu.core.mq.rabbit;
 
 
 import com.rabbitmq.client.Channel;
-import com.yuweix.kuafu.core.JsonUtil;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.core.MdcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

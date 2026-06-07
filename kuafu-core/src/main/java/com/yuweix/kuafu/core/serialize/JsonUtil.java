@@ -1,4 +1,4 @@
-package com.yuweix.kuafu.core;
+package com.yuweix.kuafu.core.serialize;
 
 
 import com.alibaba.fastjson2.JSON;
