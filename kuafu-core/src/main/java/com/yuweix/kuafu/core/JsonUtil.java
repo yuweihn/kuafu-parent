@@ -56,7 +56,7 @@ public abstract class JsonUtil {
 		}
 		try {
 			return JSON.toJSONString(t, JSONWriter.Feature.WriteClassName);
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			log.error("序列化失败. Error: {}", ex.getMessage(), ex);
 			return null;
 		}
@@ -72,7 +72,7 @@ public abstract class JsonUtil {
 			} else {
 				return JSON.parseObject(str, new TypeReference<T>() {}, Context.AUTO_TYPE_FILTER);
 			}
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			log.error("JSON string cannot be parsed. str: {}. Error: {}", str, ex.getMessage(), ex);
 			return null;
 		}
