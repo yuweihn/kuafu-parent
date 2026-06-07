@@ -8,6 +8,7 @@ import com.yuweix.kuafu.core.JsonUtil;
  * @author yuwei
  */
 public class FastSerializer implements Serializer {
+	@Override
 	public void addAccept(String autoType) {
 		JsonUtil.Context.addAccept(autoType);
 	}

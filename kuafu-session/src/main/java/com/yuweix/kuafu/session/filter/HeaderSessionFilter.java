@@ -2,6 +2,7 @@ package com.yuweix.kuafu.session.filter;
 
 
 import com.yuweix.kuafu.core.ActionUtil;
+import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.session.SessionConstant;
 import com.yuweix.kuafu.session.cache.SessionCache;
 import com.yuweix.kuafu.session.conf.SessionConf;
@@ -19,11 +20,11 @@ public class HeaderSessionFilter extends SessionFilter {
 	private String key;
 
 
-	public HeaderSessionFilter(SessionCache cache) {
-		super(cache);
-	}
 	public HeaderSessionFilter() {
 		super();
+	}
+	public HeaderSessionFilter(SessionCache cache, Serializer serializer) {
+		super(cache, serializer);
 	}
 
 	public void setKey(String key) {
