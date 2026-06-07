@@ -66,7 +66,7 @@ public class DefaultConf {
 
     @ConditionalOnMissingBean(ObjectMapper.class)
     @Bean
-    public ObjectMapper objectMapper(@Value("${kuafu.json.jackson.time-zone:Asia/Shanghai}") String timeZone) {
+    public ObjectMapper objectMapper(@Value("${kuafu.json.jackson.time-zone:" + Constant.DEFAULT_TIME_ZONE + "}") String timeZone) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
