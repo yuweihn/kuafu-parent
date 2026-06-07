@@ -34,21 +34,45 @@ public abstract class JsonUtil {
     }
 
     public static String toJson(Object obj) {
-        return JSON.toJSONString(obj);
+        try {
+            return JSON.toJSONString(obj);
+        } catch (Exception ex) {
+            log.error("序列化失败. Error: {}", ex.getMessage(), ex);
+            return null;
+        }
     }
     public static Object toObject(String text) {
-        return JSON.parse(text);
+        try {
+            return JSON.parse(text);
+        } catch (Exception ex) {
+            log.error("JSON string cannot be parsed. Error: {}", ex.getMessage(), ex);
+            return null;
+        }
     }
     public static<T> T toObject(String text, Type type) {
-        return JSON.parseObject(text, type);
+        try {
+            return JSON.parseObject(text, type);
+        } catch (Exception ex) {
+            log.error("JSON string cannot be parsed to type {}. Error: {}", type, ex.getMessage(), ex);
+            return null;
+        }
     }
     public static<T> T toObject(String text, TypeReference<T> type) {
-        return JSON.parseObject(text, type);
+        try {
+            return JSON.parseObject(text, type);
+        } catch (Exception ex) {
+            log.error("JSON string cannot be parsed to type {}. Error: {}", type, ex.getMessage(), ex);
+            return null;
+        }
     }
     public static<T> T toObject(String text, Class<T> clz) {
-        return JSON.parseObject(text, clz);
+        try {
+            return JSON.parseObject(text, clz);
+        } catch (Exception ex) {
+            log.error("JSON string cannot be parsed to clz {}. Error: {}", clz, ex.getMessage(), ex);
+            return null;
+        }
     }
-
 
     public static<T> String serialize(T t) {
         if (t == null) {
@@ -56,7 +80,7 @@ public abstract class JsonUtil {
         }
         try {
             return JSON.toJSONString(t, JSONWriter.Feature.WriteClassName);
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             log.error("序列化失败. Error: {}", ex.getMessage(), ex);
             return null;
         }
@@ -72,7 +96,7 @@ public abstract class JsonUtil {
             } else {
                 return JSON.parseObject(str, new TypeReference<T>() {}, Context.AUTO_TYPE_FILTER);
             }
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             log.error("JSON string cannot be parsed. str: {}. Error: {}", str, ex.getMessage(), ex);
             return null;
         }
