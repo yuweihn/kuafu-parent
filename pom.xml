@@ -30,6 +30,7 @@
         <hibernate.version>6.1.0.Final</hibernate.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.9</httpcore.version>
+        <jackson.version>2.10.3</jackson.version>
         <jakarta.annotation.api.version>2.1.1</jakarta.annotation.api.version>
         <jakarta.jms.api.version>3.1.0</jakarta.jms.api.version>
         <jedis.version>2.9.0</jedis.version>
@@ -388,6 +389,12 @@
                 <groupId>org.jasypt</groupId>
                 <artifactId>jasypt</artifactId>
                 <version>${jasypt.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>
