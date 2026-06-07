@@ -8,5 +8,5 @@ package com.yuweix.kuafu.core.mq.rabbit;
  */
 public interface RabbitSerializer {
 	<T>String serialize(T t);
-	<T>T deserialize(String str, Class<T> clz);
+	<T>T deserialize(String str);
 }

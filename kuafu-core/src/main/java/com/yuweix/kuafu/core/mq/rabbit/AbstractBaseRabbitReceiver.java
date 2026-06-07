@@ -2,16 +2,14 @@ package com.yuweix.kuafu.core.mq.rabbit;
 
 
 import com.rabbitmq.client.Channel;
-import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.core.MdcUtil;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -23,18 +21,12 @@ import java.util.UUID;
 public abstract class AbstractBaseRabbitReceiver<T> {
     private static final Logger log = LoggerFactory.getLogger(AbstractBaseRabbitReceiver.class);
 
-    protected Class<T> clz;
     @Resource
     protected RabbitSerializer rabbitSerializer;
 
 
-    @SuppressWarnings("unchecked")
     public AbstractBaseRabbitReceiver() {
-        this.clz = null;
-        Type t = getClass().getGenericSuperclass();
-        if (t instanceof ParameterizedType) {
-            this.clz = (Class<T>) ((ParameterizedType) t).getActualTypeArguments()[0];
-        }
+
     }
 
     protected void handleMessage(Message message, Channel channel) {
@@ -84,7 +76,7 @@ public abstract class AbstractBaseRabbitReceiver<T> {
     }
 
     protected T deserialize(String str) {
-        return rabbitSerializer.deserialize(str, clz);
+        return rabbitSerializer.deserialize(str);
     }
 
     protected abstract Object process(T t);

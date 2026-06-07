@@ -1,9 +1,9 @@
 package com.yuweix.kuafu.core.springboot;
 
 
-import com.yuweix.kuafu.core.serialize.JacksonUtil;
 import com.yuweix.kuafu.core.SpringContext;
 import com.yuweix.kuafu.core.mq.rabbit.*;
+import com.yuweix.kuafu.core.serialize.JacksonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
@@ -210,8 +210,8 @@ public class RabbitConf {
             }
 
             @Override
-            public <T> T deserialize(String str, Class<T> clz) {
-                return JacksonUtil.toObject(str, clz);
+            public <T> T deserialize(String str) {
+                return JacksonUtil.toObject(str);
             }
         };
     }

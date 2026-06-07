@@ -1,11 +1,11 @@
 package com.yuweix.kuafu.core.springboot;
 
 
-import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.core.mq.rocket.DefaultRocketSender;
 import com.yuweix.kuafu.core.mq.rocket.RocketRetryTemplate;
 import com.yuweix.kuafu.core.mq.rocket.RocketSender;
 import com.yuweix.kuafu.core.mq.rocket.RocketSerializer;
+import com.yuweix.kuafu.core.serialize.JsonUtil;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +32,12 @@ public class RocketConf {
         return new RocketSerializer() {
             @Override
             public <T> String serialize(T t) {
-                return JsonUtil.toJson(t);
+                return JsonUtil.serialize(t);
             }
 
             @Override
-            public <T> T deserialize(String str, Class<T> clz) {
-                return JsonUtil.toObject(str, clz);
+            public <T> T deserialize(String str) {
+                return JsonUtil.deserialize(str);
             }
         };
     }
