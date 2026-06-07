@@ -1,7 +1,6 @@
 package com.yuweix.kuafu.session.filter;
 
 
-import com.yuweix.kuafu.core.serialize.FastSerializer;
 import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.session.CacheHttpServletRequest;
 import com.yuweix.kuafu.session.SessionAttribute;
@@ -26,13 +25,7 @@ public abstract class SessionFilter implements Filter {
 
 
 	public SessionFilter() {
-		this(null);
-	}
-	public SessionFilter(SessionCache cache) {
-		FastSerializer serializer = new FastSerializer();
-		serializer.addAccept(SessionAttribute.class.getName());
-		setCache(cache);
-		setSerializer(serializer);
+		this(null, null);
 	}
 	public SessionFilter(SessionCache cache, Serializer serializer) {
 		setCache(cache);
@@ -44,6 +37,9 @@ public abstract class SessionFilter implements Filter {
 	}
 
 	public void setSerializer(Serializer serializer) {
+		if (serializer != null) {
+			serializer.addAccept(SessionAttribute.class.getName());
+		}
 		SessionConf.getInstance().setSerializer(serializer);
 	}
 	/**

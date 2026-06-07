@@ -1,13 +1,15 @@
 package com.yuweix.kuafu.session.filter;
 
 
-import java.util.UUID;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.session.CookiesUtil;
 import com.yuweix.kuafu.session.SessionConstant;
 import com.yuweix.kuafu.session.cache.SessionCache;
 import com.yuweix.kuafu.session.conf.SessionConf;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.UUID;
 
 
 /**
@@ -17,11 +19,11 @@ public class CookieSessionFilter extends SessionFilter {
 	private String cookieName;
 
 
-	public CookieSessionFilter(SessionCache cache) {
-		super(cache);
-	}
 	public CookieSessionFilter() {
 
+	}
+	public CookieSessionFilter(SessionCache cache, Serializer serializer) {
+		super(cache, serializer);
 	}
 
 	public void setCookieName(String cookieName) {

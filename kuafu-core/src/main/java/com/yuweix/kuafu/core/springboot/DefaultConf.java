@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.yuweix.kuafu.core.Constant;
-import com.yuweix.kuafu.core.JsonUtil;
 import com.yuweix.kuafu.core.SpringContext;
 import com.yuweix.kuafu.core.serialize.FastSerializer;
 import com.yuweix.kuafu.core.serialize.Serializer;
@@ -58,7 +57,7 @@ public class DefaultConf {
             String[] arr = accepts.trim().split(",");
             for (String accept: arr) {
                 if (accept != null && !"".equals(accept.trim())) {
-                    JsonUtil.Context.addAccept(accept.trim());
+                    serializer.addAccept(accept.trim());
                 }
             }
         }
