@@ -1,5 +1,7 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.yuweix.kuafu.boot.DefaultAutoConfiguration,\
+  com.yuweix.kuafu.boot.serialize.FastjsonAutoConfiguration,\
+  com.yuweix.kuafu.boot.serialize.JacksonAutoConfiguration,\
   com.yuweix.kuafu.boot.core.RabbitAutoConfiguration,\
   com.yuweix.kuafu.boot.core.RocketAutoConfiguration,\
   com.yuweix.kuafu.boot.sequence.SequenceAutoConfiguration,\

@@ -10,9 +10,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.yuweix.kuafu.core.Constant;
+import com.yuweix.kuafu.core.serialize.jackson.JacksonSensitiveFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,12 @@ public abstract class JacksonUtil {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        JacksonSensitiveFilter jacksonSensitiveFilter = new JacksonSensitiveFilter();
+        SimpleModule jacksonSensitiveFilterModule = new SimpleModule(jacksonSensitiveFilter.getClass().getName());
+        jacksonSensitiveFilterModule.setSerializerModifier(jacksonSensitiveFilter);
+        mapper.registerModule(jacksonSensitiveFilterModule);
+
         // 配置类型验证器以支持安全的多态类型处理
         PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder().allowIfBaseType(Object.class).build();
         // 启用默认类型信息，用于序列化和反序列化时保留类型信息

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.yuweix.kuafu.core.Constant;
+import com.yuweix.kuafu.core.serialize.jackson.JacksonSensitiveFilter;
 import com.yuweix.kuafu.core.serialize.jackson.JacksonSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,12 @@ public class JacksonConf {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        JacksonSensitiveFilter jacksonSensitiveFilter = new JacksonSensitiveFilter();
+        SimpleModule jacksonSensitiveFilterModule = new SimpleModule(jacksonSensitiveFilter.getClass().getName());
+        jacksonSensitiveFilterModule.setSerializerModifier(jacksonSensitiveFilter);
+        mapper.registerModule(jacksonSensitiveFilterModule);
+
         if (serializerModifiers != null && !"".equals(serializerModifiers.trim())) {
             List<BeanSerializerModifier> modifiers = new ArrayList<>();
             String[] arr = serializerModifiers.trim().split(",");
@@ -63,7 +70,7 @@ public class JacksonConf {
                 }
             }
             for (BeanSerializerModifier modifier : modifiers) {
-                SimpleModule module = new SimpleModule(modifier.getClass().getSimpleName());
+                SimpleModule module = new SimpleModule(modifier.getClass().getName());
                 module.setSerializerModifier(modifier);
                 mapper.registerModule(module);
             }
