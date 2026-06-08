@@ -188,17 +188,13 @@ public abstract class DateUtil {
 		try {
 			DateTimeFormatter formatter = getFormatter(pattern);
 			TemporalAccessor temporal = formatter.parse(dateStr);
-			LocalDateTime localDateTime = LocalDateTime.from(temporal);
-			return Date.from(localDateTime.atZone(zone).toInstant());
-		} catch (java.time.DateTimeException e) {
+			LocalDateTime localDateTime;
 			try {
-				TemporalAccessor temporal = getFormatter(pattern).parse(dateStr);
-				LocalDate localDate = LocalDate.from(temporal);
-				LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MIDNIGHT);
-				return Date.from(localDateTime.atZone(zone).toInstant());
-			} catch (Exception ex) {
-				return null;
+				localDateTime = LocalDateTime.from(temporal);
+			} catch (java.time.DateTimeException e) {
+				localDateTime = LocalDateTime.of(LocalDate.from(temporal), LocalTime.MIDNIGHT);
 			}
+			return Date.from(localDateTime.atZone(zone).toInstant());
 		} catch (Exception e) {
 			return null;
 		}
