@@ -1,9 +1,12 @@
 package com.yuweix.kuafu.core;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -163,7 +166,13 @@ public abstract class DateUtil {
 		}
 		try {
 			DateTimeFormatter formatter = getFormatter(pattern);
-			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
+			TemporalAccessor temporal = formatter.parse(dateStr);
+			LocalDateTime localDateTime;
+			try {
+				localDateTime = LocalDateTime.from(temporal);
+			} catch (java.time.DateTimeException e) {
+				localDateTime = LocalDateTime.of(LocalDate.from(temporal), LocalTime.MIDNIGHT);
+			}
 			return Date.from(localDateTime.atZone(zone).toInstant());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -178,8 +187,18 @@ public abstract class DateUtil {
 		}
 		try {
 			DateTimeFormatter formatter = getFormatter(pattern);
-			LocalDateTime localDateTime = LocalDateTime.parse(dateStr, formatter);
+			TemporalAccessor temporal = formatter.parse(dateStr);
+			LocalDateTime localDateTime = LocalDateTime.from(temporal);
 			return Date.from(localDateTime.atZone(zone).toInstant());
+		} catch (java.time.DateTimeException e) {
+			try {
+				TemporalAccessor temporal = getFormatter(pattern).parse(dateStr);
+				LocalDate localDate = LocalDate.from(temporal);
+				LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MIDNIGHT);
+				return Date.from(localDateTime.atZone(zone).toInstant());
+			} catch (Exception ex) {
+				return null;
+			}
 		} catch (Exception e) {
 			return null;
 		}
