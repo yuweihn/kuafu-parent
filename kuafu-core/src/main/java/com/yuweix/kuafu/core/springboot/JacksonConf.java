@@ -36,8 +36,9 @@ public class JacksonConf {
      */
     @ConditionalOnMissingBean(ObjectMapper.class)
     @Bean
-    public ObjectMapper objectMapper(@Value("${kuafu.json.jackson.time-zone:" + Constant.DEFAULT_TIME_ZONE + "}") String timeZone
-            , @Value("${kuafu.json.jackson.serializer-modifiers:}") String serializerModifiers) {
+    public ObjectMapper objectMapper(@Value("${kuafu.json.jackson.mapper.time-zone:" + Constant.DEFAULT_TIME_ZONE + "}") String timeZone
+            , @Value("${kuafu.json.jackson.mapper.sensitive:true}") boolean sensitive
+            , @Value("${kuafu.json.jackson.mapper.serializer-modifiers:}") String serializerModifiers) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
@@ -46,10 +47,15 @@ public class JacksonConf {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        JacksonSensitiveFilter jacksonSensitiveFilter = new JacksonSensitiveFilter();
-        SimpleModule jacksonSensitiveFilterModule = new SimpleModule(jacksonSensitiveFilter.getClass().getName());
-        jacksonSensitiveFilterModule.setSerializerModifier(jacksonSensitiveFilter);
-        mapper.registerModule(jacksonSensitiveFilterModule);
+        /**
+         * 脱敏配置
+         */
+        if (sensitive) {
+            JacksonSensitiveFilter jacksonSensitiveFilter = new JacksonSensitiveFilter();
+            SimpleModule jacksonSensitiveFilterModule = new SimpleModule(jacksonSensitiveFilter.getClass().getName());
+            jacksonSensitiveFilterModule.setSerializerModifier(jacksonSensitiveFilter);
+            mapper.registerModule(jacksonSensitiveFilterModule);
+        }
 
         if (serializerModifiers != null && !"".equals(serializerModifiers.trim())) {
             List<BeanSerializerModifier> modifiers = new ArrayList<>();
