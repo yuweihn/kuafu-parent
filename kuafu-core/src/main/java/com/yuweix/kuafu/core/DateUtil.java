@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
@@ -416,7 +417,7 @@ public abstract class DateUtil {
 	public static int getDayDiff(Date date1, Date date2, ZoneId zone) {
 		LocalDateTime ld1 = LocalDateTime.ofInstant(date1.toInstant(), zone);
 		LocalDateTime ld2 = LocalDateTime.ofInstant(date2.toInstant(), zone);
-		long dif = java.time.temporal.ChronoUnit.DAYS.between(ld1.toLocalDate(), ld2.toLocalDate());
+		long dif = ChronoUnit.DAYS.between(ld1.toLocalDate(), ld2.toLocalDate());
 		return (int) dif;
 	}
 
