@@ -152,7 +152,7 @@ public abstract class JacksonUtil {
             return null;
         }
         try {
-            return BASE_MAPPER.writeValueAsString(obj);
+            return SERIALIZE_MAPPER.writeValueAsString(obj);
         } catch (JsonProcessingException ex) {
             log.error("序列化失败. Error: {}", ex.getMessage(), ex);
             return null;
@@ -163,7 +163,7 @@ public abstract class JacksonUtil {
             return null;
         }
         try {
-            return BASE_MAPPER.readValue(text, new TypeReference<T>() {});
+            return SERIALIZE_MAPPER.readValue(text, new TypeReference<T>() {});
         } catch (Exception ex) {
             log.error("JSON string cannot be parsed. text: {}. Error: {}", text, ex.getMessage(), ex);
             return null;
