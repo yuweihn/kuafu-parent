@@ -85,12 +85,13 @@ public abstract class JacksonUtil {
             return null;
         }
     }
-    public static<T> T toObject(String text) {
+    public static Object toObject(String text) {
         if (text == null || text.isEmpty()) {
+            log.error("JSON string cannot be null or empty");
             return null;
         }
         try {
-            return BASE_MAPPER.readValue(text, new TypeReference<T>() {});
+            return BASE_MAPPER.readValue(text, Object.class);
         } catch (Exception ex) {
             log.error("JSON string cannot be parsed. Error: {}", ex.getMessage(), ex);
             return null;
