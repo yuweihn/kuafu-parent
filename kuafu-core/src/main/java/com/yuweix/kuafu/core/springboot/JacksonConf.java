@@ -68,7 +68,7 @@ public class JacksonConf {
                     mod = mod.trim();
                     try {
                         Class<?> clz = Class.forName(mod);
-                        BeanSerializerModifier modifier = (BeanSerializerModifier) clz.newInstance();
+                        BeanSerializerModifier modifier = (BeanSerializerModifier) clz.getDeclaredConstructor().newInstance();
                         modifiers.add(modifier);
                     } catch (Exception ex) {
                         log.error("BeanSerializerModifier cannot be created. Error: {}", ex.getMessage(), ex);
