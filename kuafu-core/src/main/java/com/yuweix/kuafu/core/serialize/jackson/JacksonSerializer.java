@@ -14,7 +14,7 @@ public class JacksonSerializer implements Serializer {
      */
     @Override
     public <T> String serialize(T t) {
-        return JacksonUtil.toJson(t);
+        return JacksonUtil.serialize(t);
     }
 
     /**
@@ -22,6 +22,6 @@ public class JacksonSerializer implements Serializer {
      */
     @Override
     public <T> T deserialize(String str) {
-        return JacksonUtil.toObject(str);
+        return JacksonUtil.deserialize(str);
     }
 }
