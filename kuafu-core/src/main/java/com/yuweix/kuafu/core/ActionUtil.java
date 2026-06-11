@@ -298,6 +298,10 @@ public abstract class ActionUtil {
 		response.setHeader(exposeHeaderKey, String.join(",", headerSet));
 	}
 
+
+	public static void output(byte[] bytes) {
+		output(bytes, null);
+	}
 	public static void output(byte[] bytes, String fileName) {
 		output(bytes, fileName, APPLICATION_OCTET_STREAM);
 	}
