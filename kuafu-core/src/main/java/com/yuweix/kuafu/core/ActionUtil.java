@@ -320,15 +320,6 @@ public abstract class ActionUtil {
 			throw new RuntimeException("HttpServletResponse为空，无法输出");
 		}
 
-		String trimmedFileName = fileName.trim();
-		String encodedFileName = null;
-		try {
-			encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8.name());
-		} catch (UnsupportedEncodingException ex) {
-			log.error("下载文件时URLEncoder.encode()失败，Error: {}", ex.getMessage(), ex);
-			throw new RuntimeException(ex);
-		}
-
 		resp.setCharacterEncoding(Constant.ENCODING_UTF_8);
 		if (contentType != null) {
 			if (!contentType.toLowerCase(Locale.ROOT).contains("charset")) {
@@ -346,9 +337,20 @@ public abstract class ActionUtil {
                 resp.setHeader(entry.getKey(), entry.getValue());
 			}
 		}
-		String asciiFileName = FileUtil.buildAsciiFileName(trimmedFileName);
-		resp.setHeader("Content-Disposition", "attachment; filename=\"" + asciiFileName + "\"; filename*=UTF-8''" + encodedFileName);
-		addExposeHeader(resp, "_filename", encodedFileName);
+
+		String trimmedFileName = fileName == null ? null : fileName.trim();
+		if (trimmedFileName != null && !trimmedFileName.isEmpty()) {
+			String encodedFileName = null;
+			try {
+				encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8.name());
+			} catch (UnsupportedEncodingException ex) {
+				log.error("下载文件时URLEncoder.encode()失败，Error: {}", ex.getMessage(), ex);
+				throw new RuntimeException(ex);
+			}
+			String asciiFileName = FileUtil.buildAsciiFileName(trimmedFileName);
+			resp.setHeader("Content-Disposition", "attachment; filename=\"" + asciiFileName + "\"; filename*=UTF-8''" + encodedFileName);
+			addExposeHeader(resp, "_filename", encodedFileName);
+		}
 
 		try (OutputStream os = resp.getOutputStream()) {
 			os.write(bytes);
