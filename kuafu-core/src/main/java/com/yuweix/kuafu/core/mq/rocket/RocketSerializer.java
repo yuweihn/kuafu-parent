@@ -8,5 +8,5 @@ package com.yuweix.kuafu.core.mq.rocket;
  */
 public interface RocketSerializer {
 	<T>String serialize(T t);
-	<T>T deserialize(String str);
+	<T>T deserialize(String str, Class<T> clz);
 }

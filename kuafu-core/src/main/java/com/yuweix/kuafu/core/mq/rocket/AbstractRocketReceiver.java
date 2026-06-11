@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.UUID;
 
 
@@ -20,10 +22,16 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
 
     @Resource
     protected RocketSerializer rocketSerializer;
+    protected Class<T> clz;
 
 
+    @SuppressWarnings("unchecked")
     public AbstractRocketReceiver() {
-
+        this.clz = null;
+        Type t = getClass().getGenericSuperclass();
+        if (t instanceof ParameterizedType) {
+            this.clz = (Class<T>) ((ParameterizedType) t).getActualTypeArguments()[0];
+        }
     }
 
     @Override
@@ -65,7 +73,7 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
     }
 
     protected T deserialize(String str) {
-        return rocketSerializer.deserialize(str);
+        return rocketSerializer.deserialize(str, clz);
     }
 
     protected abstract Object process(T t);
