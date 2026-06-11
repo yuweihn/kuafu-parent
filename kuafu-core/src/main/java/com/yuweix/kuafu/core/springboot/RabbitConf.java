@@ -206,12 +206,12 @@ public class RabbitConf {
         return new RabbitSerializer() {
             @Override
             public <T> String serialize(T t) {
-                return JacksonUtil.serialize(t);
+                return JacksonUtil.toJson(t);
             }
 
             @Override
-            public <T> T deserialize(String str) {
-                return JacksonUtil.deserialize(str);
+            public <T> T deserialize(String str, Class<T> clz) {
+                return JacksonUtil.toObject(str, clz);
             }
         };
     }

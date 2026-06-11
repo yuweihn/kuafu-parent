@@ -32,12 +32,12 @@ public class RocketConf {
         return new RocketSerializer() {
             @Override
             public <T> String serialize(T t) {
-                return JsonUtil.serialize(t);
+                return JsonUtil.toJson(t);
             }
 
             @Override
-            public <T> T deserialize(String str) {
-                return JsonUtil.deserialize(str);
+            public <T> T deserialize(String str, Class<T> clz) {
+                return JsonUtil.toObject(str, clz);
             }
         };
     }
