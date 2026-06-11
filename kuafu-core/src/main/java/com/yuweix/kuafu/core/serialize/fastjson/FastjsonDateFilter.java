@@ -13,16 +13,16 @@ import java.util.Date;
  * @author yuwei
  */
 public class FastjsonDateFilter implements ValueFilter {
-    private String defaultDateFormat = "yyyy-MM-dd HH:mm:ss";
+    private String dateFormat = "yyyy-MM-dd HH:mm:ss";
 
     public FastjsonDateFilter() {
     }
-    public FastjsonDateFilter(String defaultDateFormat) {
-        this.defaultDateFormat = defaultDateFormat;
+    public FastjsonDateFilter(String dateFormat) {
+        this.dateFormat = dateFormat;
     }
 
-    public void setDefaultDateFormat(String defaultDateFormat) {
-        this.defaultDateFormat = defaultDateFormat;
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class FastjsonDateFilter implements ValueFilter {
             return value;
         }
         String format = jsonField.format();
-        return DateUtil.formatDate((Date) value, format == null || format.length() <= 0 ? defaultDateFormat : format);
+        return DateUtil.formatDate((Date) value, format == null || format.length() <= 0 ? dateFormat : format);
     }
 
     private static Field getField(Object object, String fieldName) {
