@@ -78,7 +78,7 @@ public class PermissionCheckInterceptor implements HandlerInterceptor {
 		String tips = String.format("[权限编码: %s]", Arrays.asList(permNos));
 		log.error("没有权限[权限编码: {}]", Arrays.asList(permNos));
 		String content = new Response<String, Void>(errCode, "没有权限" + tips).toString();
-		ActionUtil.output(content.getBytes(StandardCharsets.UTF_8), ContentType.APPLICATION_JSON.getMimeType());
+		ActionUtil.download(content.getBytes(StandardCharsets.UTF_8), ContentType.APPLICATION_JSON.getMimeType());
 	}
 
 	@Override
