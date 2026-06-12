@@ -49,6 +49,13 @@ public abstract class JsonUtil {
 			return null;
 		}
 	}
+	public static Object tryParse(String text) {
+		try {
+			return JSON.parse(text);
+		} catch (Exception ex) {
+			return null;
+		}
+	}
     public static<T> T toObject(String text, Type type) {
 		try {
 			return JSON.parseObject(text, type);
