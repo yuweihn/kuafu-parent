@@ -97,7 +97,7 @@ public abstract class JacksonUtil {
             return null;
         }
     }
-    public static Object tryParse(String text) {
+    public static Object parse(String text) {
         if (text == null || text.isEmpty()) {
             return null;
         }
