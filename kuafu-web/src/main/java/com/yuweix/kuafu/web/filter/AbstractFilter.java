@@ -346,7 +346,8 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 
 	protected Object limit(String str, Integer maxSize) {
 		if (maxSize == null || maxSize < 0) {
-			return JsonUtil.tryParse(str);
+			Object parsedStr = JsonUtil.parse(str);
+			return parsedStr != null ? parsedStr : str;
 		}
 		if (maxSize == 0) {
 			return null;
@@ -354,7 +355,8 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		if (str != null && str.length() > maxSize) {
 			str = str.substring(0, maxSize) + "......";
 		}
-		return JsonUtil.tryParse(str);
+		Object parsedStr = JsonUtil.parse(str);
+		return parsedStr != null ? parsedStr : str;
 	}
 
 	@Override
