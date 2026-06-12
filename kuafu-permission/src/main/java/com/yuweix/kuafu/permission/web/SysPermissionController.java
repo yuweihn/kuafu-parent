@@ -150,7 +150,7 @@ public class SysPermissionController {
 		String rawFileName = String.format("%s.permission.%s.json"
 				, properties.getAppName(), DateUtil.formatDate(new Date(), "yyyyMMddHHmmss"));
 		log.info("导出权限数据，文件名: {}, 数据大小: {} bytes", rawFileName, bytes.length);
-		ActionUtil.output(bytes, rawFileName);
+		ActionUtil.download(bytes, rawFileName);
 	}
 
 	/**

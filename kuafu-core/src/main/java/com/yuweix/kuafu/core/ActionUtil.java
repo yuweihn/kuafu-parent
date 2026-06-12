@@ -297,22 +297,22 @@ public abstract class ActionUtil {
 		response.setHeader(exposeHeaderKey, String.join(",", headerSet));
 	}
 
-	public static void output(byte[] bytes) {
-		output(bytes, null);
+	public static void output(byte[] bytes, String contentType) {
+		download(bytes, null, contentType);
 	}
-	public static void output(byte[] bytes, String fileName) {
-		output(bytes, fileName, APPLICATION_OCTET_STREAM);
+	public static void download(byte[] bytes) {
+		download(bytes, null);
 	}
-
-	public static void output(byte[] bytes, String fileName, String contentType) {
-		output(bytes, fileName, contentType, null);
+	public static void download(byte[] bytes, String fileName) {
+		download(bytes, fileName, APPLICATION_OCTET_STREAM);
 	}
-
-	public static void output(byte[] bytes, String fileName, String contentType, Map<String, String> headers) {
-		output(bytes, fileName, contentType, headers, getResponse());
+	public static void download(byte[] bytes, String fileName, String contentType) {
+		download(bytes, fileName, contentType, null);
 	}
-
-	public static void output(byte[] bytes, String fileName, String contentType, Map<String, String> headers, HttpServletResponse resp) {
+	public static void download(byte[] bytes, String fileName, String contentType, Map<String, String> headers) {
+		download(bytes, fileName, contentType, headers, getResponse());
+	}
+	public static void download(byte[] bytes, String fileName, String contentType, Map<String, String> headers, HttpServletResponse resp) {
 		if (bytes == null) {
 			log.error("响应内容为空");
 			throw new RuntimeException("响应内容为空");
@@ -353,7 +353,7 @@ public abstract class ActionUtil {
 			os.write(bytes);
 			os.flush();
 		} catch (Exception ex) {
-			log.error("Http响应出错[ActionUtil.output]，Error: {}", ex.getMessage(), ex);
+			log.error("Http响应出错[ActionUtil.download]，Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
 		}
 	}

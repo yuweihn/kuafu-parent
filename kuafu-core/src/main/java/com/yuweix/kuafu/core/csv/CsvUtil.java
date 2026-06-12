@@ -33,7 +33,7 @@ public abstract class CsvUtil {
 	}
 	public static<T> void export(List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
 		byte[] bytes = export(dataList);
-		ActionUtil.output(bytes, fileName, contentType, null, resp);
+		ActionUtil.download(bytes, fileName, contentType, null, resp);
 	}
 
 	/**
