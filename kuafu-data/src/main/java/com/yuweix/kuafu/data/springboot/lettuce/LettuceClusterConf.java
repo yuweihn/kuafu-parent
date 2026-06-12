@@ -74,8 +74,9 @@ public class LettuceClusterConf {
 		template.setConnectionFactory(connFactory);
 		template.setKeySerializer(redisSerializer);
 		template.setValueSerializer(redisSerializer);
-		template.setEnableDefaultSerializer(true);
-//		template.setEnableTransactionSupport(true);
+		template.setHashKeySerializer(redisSerializer);
+		template.setHashValueSerializer(redisSerializer);
+		template.setEnableDefaultSerializer(false);
 		return template;
 	}
 
