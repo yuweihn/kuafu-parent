@@ -1,7 +1,10 @@
 package com.yuweix.kuafu.web.filter;
 
 
-import com.yuweix.kuafu.core.*;
+import com.yuweix.kuafu.core.ActionUtil;
+import com.yuweix.kuafu.core.BeanUtil;
+import com.yuweix.kuafu.core.Constant;
+import com.yuweix.kuafu.core.MdcUtil;
 import com.yuweix.kuafu.core.serialize.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -348,11 +351,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 
 	protected Object limit(String str, Integer maxSize) {
 		if (maxSize == null || maxSize < 0) {
-			try {
-				return JsonUtil.toObject(str);
-			} catch (Exception e) {
-				return str;
-			}
+			return JsonUtil.tryParse(str);
 		}
 		if (maxSize == 0) {
 			return null;
@@ -360,11 +359,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 		if (str != null && str.length() > maxSize) {
 			str = str.substring(0, maxSize) + "......";
 		}
-		try {
-			return JsonUtil.toObject(str);
-		} catch (Exception e) {
-			return str;
-		}
+		return JsonUtil.tryParse(str);
 	}
 
 	@Override
