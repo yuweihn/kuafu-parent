@@ -317,7 +317,7 @@ public abstract class PoiExcel {
 	}
 	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
 		byte[] bytes = export(clz, dataList);
-		ActionUtil.download(bytes, fileName, contentType, null, resp);
+		ActionUtil.export(bytes, fileName, contentType, null, resp);
 	}
 
 	/**
