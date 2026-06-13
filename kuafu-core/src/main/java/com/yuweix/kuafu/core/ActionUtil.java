@@ -298,21 +298,21 @@ public abstract class ActionUtil {
 	}
 
 	public static void output(byte[] bytes, String contentType) {
-		download(bytes, null, contentType);
+		export(bytes, null, contentType);
 	}
-	public static void download(byte[] bytes) {
-		download(bytes, null);
+	public static void export(byte[] bytes) {
+		export(bytes, null);
 	}
-	public static void download(byte[] bytes, String fileName) {
-		download(bytes, fileName, APPLICATION_OCTET_STREAM);
+	public static void export(byte[] bytes, String fileName) {
+		export(bytes, fileName, APPLICATION_OCTET_STREAM);
 	}
-	public static void download(byte[] bytes, String fileName, String contentType) {
-		download(bytes, fileName, contentType, null);
+	public static void export(byte[] bytes, String fileName, String contentType) {
+		export(bytes, fileName, contentType, null);
 	}
-	public static void download(byte[] bytes, String fileName, String contentType, Map<String, String> headers) {
-		download(bytes, fileName, contentType, headers, getResponse());
+	public static void export(byte[] bytes, String fileName, String contentType, Map<String, String> headers) {
+		export(bytes, fileName, contentType, headers, getResponse());
 	}
-	public static void download(byte[] bytes, String fileName, String contentType, Map<String, String> headers, HttpServletResponse resp) {
+	public static void export(byte[] bytes, String fileName, String contentType, Map<String, String> headers, HttpServletResponse resp) {
 		if (bytes == null) {
 			log.error("响应内容为空");
 			throw new RuntimeException("响应内容为空");
@@ -353,7 +353,7 @@ public abstract class ActionUtil {
 			os.write(bytes);
 			os.flush();
 		} catch (Exception ex) {
-			log.error("Http响应出错[ActionUtil.download]，Error: {}", ex.getMessage(), ex);
+			log.error("Http响应出错[ActionUtil.export]，Error: {}", ex.getMessage(), ex);
 			throw new RuntimeException(ex);
 		}
 	}
