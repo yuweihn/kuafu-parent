@@ -1,4 +1,7 @@
 
+# 使用node -v检查node是否已安装
+建议node版本：v24.16.0
+
 # 安装依赖
 yarn --registry=https://registry.npmmirror.com
 
