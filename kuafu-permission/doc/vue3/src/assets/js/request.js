@@ -83,7 +83,8 @@ service.interceptors.request.use(config => {
 // 响应拦截器
 service.interceptors.response.use(res => {
     //非json数据直接返回
-    if (res.headers["content-type"].indexOf("application/json") !== 0) {
+    const contentType = res.headers?.['content-type'] || '';
+    if (!contentType.includes('application/json')) {
         return Promise.resolve(res);
     }
 
