@@ -24,20 +24,20 @@ export const basicRoutes = [
 //		redirect: '/monitor',
 //		hidden: true
 //	},
-	{
-		path: '',
-		name: '',
-		component: Layout,
-		leaf: true,
-		children: [
-			{
+    {
+        path: '',
+        name: '',
+        component: Layout,
+        leaf: true,
+        children: [
+            {
                 path: '/',
-                name: 'monitor',
-                component: () => import('@/views/monitor/Monitor.vue'),
-                meta: {title: '系统状态', icon: 'dashboard'}
-			}
-		]
-	}
+                name: 'home',
+                component: () => import('@/views/Home.vue'),
+                meta: {title: '首页', icon: 'home'}
+            }
+        ]
+    }
 ];
 
 export const createBasicRouter = () => new VueRouter({
