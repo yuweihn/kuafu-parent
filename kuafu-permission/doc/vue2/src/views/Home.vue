@@ -13,9 +13,13 @@
                         <span>联系信息</span>
                     </div>
                     <div class="body">
-                        <p>
-                            <i class="el-icon-phone"></i> 24小时热线：
-                            <a href="javascript:;">021-31600201</a>
+                        <p class="home-link-item">
+                            <i class="el-icon-s-promotion"></i><span class="link-label">官网：</span>
+                            <el-link :href="homeUrl" type="primary" :underline="false">{{homeUrl}}</el-link>
+                        </p>
+                        <p class="home-link-item">
+                            <i class="el-icon-phone"></i><span class="link-label">24小时热线：</span>
+                            <el-link href="javascript:void(0);" type="primary" :underline="false">021-31600201</el-link>
                         </p>
                     </div>
                 </el-card>
@@ -44,13 +48,12 @@ export default {
     data() {
         return {
             // 版本号
-            version: "1.0.0"
+            version: "1.0.0",
+            homeUrl: window.location.protocol + "//" + window.location.host + window.location.pathname
         };
     },
     methods: {
-        goTarget(href) {
-            window.open(href, "_blank");
-        }
+
     }
 };
 </script>
@@ -110,6 +113,12 @@ export default {
             margin-inline-end: 0;
             padding-inline-start: 40px;
         }
+    }
+
+    .home-link-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 }
 </style>
