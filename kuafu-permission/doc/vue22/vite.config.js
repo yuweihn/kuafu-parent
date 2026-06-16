@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
             preprocessorOptions: {
                 scss: {
                     api: 'modern-compiler',
-                    additionalData: `@use "${path.resolve(__dirname, 'src/components/css/vars.scss')}" as *;`
+                    additionalData:  `@use "@/components/css/vars.scss" as *;`
                 }
             }
         },
