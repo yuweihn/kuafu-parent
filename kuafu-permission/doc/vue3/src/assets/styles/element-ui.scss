@@ -58,3 +58,9 @@
     margin-left: 20px;
     margin-right: 10px;
 }
+
+// 全局设置 el-switch 颜色
+.el-switch {
+    --el-switch-on-color: #13ce66;
+    --el-switch-off-color: #ff4949;
+}
