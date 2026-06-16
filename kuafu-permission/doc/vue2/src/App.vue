@@ -64,17 +64,13 @@ body {
 }
 
 .fade-enter, .fade-leave-active {
-	opacity: 0;
-}
-
-.el-upload__tip {
-  line-height: 10px;
+    opacity: 0;
 }
 
 .el-dialog .el-form {
-  padding-right: 10px;
+    padding-right: 10px;
 }
 .dialog-footer {
-  padding-right: 10px;
+    padding-right: 10px;
 }
 </style>

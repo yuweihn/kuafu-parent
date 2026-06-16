@@ -1,3 +1,3 @@
-module.exports = {
-    title: 'Vue2'
+export default {
+    title: import.meta.env.VITE_APP_TITLE
 }

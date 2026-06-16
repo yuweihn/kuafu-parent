@@ -21,85 +21,85 @@
 </template>
 
 <script>
-export default {
-    data() {
-        return {
-            editFormVisible: false,//编辑界面是否显示
-            editLoading: false,
-            editFormRules: {
-                realName: [
-                    {required: true, message: '请输入真实姓名', trigger: 'blur'}
-                ],
-                gender: [
-                    {required: true, message: '请选择性别', trigger: 'blur'}
-                ]
-            },
+	export default {
+		data() {
+			return {
+				editFormVisible: false,//编辑界面是否显示
+				editLoading: false,
+				editFormRules: {
+					realName: [
+						{required: true, message: '请输入真实姓名', trigger: 'blur'}
+					],
+					gender: [
+						{required: true, message: '请选择性别', trigger: 'blur'}
+					]
+				},
 
-            genderOptions: [],
+				genderOptions: [],
 
-            //编辑界面数据
-            editForm: {
-                id: null,
-                accountNo: null,
-                password: null,
-                realName: null,
-                gender: null
-            }
-        }
-    },
-    methods: {
-        show: function(index, row) {
-            this.editFormVisible = true;
-            this.editForm = Object.assign({}, row);
-            this.resetForm("editForm");
-        },
+				//编辑界面数据
+				editForm: {
+					id: null,
+					accountNo: null,
+					password: null,
+					realName: null,
+					gender: null
+				}
+			}
+		},
+		methods: {
+			show: function(index, row) {
+				this.editFormVisible = true;
+				this.editForm = Object.assign({}, row);
+				this.resetForm("editForm");
+			},
 
-        //编辑
-        editSubmit: function() {
-            this.$refs.editForm.validate((valid) => {
-                if (valid) {
-                    var params = "accountId=" + this.editForm.id
-                            + (this.editForm.realName ? "&realName=" + this.editForm.realName : "")
-                            + "&gender=" + (this.editForm.gender || '');
-                    this.editLoading = true;
-                    this.$axios.post(this.$global.baseUrl + '/sys/admin/update', params).then((res) => {
-                        if (res.data.code === '0000') {
-                            this.$message({type: "success", message: res.data.msg});
-                        } else {
-                            this.$message.error(res.data.msg);
-                        }
-                        this.$refs['editForm'].resetFields();
-                        this.editFormVisible = false;
-                        this.editLoading = false;
-                        this.$emit("success", 1);
-                    }).catch((err) => {
-                        this.editLoading = false;
-                        this.$message.error(err.message);
-                    });
-                }
-            });
-        },
+			//编辑
+			editSubmit: function() {
+				this.$refs.editForm.validate((valid) => {
+					if (valid) {
+						var params = "accountId=" + this.editForm.id
+								+ (this.editForm.realName ? "&realName=" + this.editForm.realName : "")
+								+ "&gender=" + (this.editForm.gender || '');
+						this.editLoading = true;
+						this.$axios.post(this.$global.baseUrl + '/sys/admin/update', params).then((res) => {
+							if (res.data.code === '0000') {
+								this.$message({type: "success", message: res.data.msg});
+							} else {
+								this.$message.error(res.data.msg);
+							}
+							this.$refs['editForm'].resetFields();
+							this.editFormVisible = false;
+							this.editLoading = false;
+							this.$emit("success", 1);
+						}).catch((err) => {
+							this.editLoading = false;
+							this.$message.error(err.message);
+						});
+					}
+				});
+			},
 
-        getGenderOptions() {
-            let me = this;
-            this.$axios.get(this.$global.baseUrl + '/sys/admin/gender/drop-down-list', {}).then((res) => {
-                if (res.data.code === '0000') {
-                    me.genderOptions = res.data.data.map(item => {
-                        return {val: item.id, label: item.name};
-                    });
-                } else {
-                    me.genderOptions = [];
-                    me.$message.error(res.data.msg);
-                }
-            }).catch((err) => {
-                me.$message.error(err.message);
-            });
-        }
-    },
-    mounted() {
-        this.getGenderOptions();
-    }
-}
+			getGenderOptions() {
+				let me = this;
+				this.$axios.get(this.$global.baseUrl + '/sys/admin/gender/drop-down-list', {}).then((res) => {
+					if (res.data.code === '0000') {
+						me.genderOptions = res.data.data.map(item => {
+							return {val: item.id, label: item.name};
+						});
+					} else {
+						me.genderOptions = [];
+						me.$message.error(res.data.msg);
+					}
+				}).catch((err) => {
+					me.$message.error(err.message);
+				});
+			}
+		},
+		mounted() {
+			this.getGenderOptions();
+		}
+	}
 </script>
 
 <style scoped>

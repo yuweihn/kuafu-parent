@@ -16,66 +16,66 @@
 </template>
 
 <script>
-export default {
-    data() {
-        return {
-            addFormVisible: false,//新增界面是否显示
-            addLoading: false,
-            addFormRules: {
-                roleNo: [
-                    {required: true, message: '请输入角色编码', trigger: 'blur'}
-                ],
-                roleName: [
-                    {required: true, message: '请输入角色名称', trigger: 'blur'}
-                ]
-            },
-            //新增界面数据
-            addForm: {
-                roleNo: null,
-                roleName: null
-            }
-        }
-    },
-    methods: {
-        show: function() {
-            this.addFormVisible = true;
-            this.addForm = {
-                roleNo: null,
-                roleName: null
-            };
-            this.resetForm("addForm");
-        },
-        //新增
-        addSubmit: function() {
-            this.$refs.addForm.validate((valid) => {
-                if (valid) {
-                    var params = "_fk=u"
-                             + (this.addForm.roleNo ? "&roleNo=" + this.addForm.roleNo : "")
-                             + (this.addForm.roleName ? "&roleName=" + this.addForm.roleName : "");
-                    this.addLoading = true;
-                    this.$axios.post(this.$global.baseUrl + '/sys/role/create', params).then((res) => {
-                        if (res.data.code === '0000') {
-                            this.$message({type: "success", message: res.data.msg});
-                        } else {
-                            this.$message.error(res.data.msg);
-                        }
-                        this.removeDynamicLoaded();
-                        this.$refs['addForm'].resetFields();
-                        this.addFormVisible = false;
-                        this.addLoading = false;
-                        this.$emit("success", 1);
-                    }).catch((err) => {
-                        this.addLoading = false;
-                        this.$message.error(err.message);
-                    });
-                }
-            });
-        }
-    },
-    mounted() {
+	export default {
+		data() {
+			return {
+				addFormVisible: false,//新增界面是否显示
+				addLoading: false,
+				addFormRules: {
+					roleNo: [
+						{required: true, message: '请输入角色编码', trigger: 'blur'}
+					],
+					roleName: [
+						{required: true, message: '请输入角色名称', trigger: 'blur'}
+					]
+				},
+				//新增界面数据
+				addForm: {
+					roleNo: null,
+					roleName: null
+				}
+			}
+		},
+		methods: {
+			show: function() {
+				this.addFormVisible = true;
+				this.addForm = {
+					roleNo: null,
+					roleName: null
+				};
+				this.resetForm("addForm");
+			},
+			//新增
+			addSubmit: function() {
+				this.$refs.addForm.validate((valid) => {
+					if (valid) {
+						var params = "_fk=u"
+								 + (this.addForm.roleNo ? "&roleNo=" + this.addForm.roleNo : "")
+								 + (this.addForm.roleName ? "&roleName=" + this.addForm.roleName : "");
+						this.addLoading = true;
+						this.$axios.post(this.$global.baseUrl + '/sys/role/create', params).then((res) => {
+							if (res.data.code === '0000') {
+								this.$message({type: "success", message: res.data.msg});
+							} else {
+								this.$message.error(res.data.msg);
+							}
+                            this.removeDynamicLoaded();
+							this.$refs['addForm'].resetFields();
+							this.addFormVisible = false;
+							this.addLoading = false;
+							this.$emit("success", 1);
+						}).catch((err) => {
+							this.addLoading = false;
+							this.$message.error(err.message);
+						});
+					}
+				});
+			}
+		},
+		mounted() {
 
-    }
-}
+		}
+	}
 </script>
 
 <style scoped>

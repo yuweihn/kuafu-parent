@@ -91,8 +91,10 @@
 		<el-col :span="24" class="toolbar2">
 			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length === 0" class="el-icon-delete" v-hasPerm="['sys.role.delete']"> 批量删除</el-button>
 			<el-pagination layout="total, sizes, prev, pager, next, jumper" background
-						@size-change="handleSizeChange" @current-change="handleCurrentChange"
-						:page-sizes="[10,20,50,100]" :current-page="pageNo" :page-size="pageSize" :total="total" style="float: right;" />
+						@size-change="handleSizeChange"
+						@current-change="handleCurrentChange"
+						:page-sizes="[10,20,50,100]" :current-page="pageNo" :page-size="pageSize" :total="total" style="float:right;">
+			</el-pagination>
 		</el-col>
 
 		<!--新增界面-->
@@ -106,120 +108,119 @@
 </template>
 
 <script>
-import CreateRole from './components/CreateRole';
-import EditRole from './components/EditRole';
-import RolePermission from "./RolePermission";
+	import CreateRole from './components/CreateRole';
+	import EditRole from './components/EditRole';
+	import RolePermission from "./RolePermission";
+	export default {
+		components: {
+			'create-role': CreateRole,
+			'edit-role': EditRole,
+			'role-permission': RolePermission
+		},
 
-export default {
-    components: {
-        'create-role': CreateRole,
-        'edit-role': EditRole,
-        'role-permission': RolePermission
-    },
+		data() {
+			return {
+				filters: {
+					keywords: null
+				},
 
-    data() {
-        return {
-            filters: {
-                keywords: null
-            },
+				total: 0,
+				roleList: [],
+				pageNo: 1,
+				pageSize: 10,
+				listLoading: false,
+				sels: []    //列表选中列
+			}
+		},
+		methods: {
+			formatUpdater: function(row, column) {
+				return row.updater || row.creator;
+			},
+			formatUpdateTime: function(row, column) {
+				return this.$date.formatDate(row.updateTime || row.createTime, 'yyyy-MM-dd HH:mm:ss');
+			},
+			handleSizeChange(psize) {
+				this.getRoleList(1, psize);
+			},
+			handleCurrentChange(pno) {
+				this.getRoleList(pno, null);
+			},
+			onSelsChanged: function(sels) {
+				this.sels = sels;
+			},
+			getRoleList(pno, psize) {
+				if (pno != null) {
+					this.pageNo = pno;
+				}
+				if (psize != null) {
+					this.pageSize = psize;
+				}
+				var params = {keywords: this.filters.keywords, pageNo: this.pageNo, pageSize: this.pageSize};
+				this.listLoading = true;
+				this.$axios.get(this.$global.baseUrl + '/sys/role/list', {params: params}).then((res) => {
+					if (res.data.code === '0000') {
+						this.total = res.data.data.size;
+						this.roleList = res.data.data.list;
+					} else {
+						this.total = 0;
+						this.roleList = [];
+						this.$message.error(res.data.msg);
+					}
+					this.listLoading = false;
+				}).catch((err) => {
+					this.listLoading = false;
+					this.$message.error(err.message);
+				});
+			},
 
-            total: 0,
-            roleList: [],
-            pageNo: 1,
-            pageSize: 10,
-            listLoading: false,
-            sels: []    //列表选中列
-        }
-    },
-    methods: {
-        formatUpdater: function(row, column) {
-            return row.updater || row.creator;
-        },
-        formatUpdateTime: function(row, column) {
-            return this.$date.formatDate(row.updateTime || row.createTime, 'yyyy-MM-dd HH:mm:ss');
-        },
-        handleSizeChange(psize) {
-            this.getRoleList(1, psize);
-        },
-        handleCurrentChange(pno) {
-            this.getRoleList(pno, null);
-        },
-        onSelsChanged: function(sels) {
-            this.sels = sels;
-        },
-        getRoleList(pno, psize) {
-            if (pno != null) {
-                this.pageNo = pno;
-            }
-            if (psize != null) {
-                this.pageSize = psize;
-            }
-            var params = {keywords: this.filters.keywords, pageNo: this.pageNo, pageSize: this.pageSize};
-            this.listLoading = true;
-            this.$axios.get(this.$global.baseUrl + '/sys/role/list', {params: params}).then((res) => {
-                if (res.data.code === '0000') {
-                    this.total = res.data.data.size;
-                    this.roleList = res.data.data.list;
-                } else {
-                    this.total = 0;
-                    this.roleList = [];
-                    this.$message.error(res.data.msg);
-                }
-                this.listLoading = false;
-            }).catch((err) => {
-                this.listLoading = false;
-                this.$message.error(err.message);
-            });
-        },
+			//删除
+			handleDel: function(index, row) {
+				this.sels = [];
+				this.sels.push(row);
+				this.batchRemove();
+			},
+			//批量删除
+			batchRemove: function() {
+				var ids = this.sels.map(item => item.id).toString();
+				this.$confirm('确定删除选中记录吗？', '提示', {type: 'warning'}).then(() => {
+					var params = {ids: ids};
+					this.listLoading = true;
+					this.$axios.delete(this.$global.baseUrl + '/sys/role/delete', {params: params}).then((res) => {
+						if (res.data.code === '0000') {
+							this.$message({type: "success", message: res.data.msg});
+						} else {
+							this.$message.error(res.data.msg);
+						}
+					    this.removeDynamicLoaded();
+						this.listLoading = false;
+						this.getRoleList();
+					}).catch((err) => {
+						this.listLoading = false;
+						this.$message.error(err.message);
+					});
+				}).catch(() => {
 
-        //删除
-        handleDel: function(index, row) {
-            this.sels = [];
-            this.sels.push(row);
-            this.batchRemove();
-        },
-        //批量删除
-        batchRemove: function() {
-            var ids = this.sels.map(item => item.id).toString();
-            this.$confirm('确定删除选中记录吗？', '提示', {type: 'warning'}).then(() => {
-                var params = {ids: ids};
-                this.listLoading = true;
-                this.$axios.delete(this.$global.baseUrl + '/sys/role/delete', {params: params}).then((res) => {
-                    if (res.data.code === '0000') {
-                        this.$message({type: "success", message: res.data.msg});
-                    } else {
-                        this.$message.error(res.data.msg);
-                    }
-                    this.removeDynamicLoaded();
-                    this.listLoading = false;
-                    this.getRoleList();
-                }).catch((err) => {
-                    this.listLoading = false;
-                    this.$message.error(err.message);
-                });
-            }).catch(() => {
-
-            });
-            this.sels = [];
-        }
-    },
-    mounted() {
-        this.getRoleList();
-    }
-}
+				});
+				this.sels = [];
+			}
+		},
+		mounted() {
+			this.getRoleList();
+		}
+	}
 </script>
 
 <style scoped>
-.table-expand {
-    font-size: 0;
-}
-.table-expand >>> label {
-    color: #99a9bf;
-}
-.table-expand .el-form-item {
-    margin-right: 0;
-    margin-bottom: 0;
-    width: 90%;
-}
+	.table-expand {
+		font-size: 0;
+	}
+	.table-expand >>> label {
+		color: #99a9bf;
+	}
+	.table-expand .el-form-item {
+		margin-right: 0;
+		margin-bottom: 0;
+		width: 90%;
+	}
 </style>
 

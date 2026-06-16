@@ -77,16 +77,25 @@ function filterAsyncRouters(routers) {
     });
 }
 
+// 预加载所有 views 下的组件
+const modules = import.meta.glob('@/views/**/*.vue');
+
 function isFileExist(view) {
-    try {
-        require(`@/views/${view}`);
-        return true;
-    } catch (e) {
-        return false;
-    }
+    // 检查组件是否存在
+    const path = `/src/views/${view}.vue`;
+    return modules[path] !== undefined;
 }
+
 function loadView(view) {
-    return (resolve) => require([`@/views/${view}`], resolve);
+    // 使用预加载的模块
+    const path = `/src/views/${view}.vue`;
+    const module = modules[path];
+    if (!module) {
+        console.error(`Component not found: ${path}`);
+        return () => import('@/views/404.vue');
+    }
+    // 返回一个函数，调用时执行模块导入
+    return () => module();
 }
 
 export default dynamicRoutes;

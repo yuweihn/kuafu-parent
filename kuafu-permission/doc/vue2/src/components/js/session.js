@@ -1,6 +1,6 @@
 
-var userKey = "xx_user";
-var tokenKey = "xx_token";
+var userKey = "ngx_user";
+var tokenKey = "ngx_token";
 
 export default {
 	putUser: function(user) {

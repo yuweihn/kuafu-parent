@@ -155,10 +155,10 @@ export default {
 </style>
 
 
-/**
- * 父组件可以自定义change事件，用于解析文件上传的后台响应数据。
- * eg.      <file-upload ref="fileUpload" :title="'上传文件'" :fileLabel="'文件'" :fileTips="'请选择文件，文件不要超过2MB'"
- *                      :accept="''" :maxSize="2097152" :fileType="'text'"
- *                      :actionUrl="this.$global.baseUrl + '/file/upload'" v-on:before="onBeforeImport" v-on:change="onUploadChanged" />
- **/
+<!--
+ 父组件可以自定义change事件，用于解析文件上传的后台响应数据。
+ eg.      <file-upload ref="fileUpload" :title="'上传文件'" :fileLabel="'文件'" :fileTips="'请选择文件，文件不要超过2MB'"
+                      :accept="''" :maxSize="2097152" :fileType="'text'"
+                      :actionUrl="this.$global.baseUrl + '/file/upload'" v-on:before="onBeforeImport" v-on:change="onUploadChanged" />
+-->
 

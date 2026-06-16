@@ -204,13 +204,13 @@ export default {
 </style>
 
 
-/**
- * 父组件可以自定义change和complete这两个事件。
- * 1、change用于解析文件上传的后台响应数据，返回任意值；
- * 2、complete用于处理组件结束之后的善后操作，参数为change返回值。
- *
- * eg.      <file-upload ref="fileUpload" :title="'上传文件'" :fileLabel="'文件'" :fileTips="'请选择文件，文件不要超过2MB'"
- *                      :accept="''" :maxSize="2097152" :fileErr="'请选择文件'" :fileType="'text'"
- *                      :actionUrl="this.$global.baseUrl + '/file/upload'" v-on:before="onBeforeImport" v-on:change="onUploadChanged" v-on:complete="onUploadCompleted" />
- **/
+<!--
+  父组件可以自定义change和complete这两个事件。
+  1、change用于解析文件上传的后台响应数据，返回任意值；
+  2、complete用于处理组件结束之后的善后操作，参数为change返回值。
+
+  eg.      <file-upload ref="fileUpload" :title="'上传文件'" :fileLabel="'文件'" :fileTips="'请选择文件，文件不要超过2MB'"
+                       :accept="''" :maxSize="2097152" :fileErr="'请选择文件'" :fileType="'text'"
+                       :actionUrl="this.$global.baseUrl + '/file/upload'" v-on:before="onBeforeImport" v-on:change="onUploadChanged" v-on:complete="onUploadCompleted" />
+-->
 

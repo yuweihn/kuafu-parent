@@ -3,10 +3,14 @@
 module.exports = {
   root: true,
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: 'vue-eslint-parser',
+    ecmaVersion: 2020,
+    sourceType: 'module'
   },
   env: {
     browser: true,
+    es2021: true,
+    node: true
   },
   extends: [
     // https://github.com/vuejs/eslint-plugin-vue#priority-a-essential-error-prevention
@@ -23,8 +27,8 @@ module.exports = {
   rules: {
     // allow async-await
     'generator-star-spacing': 'off',
-    // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    // disallow debugger in production
+    'no-debugger': 'warn',
     "no-tabs": "off"
   }
 }

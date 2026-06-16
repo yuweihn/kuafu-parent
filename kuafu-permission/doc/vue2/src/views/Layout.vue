@@ -15,9 +15,9 @@
 						<img :src="this.sysUserAvatar" @click="showBigAvatar" class="avatar"/>
 						{{this.$util.slice(sysUserName, 10)}}
 					</span>
-					<el-dropdown-menu slot="dropdown" class="header-pop">
-                        <el-dropdown-item @click.native="toChangePassword"><span>修改密码</span></el-dropdown-item>
-                        <el-dropdown-item divided @click.native="logout"><span>退出登录</span></el-dropdown-item>
+					<el-dropdown-menu slot="dropdown">
+						<el-dropdown-item @click.native="toChangePassword">修改密码</el-dropdown-item>
+						<el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
 					</el-dropdown-menu>
 				</el-dropdown>
 			</el-col>
@@ -35,7 +35,7 @@
 						</el-menu-item>
 						<el-submenu :index="index + ''" v-else-if="!item.leaf"><!--非叶子节点-->
 							<template slot="title">
-                                <svg-icon v-if="item.meta && item.meta.icon" :icon-class="item.meta.icon" />
+						    <svg-icon v-if="item.meta && item.meta.icon" :icon-class="item.meta.icon" />
                                 <span v-if="item.meta && item.meta.title">{{item.meta.title}}</span>
                                 <span v-else>{{item.name}}</span>
 							</template>
@@ -65,14 +65,14 @@
 						</template>
 						<template v-else-if="!item.leaf"><!--非叶子节点-->
 							<div class="el-submenu__title" style="padding: 0px 0px 0px 20px;" @mouseover="showMenu(index, true)"
-                                        @mouseout="showMenu(index, false)">
+							        @mouseout="showMenu(index, false)">
 						        <svg-icon v-if="item.meta && item.meta.icon" :icon-class="item.meta.icon" />
 							</div>
 							<ul class="el-menu submenu" :class="'submenu-hook-' + index" @mouseover="showMenu(index, true)"
-                                        @mouseout="showMenu(index, false)">
+							        @mouseout="showMenu(index, false)">
 								<li v-for="child in item.children" v-if="!child.hidden" :key="child.path" class="el-menu-item"
-                                            style="padding: 0px 0px 0px 30px;" :class="$route.path == child.path ? 'is-active' : ''"
-                                            @click="child.ifExt ? redirectExtUrl(child.path) : $route.path != child.path && $router.push(child.path)">
+								        style="padding: 0px 0px 0px 30px;" :class="$route.path == child.path ? 'is-active' : ''"
+								        @click="child.ifExt ? redirectExtUrl(child.path) : $route.path != child.path && $router.push(child.path)">
                                     <svg-icon v-if="child.meta && child.meta.icon" :icon-class="child.meta.icon" />
                                     <span v-if="child.meta && child.meta.title">{{child.meta.title}}</span>
                                     <span v-else>{{child.name}}</span>
@@ -114,13 +114,13 @@
 				<el-dialog title="修改密码" :visible.sync="pwdFormVisible" width="450px" :close-on-click-modal="true" v-drag>
 					<el-form :model="pwdForm" label-width="100px" :rules="pwdFormRules" ref="pwdForm" style="padding-right: 10px;">
 						<el-form-item label="原密码" prop="oldPassword">
-							<el-input v-model="pwdForm.oldPassword" clearable autocomplete="off" show-password style="width: 100%" />
+							<el-input v-model="pwdForm.oldPassword" clearable autocomplete="off" show-password style="width: 100%;" />
 						</el-form-item>
 						<el-form-item label="新密码" prop="password">
-							<el-input v-model="pwdForm.password" clearable autocomplete="off" show-password style="width: 100%" />
+							<el-input v-model="pwdForm.password" clearable autocomplete="off" show-password style="width: 100%;" />
 						</el-form-item>
 						<el-form-item label="重复新密码" prop="rptPassword">
-							<el-input v-model="pwdForm.rptPassword" clearable autocomplete="off" show-password style="width: 100%" />
+							<el-input v-model="pwdForm.rptPassword" clearable autocomplete="off" show-password style="width: 100%;" />
 						</el-form-item>
 					</el-form>
 					<div slot="footer" class="dialog-footer" style="padding-right: 10px;">
@@ -134,301 +134,293 @@
 </template>
 
 <script>
-import logoImg from '@/components/img/logo.png';
+    import logoImg from '@/components/img/logo.png';
+    import avatarImg from '@/components/img/avatar.png';
 
-export default {
-    data() {
-        var isPasswordEquals = (rule, value, callback) => {
-            if (!value) {
-                return callback(new Error('请再次输入新密码'));
+    export default {
+		data() {
+			var isPasswordEquals = (rule, value, callback) => {
+				if (!value) {
+					return callback(new Error('请再次输入新密码'));
+				}
+				setTimeout(() => {
+					if (value != this.pwdForm.password) {
+						callback(new Error('两次输入密码不一致'));
+					} else {
+						callback();
+					}
+				}, 0);
+			};
+
+			return {
+                logoSrc: logoImg,
+                collapsed: false,
+                sysUserName: '',
+                sysUserAvatar: '',
+				isAvatarVisible: false,
+
+				pwdFormVisible: false,//修改密码界面是否显示
+				pwdLoading: false,
+				pwdFormRules: {
+					oldPassword: [
+						{required: true, message: '请输入原密码', trigger: 'blur'}
+					],
+					password: [
+						{required: true, message: '请输入新密码', trigger: 'blur'}
+					],
+					rptPassword: [
+						{required: true, message: '请再次输入新密码', trigger: 'blur'}
+								, {validator: isPasswordEquals, trigger: 'blur'}
+					]
+				},
+				//修改密码界面数据
+				pwdForm: {
+					oldPassword: null,
+					password: null,
+					rptPassword: null
+				}
+			}
+		},
+
+        computed: {
+            //动态加载菜单
+            routeList() {
+                return this.$store.getters.routes;
             }
-            setTimeout(() => {
-                if (value != this.pwdForm.password) {
-                    callback(new Error('两次输入密码不一致'));
-                } else {
-                    callback();
-                }
-            }, 0);
-        };
+        },
 
-        return {
-            logoSrc: logoImg,
-            collapsed: false,
-            sysUserName: '',
-            sysUserAvatar: '',
-            isAvatarVisible: false,
+		methods: {
+			handleOpen() {
+				//console.log('handleOpen');
+			},
+			handleClose() {
+				//console.log('handleClose');
+			},
+			handleSelect: function(a, b) {
 
-            pwdFormVisible: false,//修改密码界面是否显示
-            pwdLoading: false,
-            pwdFormRules: {
-                oldPassword: [
-                    {required: true, message: '请输入原密码', trigger: 'blur'}
-                ],
-                password: [
-                    {required: true, message: '请输入新密码', trigger: 'blur'}
-                ],
-                rptPassword: [
-                    {required: true, message: '请再次输入新密码', trigger: 'blur'}
-                            , {validator: isPasswordEquals, trigger: 'blur'}
-                ]
+			},
+
+            redirectExtUrl(path) {
+                window.open(path);
             },
-            //修改密码界面数据
-            pwdForm: {
-                oldPassword: null,
-                password: null,
-                rptPassword: null
-            }
-        }
-    },
 
-    computed: {
-        //动态加载菜单
-        routeList() {
-            return this.$store.getters.routes;
-        }
-    },
+			//显示修改密码界面
+			toChangePassword: function() {
+				this.pwdFormVisible = true;
+				this.pwdForm = {
+					password: null,
+					rptPassword: null
+				};
+				this.resetForm("pwdForm");
+			},
+			//提交修改密码
+			pwdSubmit: function() {
+				this.$refs.pwdForm.validate((valid) => {
+					if (valid) {
+						var params = "oldPassword=" + this.$md5(this.pwdForm.oldPassword) + "&password=" + this.$md5(this.pwdForm.password);
+						this.pwdLoading = true;
 
-    methods: {
-        handleOpen() {
-            //console.log('handleOpen');
-        },
-        handleClose() {
-            //console.log('handleClose');
-        },
-        handleSelect: function(a, b) {
+						this.$axios.post(this.$global.baseUrl + '/admin/change-my-password', params).then((res) => {
+							if (res.data.code === '0000') {
+								this.$message({type: "success", message: res.data.msg});
+							} else {
+								this.$message.error(res.data.msg);
+							}
+							this.$refs['pwdForm'].resetFields();
+							this.pwdFormVisible = false;
+							this.pwdLoading = false;
+						}).catch((err) => {
+							this.pwdLoading = false;
+							this.$message.error(err.message);
+						});
+					}
+				});
+			},
 
-        },
+			//退出登录
+			logout: function() {
+				var me = this;
+				this.$confirm('确定退出吗?', '提示', {}).then(() => {
+					me.$axios.post(me.$global.baseUrl + '/admin/logout', '').then((res) => {
+                        me.$session.removeUser();
+                        me.$session.removeToken();
+                        me.removeDynamicLoaded();
+                        me.$router.push({path: '/login'});
+					}).catch((err) => {
+                        me.$message.error(err.message);
+                        me.$router.push({path: '/login'});
+					});
+				}).catch(() => {
 
-        redirectExtUrl(path) {
-            window.open(path);
-        },
+				});
+			},
+			showMenu(i, status) {
+				this.$refs.menuCollapsed.getElementsByClassName('submenu-hook-' + i)[0].style.display = status ? 'block' : 'none';
+			},
+			showBigAvatar() {
+				this.isAvatarVisible = true;
+			},
+			closeBigAvatar() {
+				this.isAvatarVisible = false;
+			},
+			refreshSession() {
+				this.$axios.get(this.$global.baseUrl + '/admin/session', {}).then((res) => {
+					if (res.data.code === '0000') {
+						this.$session.putUser(res.data.data);
+						this.$session.putToken(res.headers[this.$global.tokenHeaderName]);
+						this.resolveUser();
+						this.$message({type: "success", message: res.data.msg});
+					} else {
+						this.$message.error(res.data.msg);
+					}
+				}).catch((err) => {
+					this.$message.error(err.message);
+				});
+			},
+			resolveUser() {
+				var user = this.$session.getUser();
+				if (user) {
+					this.sysUserName = user.accountNo || '';
+					this.sysUserAvatar = user.avatar || avatarImg;
+				}
+			}
+		},
+		mounted() {
+			this.resolveUser();
+		}
+	}
 
-        //显示修改密码界面
-        toChangePassword: function() {
-            this.pwdFormVisible = true;
-            this.pwdForm = {
-                password: null,
-                rptPassword: null
-            };
-            this.resetForm("pwdForm");
-        },
-        //提交修改密码
-        pwdSubmit: function() {
-            this.$refs.pwdForm.validate((valid) => {
-                if (valid) {
-                    var params = "oldPassword=" + this.$md5(this.pwdForm.oldPassword) + "&password=" + this.$md5(this.pwdForm.password);
-                    this.pwdLoading = true;
-
-                    this.$axios.post(this.$global.baseUrl + '/admin/change-my-password', params).then((res) => {
-                        if (res.data.code === '0000') {
-                            this.$message({type: "success", message: res.data.msg});
-                        } else {
-                            this.$message.error(res.data.msg);
-                        }
-                        this.$refs['pwdForm'].resetFields();
-                        this.pwdFormVisible = false;
-                        this.pwdLoading = false;
-                    }).catch((err) => {
-                        this.pwdLoading = false;
-                        this.$message.error(err.message);
-                    });
-                }
-            });
-        },
-
-        //退出登录
-        logout: function() {
-            var me = this;
-            this.$confirm('确定退出吗?', '提示', {}).then(() => {
-                me.$axios.post(me.$global.baseUrl + '/admin/logout', '').then((res) => {
-                    me.$session.removeUser();
-                    me.$session.removeToken();
-                    me.removeDynamicLoaded();
-                    me.$router.push({path: '/login'});
-                }).catch((err) => {
-                    me.$message.error(err.message);
-                    me.$router.push({path: '/login'});
-                });
-            }).catch(() => {
-
-            });
-        },
-        showMenu(i, status) {
-            this.$refs.menuCollapsed.getElementsByClassName('submenu-hook-' + i)[0].style.display = status ? 'block' : 'none';
-        },
-        showBigAvatar() {
-            this.isAvatarVisible = true;
-        },
-        closeBigAvatar() {
-            this.isAvatarVisible = false;
-        },
-        refreshSession() {
-            this.$axios.get(this.$global.baseUrl + '/admin/session', {}).then((res) => {
-                if (res.data.code === '0000') {
-                    this.$session.putUser(res.data.data);
-                    this.$session.putToken(res.headers[this.$global.tokenHeaderName]);
-                    this.resolveUser();
-                    this.$message({type: "success", message: res.data.msg});
-                } else {
-                    this.$message.error(res.data.msg);
-                }
-            }).catch((err) => {
-                this.$message.error(err.message);
-            });
-        },
-        resolveUser() {
-            var user = this.$session.getUser();
-            if (user) {
-                this.sysUserName = user.accountNo || '';
-                this.sysUserAvatar = user.avatar || require('@/components/img/avatar.png');
-            }
-        }
-    },
-    mounted() {
-        this.resolveUser();
-    }
-}
 </script>
 
 <style scoped lang="scss">
-@import '~scss_vars';
+	// scss_vars 已在 vite.config.mjs 中全局注入
 
-.container {
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    width: 100%;
-    .header {
-        height: 60px;
-        line-height: 60px;
-        background: $color-primary;
-        vertical-align: middle;
-        color: #fff;
-        .userinfo {
-            text-align: right;
-            padding-right: 35px;
-            float: right;
-            .userinfo-inner {
-                cursor: pointer;
-                color: #fff;
-                .avatar {
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 20px;
-                    margin: 10px 0px 10px 10px;
-                    float: right;
-                }
-            }
-        }
-        .logo {
-            height: 60px;
-            font-size: 22px;
-            padding: 0 10px;
-            border-color: rgba(238, 241, 146, 0.3);
-            border-right-width: 1px;
-            border-right-style: solid;
-            display: flex;
-            align-items: center;
-        }
-        .logo-width {
-            width: 260px;
-        }
-        .logo-collapse-width {
-            width: 60px
-        }
-        .sidebar-logo {
-            width: 40px;
-            height: 40px;
-            vertical-align: middle;
-            border-radius: 20px;
-        }
-        .sidebar-word {
-            margin-left: 10px;
-        }
-        .tools {
-            padding: 0px 23px;
-            width: 14px;
-            height: 60px;
-            line-height: 60px;
-            cursor: pointer;
-        }
-    }
-    .main {
-        display: flex;
-        // background: #324057;
+	.container {
         position: absolute;
-        top: 60px;
+        top: 0px;
         bottom: 0px;
-        overflow: hidden;
-        aside {
-            flex: 0 0 230px;
-            width: 230px;
-            // position: absolute;
-            // top: 0px;
-            // bottom: 0px;
-            .el-menu {
-                height: 100%;
-                width: auto !important;
+        width: 100%;
+        .header {
+			height: 60px;
+            line-height: 60px;
+            background: $color-primary;
+            vertical-align: middle;
+            color:#fff;
+			.userinfo {
+				text-align: right;
+				padding-right: 35px;
+				float: right;
+				.userinfo-inner {
+					cursor: pointer;
+					color:#fff;
+					.avatar {
+						width: 40px;
+						height: 40px;
+						border-radius: 20px;
+						margin: 10px 0px 10px 10px;
+						float: right;
+					}
+				}
+			}
+			.logo {
+				height:60px;
+                font-size: 22px;
+                padding: 0 10px;
+                border-color: rgba(238, 241, 146, 0.3);
+                border-right-width: 1px;
+                border-right-style: solid;
+                display: flex;
+				align-items: center;
+			}
+			.logo-width {
+				width: 260px;
+			}
+			.logo-collapse-width {
+				width: 60px
+			}
+            .sidebar-logo {
+				width: 40px;
+				height: 40px;
+				vertical-align: middle;
+				border-radius: 20px;
             }
-            .collapsed {
-                width: 60px;
-                .item {
-                    position: relative;
-                }
-                .submenu {
-                    position: absolute;
-                    top: 0px;
-                    left: 60px;
-                    z-index: 99999;
-                    height: auto;
-                    display: none;
-                }
+            .sidebar-word {
+                margin-left: 10px;
             }
-        }
-        .menu-collapsed {
-            flex: 0 0 60px;
-            width: 60px;
-        }
-        .menu-expanded {
-            flex: 0 0 260px;
-            width: 260px;
-        }
-        .content-container {
-            // background: #f1f2f7;
-            flex: 1;
-            // position: absolute;
-            // right: 0px;
-            // top: 0px;
-            // bottom: 0px;
-            // left: 230px;
-            overflow-y: scroll;
-            padding: 20px;
-            .breadcrumb-container {
-                //margin-bottom: 15px;
-                .title {
-                    //width: 200px;
-                    float: left;
-                    color: #8492a6;
-                    font-size: 14px;
-                    font-weight: bold;
-                }
-                .breadcrumb-inner {
-                    float: left;
-                }
-            }
-            .content-wrapper {
-                background-color: #fff;
-                box-sizing: border-box;
-            }
-        }
-        .menu-scroll {
-            overflow-x: hidden;
-            overflow-y: scroll !important;
-        }
-    }
-}
-.header-pop span {
-    margin: 2px 5px;
-    text-align: center;
-}
+            .tools {
+				padding: 0px 23px;
+				width:14px;
+				height: 60px;
+				line-height: 60px;
+				cursor: pointer;
+			}
+		}
+		.main {
+			display: flex;
+			// background: #324057;
+			position: absolute;
+			top: 60px;
+			bottom: 0px;
+			overflow: hidden;
+			aside {
+				flex:0 0 230px;
+				width: 230px;
+				// position: absolute;
+				// top: 0px;
+				// bottom: 0px;
+				.el-menu{
+					height: 100%;
+					width: auto !important;
+				}
+				.collapsed{
+					width:60px;
+					.item{
+						position: relative;
+					}
+					.submenu{
+						position:absolute;
+						top:0px;
+						left:60px;
+						z-index:99999;
+						height:auto;
+						display:none;
+					}
+				}
+			}
+			.menu-collapsed {
+				flex: 0 0 60px;
+				width: 60px;
+			}
+			.menu-expanded {
+				flex: 0 0 260px;
+				width: 260px;
+			}
+			.content-container {
+				flex:1;
+				overflow-y: scroll;
+				padding: 20px;
+				.breadcrumb-container {
+					//margin-bottom: 15px;
+					.title {
+						//width: 200px;
+						float: left;
+						color: #8492a6;
+						font-size: 14px;
+						font-weight: bold;
+					}
+					.breadcrumb-inner {
+						float: left;
+					}
+				}
+				.content-wrapper {
+					background-color: #fff;
+					box-sizing: border-box;
+				}
+			}
+			.menu-scroll {
+				overflow-x: hidden;
+				overflow-y: scroll !important;
+			}
+		}
+	}
 </style>

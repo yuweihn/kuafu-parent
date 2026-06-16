@@ -1,23 +1,9 @@
-const env = process.env.ENV;
+let env = import.meta.env.VITE_ENV;
 
-var baseUrl = null;
-var signKey = null;
-var signSecret = null;
-var tokenHeaderName = "x-token";
-
-if (env == "dev") {
-	baseUrl = 'https://convert-api-test.agilenaas.net';
-	signKey = 'ags';
-	signSecret = 'test';
-} else if (env == "qa") {
-    baseUrl = 'https://convert-api-test.agilenaas.net';
-	signKey = 'ags';
-	signSecret = 'test';
-} else if (env == "prd") {
-    baseUrl = 'https://convert-api-test.agilenaas.net';
-    signKey = 'ags';
-    signSecret = 'test';
-}
+let baseUrl = import.meta.env.VITE_BASE_URL;
+let signKey = import.meta.env.VITE_SIGN_KEY;
+let signSecret = import.meta.env.VITE_SIGN_SECRET;
+let tokenHeaderName = "x-token";
 
 export default {
 	baseUrl,

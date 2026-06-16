@@ -1,5 +1,5 @@
 
-var keyPre = "xx_";
+var keyPre = "ngx_";
 
 const sessionCache = {
     set(key, value) {

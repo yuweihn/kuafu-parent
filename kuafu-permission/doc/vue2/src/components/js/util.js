@@ -39,7 +39,7 @@ export default {
 		};
 		var timestamp = new Date().getTime();
 		var sign = md5("key=" + key + "&secret=" + secret + "&timestamp=" + timestamp).toLowerCase();
-		var aurl = 'https://www.yuweix.com/audio/tta?text=' + options.content + '&lan=' + options.lang + '&spd=' + options.speed + '&key=' + key + '&timestamp=' + timestamp + '&sign=' + sign;
+		var aurl = 'https://yuweix.com/audio/tta?text=' + options.content + '&lan=' + options.lang + '&spd=' + options.speed + '&key=' + key + '&timestamp=' + timestamp + '&sign=' + sign;
 		var audio = new Audio(aurl);
 		audio.play();
 		return audio;
@@ -124,16 +124,16 @@ export default {
 		return (r1 / r2) * Math.pow(10, t2 - t1);
 	},
 
-  slice: function(val, len) {
-    if (!len) {
-      len = 10;
-    }
-    if (!val) {
-      return '';
-    }
-    if (val.length > len) {
-      return val.slice(0, len) + '...';
-    }
-    return val;
-  }
+	slice: function(val, len) {
+		if (!len) {
+			len = 10;
+		}
+		if (!val) {
+			return '';
+		}
+		if (val.length > len) {
+			return val.slice(0, len) + '...';
+		}
+		return val;
+	}
 }

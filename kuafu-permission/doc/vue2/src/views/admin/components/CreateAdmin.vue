@@ -24,94 +24,94 @@
 </template>
 
 <script>
-export default {
-    data() {
-        return {
-            addFormVisible: false,//新增界面是否显示
-            addLoading: false,
-            addFormRules: {
-                accountNo: [
-                    {required: true, message: '请输入用户名', trigger: 'blur'}
-                ],
-                password: [
-                    {required: true, message: '请输入密码', trigger: 'blur'}
-                ],
-                realName: [
-                    {required: true, message: '请输入真实姓名', trigger: 'blur'}
-                ],
-                gender: [
-                    {required: true, message: '请选择性别', trigger: 'blur'}
-                ]
-            },
+	export default {
+		data() {
+			return {
+				addFormVisible: false,//新增界面是否显示
+				addLoading: false,
+				addFormRules: {
+					accountNo: [
+						{required: true, message: '请输入用户名', trigger: 'blur'}
+					],
+					password: [
+						{required: true, message: '请输入密码', trigger: 'blur'}
+					],
+					realName: [
+						{required: true, message: '请输入真实姓名', trigger: 'blur'}
+					],
+					gender: [
+						{required: true, message: '请选择性别', trigger: 'blur'}
+					]
+				},
 
-            genderOptions: [],
+				genderOptions: [],
 
-            //新增界面数据
-            addForm: {
-                accountNo: null,
-                password: null,
-                realName: null,
-                gender: null
-            }
-        }
-    },
-    methods: {
-        show: function() {
-            this.addFormVisible = true;
-            this.addForm = {
-                accountNo: null,
-                password: null,
-                realName: null,
-                gender: null
-            };
-            this.resetForm("addForm");
-        },
-        //新增
-        addSubmit: function() {
-            this.$refs.addForm.validate((valid) => {
-                if (valid) {
-                    var params = "accountNo=" + this.addForm.accountNo + "&password=" + this.$md5(this.addForm.password)
-                            + (this.addForm.realName ? "&realName=" + this.addForm.realName : "")
-                            + "&gender=" + (this.addForm.gender || '');
-                    this.addLoading = true;
-                    this.$axios.post(this.$global.baseUrl + '/sys/admin/create', params).then((res) => {
-                        if (res.data.code === '0000') {
-                            this.$message({type: "success", message: res.data.msg});
-                        } else {
-                            this.$message.error(res.data.msg);
-                        }
-                        this.$refs['addForm'].resetFields();
-                        this.addFormVisible = false;
-                        this.addLoading = false;
-                        this.$emit("success", 1);
-                    }).catch((err) => {
-                        this.addLoading = false;
-                        this.$message.error(err.message);
-                    });
-                }
-            });
-        },
+				//新增界面数据
+				addForm: {
+					accountNo: null,
+					password: null,
+					realName: null,
+					gender: null
+				}
+			}
+		},
+		methods: {
+			show: function() {
+				this.addFormVisible = true;
+				this.addForm = {
+					accountNo: null,
+					password: null,
+					realName: null,
+					gender: null
+				};
+				this.resetForm("addForm");
+			},
+			//新增
+			addSubmit: function() {
+				this.$refs.addForm.validate((valid) => {
+					if (valid) {
+						var params = "accountNo=" + this.addForm.accountNo + "&password=" + this.$md5(this.addForm.password)
+								+ (this.addForm.realName ? "&realName=" + this.addForm.realName : "")
+								+ "&gender=" + (this.addForm.gender || '');
+						this.addLoading = true;
+						this.$axios.post(this.$global.baseUrl + '/sys/admin/create', params).then((res) => {
+							if (res.data.code === '0000') {
+								this.$message({type: "success", message: res.data.msg});
+							} else {
+								this.$message.error(res.data.msg);
+							}
+							this.$refs['addForm'].resetFields();
+							this.addFormVisible = false;
+							this.addLoading = false;
+							this.$emit("success", 1);
+						}).catch((err) => {
+							this.addLoading = false;
+							this.$message.error(err.message);
+						});
+					}
+				});
+			},
 
-        getGenderOptions() {
-            let me = this;
-            this.$axios.get(this.$global.baseUrl + '/sys/admin/gender/drop-down-list', {}).then((res) => {
-                if (res.data.code === '0000') {
-                    me.genderOptions = res.data.data.map(item => {
-                        return {val: item.id, label: item.name};
-                    });
-                } else {
-                    me.genderOptions = [];
-                    me.$message.error(res.data.msg);
-                }
-            }).catch((err) => {
-                this.$message.error(err.message);
-            });
-        }
-    },
-    mounted() {
-        this.getGenderOptions();
-    }
-}
+			getGenderOptions() {
+				let me = this;
+				this.$axios.get(this.$global.baseUrl + '/sys/admin/gender/drop-down-list', {}).then((res) => {
+					if (res.data.code === '0000') {
+						me.genderOptions = res.data.data.map(item => {
+							return {val: item.id, label: item.name};
+						});
+					} else {
+						me.genderOptions = [];
+						me.$message.error(res.data.msg);
+					}
+				}).catch((err) => {
+					this.$message.error(err.message);
+				});
+			}
+		},
+		mounted() {
+			this.getGenderOptions();
+		}
+	}
 </script>
 
 <style scoped>

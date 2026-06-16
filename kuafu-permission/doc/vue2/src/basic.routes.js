@@ -10,18 +10,18 @@ export const basicRoutes = [
 	{
         path: '/login',
         name: '',
-        component: (resolve) => require(['@/views/Login'], resolve),
+        component: () => import('@/views/Login.vue'),
         hidden: true
 	},
 	{
         path: '/404',
         name: '',
-        component: (resolve) => require(['@/views/404'], resolve),
+        component: () => import('@/views/404.vue'),
         hidden: true
 	},
 //	{
 //		path: '/',
-//		redirect: '/home',
+//		redirect: '/monitor',
 //		hidden: true
 //	},
 	{
@@ -32,9 +32,9 @@ export const basicRoutes = [
 		children: [
 			{
                 path: '/',
-                name: 'home',
-                component: (resolve) => require(['@/views/Home'], resolve),
-                meta: {title: '首页', icon: 'home'}
+                name: 'monitor',
+                component: () => import('@/views/monitor/Monitor.vue'),
+                meta: {title: '系统状态', icon: 'dashboard'}
 			}
 		]
 	}

@@ -7,7 +7,7 @@ import Vuex from 'vuex';
 //import NProgress from 'nprogress';
 //import 'nprogress/nprogress.css';
 import {router} from './basic.routes';
-//import Mock from './mock';
+//import Mock from './mock'
 import '@/components/css/index.scss';
 //Mock.bootstrap();
 import 'font-awesome/css/font-awesome.min.css';
@@ -20,6 +20,7 @@ import cache from './components/js/cache';
 import session from './components/js/session';
 import './components/js/dialog.drag';
 import './components/js/has.permission';
+import 'virtual:svg-icons-register';
 import './components/svg/index.js';
 import settings from './settings';
 import './permission';

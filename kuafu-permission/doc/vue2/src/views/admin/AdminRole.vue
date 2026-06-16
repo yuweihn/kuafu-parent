@@ -91,8 +91,8 @@
 		<el-col :span="24" class="toolbar2">
 			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length === 0" class="el-icon-delete" v-hasPerm="['sys.admin.role.delete']"> 批量删除</el-button>
 			<el-pagination layout="total, sizes, prev, pager, next, jumper" background
-						@size-change="handleSizeChange" @current-change="handleCurrentChange"
-						:page-sizes="[10,20,50,100]" :current-page="pageNo" :page-size="pageSize" :total="total" style="float: right;" />
+					@size-change="handleSizeChange" @current-change="handleCurrentChange"
+					:page-sizes="[10,20,50,100]" :current-page="pageNo" :page-size="pageSize" :total="total" style="float:right;" />
 		</el-col>
 
 		<!--新增界面-->
@@ -107,130 +107,129 @@
 </template>
 
 <script>
-import CreateAdminRole from './components/CreateAdminRole';
-import EditAdminRole from './components/EditAdminRole';
-import RolePermission from "./RolePermission";
+	import CreateAdminRole from './components/CreateAdminRole';
+	import EditAdminRole from './components/EditAdminRole';
+	import RolePermission from "./RolePermission";
+	export default {
+		components: {
+			'create-admin-role': CreateAdminRole,
+			'edit-admin-role': EditAdminRole,
+			'role-permission': RolePermission
+		},
 
-export default {
-    components: {
-        'create-admin-role': CreateAdminRole,
-        'edit-admin-role': EditAdminRole,
-        'role-permission': RolePermission
-    },
+		data() {
+			return {
+                formVisible: false,
+                adminId: null,
+                title: null,
+				filters: {
+					keywords: null
+				},
+				total: 0,
+				adminRoleList: [],
+				pageNo: 1,
+				pageSize: 10,
+				listLoading: false,
+				sels: []    //列表选中列
+			}
+		},
+		methods: {
+			show: function(adminId, accountNo) {
+				this.adminId = adminId;
+				this.title = accountNo == null ? '管理员角色' : '管理员角色 - ' + accountNo;
+				this.listLoading = false;
+				this.formVisible = true;
+				this.getAdminRoleList();
+			},
+			handleSizeChange(psize) {
+				this.getAdminRoleList(1, psize);
+			},
+			handleCurrentChange(pno) {
+				this.getAdminRoleList(pno, null);
+			},
+			onSelsChanged: function(sels) {
+				this.sels = sels;
+			},
+			getAdminRoleList(pno, psize) {
+				if (pno != null) {
+					this.pageNo = pno;
+				}
+				if (psize != null) {
+					this.pageSize = psize;
+				}
+				var params = {adminId: this.adminId, keywords: this.filters.keywords, pageNo: this.pageNo, pageSize: this.pageSize};
+				this.listLoading = true;
+				this.$axios.get(this.$global.baseUrl + '/sys/admin/role/list', {params: params}).then((res) => {
+					if (res.data.code === '0000') {
+						this.total = res.data.data.size;
+						this.adminRoleList = res.data.data.list;
+					} else {
+						this.total = 0;
+						this.adminRoleList = [];
+						this.$message.error(res.data.msg);
+					}
+					this.listLoading = false;
+				}).catch((err) => {
+					this.listLoading = false;
+					this.$message.error(err.message);
+				});
+			},
 
-    data() {
-        return {
-            formVisible: false,
-            adminId: null,
-            title: null,
-            filters: {
-                keywords: null
-            },
-            total: 0,
-            adminRoleList: [],
-            pageNo: 1,
-            pageSize: 10,
-            listLoading: false,
-            sels: []    //列表选中列
-        }
-    },
-    methods: {
-        show: function(adminId, accountNo) {
-            this.adminId = adminId;
-            this.title = accountNo == null ? '管理员角色' : '管理员角色 - ' + accountNo;
-            this.listLoading = false;
-            this.formVisible = true;
-            this.getAdminRoleList();
-        },
-        handleSizeChange(psize) {
-            this.getAdminRoleList(1, psize);
-        },
-        handleCurrentChange(pno) {
-            this.getAdminRoleList(pno, null);
-        },
-        onSelsChanged: function(sels) {
-            this.sels = sels;
-        },
-        getAdminRoleList(pno, psize) {
-            if (pno != null) {
-                this.pageNo = pno;
-            }
-            if (psize != null) {
-                this.pageSize = psize;
-            }
-            var params = {adminId: this.adminId, keywords: this.filters.keywords, pageNo: this.pageNo, pageSize: this.pageSize};
-            this.listLoading = true;
-            this.$axios.get(this.$global.baseUrl + '/sys/admin/role/list', {params: params}).then((res) => {
-                if (res.data.code === '0000') {
-                    this.total = res.data.data.size;
-                    this.adminRoleList = res.data.data.list;
-                } else {
-                    this.total = 0;
-                    this.adminRoleList = [];
-                    this.$message.error(res.data.msg);
-                }
-                this.listLoading = false;
-            }).catch((err) => {
-                this.listLoading = false;
-                this.$message.error(err.message);
-            });
-        },
+			//删除
+			handleDel: function(index, row) {
+				this.sels = [];
+				this.sels.push(row);
+				this.batchRemove();
+			},
+			//批量删除
+			batchRemove: function() {
+				var ids = this.sels.map(item => item.id).toString();
+				this.$confirm('确定删除选中记录吗？', '提示', {type: 'warning'}).then(() => {
+					var params = {ids: ids};
+					this.listLoading = true;
+					this.$axios.delete(this.$global.baseUrl + '/sys/admin/role/delete', {params: params}).then((res) => {
+						if (res.data.code === '0000') {
+							this.$message({type: "success", message: res.data.msg});
+						} else {
+							this.$message.error(res.data.msg);
+						}
+					    this.removeDynamicLoaded();
+						this.listLoading = false;
+						this.getAdminRoleList();
+					}).catch((err) => {
+						this.listLoading = false;
+						this.$message.error(err.message);
+					});
+				}).catch(() => {
 
-        //删除
-        handleDel: function(index, row) {
-            this.sels = [];
-            this.sels.push(row);
-            this.batchRemove();
-        },
-        //批量删除
-        batchRemove: function() {
-            var ids = this.sels.map(item => item.id).toString();
-            this.$confirm('确定删除选中记录吗？', '提示', {type: 'warning'}).then(() => {
-                var params = {ids: ids};
-                this.listLoading = true;
-                this.$axios.delete(this.$global.baseUrl + '/sys/admin/role/delete', {params: params}).then((res) => {
-                    if (res.data.code === '0000') {
-                        this.$message({type: "success", message: res.data.msg});
-                    } else {
-                        this.$message.error(res.data.msg);
-                    }
-                    this.removeDynamicLoaded();
-                    this.listLoading = false;
-                    this.getAdminRoleList();
-                }).catch((err) => {
-                    this.listLoading = false;
-                    this.$message.error(err.message);
-                });
-            }).catch(() => {
+				});
+				this.sels = [];
+			}
+		},
+		mounted() {
 
-            });
-            this.sels = [];
-        }
-    },
-    mounted() {
-
-    }
-}
+		}
+	}
 </script>
 
 <style scoped>
-a {
-    text-decoration: none;
-    color: #5cb6ff;
-}
-a:hover {
-    color: #ff0000;
-}
-.table-expand {
-    font-size: 0;
-}
-.table-expand >>> label {
-    color: #99a9bf;
-}
-.table-expand .el-form-item {
-    margin-right: 0;
-    margin-bottom: 0;
-    width: 90%;
-}
+	a {
+		text-decoration: none;
+		color: #5cb6ff;
+	}
+	a:hover {
+		color: #ff0000;
+	}
+	.table-expand {
+		font-size: 0;
+	}
+	.table-expand >>> label {
+		color: #99a9bf;
+	}
+	.table-expand .el-form-item {
+		margin-right: 0;
+		margin-bottom: 0;
+		width: 90%;
+	}
 </style>
 
