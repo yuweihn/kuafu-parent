@@ -1,6 +1,6 @@
 
-var userKey = "ngx_user";
-var tokenKey = "ngx_token";
+var userKey = import.meta.env.VITE_CACHE_PREFIX + "user";
+var tokenKey = import.meta.env.VITE_CACHE_PREFIX + "token";
 
 export default {
 	putUser: function(user) {
