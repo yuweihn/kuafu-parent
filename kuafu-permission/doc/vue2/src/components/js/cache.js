@@ -1,5 +1,5 @@
 
-var keyPre = "ngx_";
+var keyPre = import.meta.env.VITE_CACHE_PREFIX;
 
 const sessionCache = {
     set(key, value) {
