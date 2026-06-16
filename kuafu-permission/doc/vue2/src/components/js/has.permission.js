@@ -10,29 +10,29 @@ import store from '@/vuex/store';
 
 
 Vue.directive('hasPerm', {
-  inserted(el, binding, vnode) {
-    const val = binding.value;
-    setTimeout(() => {
-      const hasPermissions = hasPerm(val);
-      if (!hasPermissions) {
-        el.parentNode && el.parentNode.removeChild(el);
-      }
-    }, 0);
-  }
+    inserted(el, binding, vnode) {
+        const val = binding.value;
+        setTimeout(() => {
+            const hasPermissions = hasPerm(val);
+            if (!hasPermissions) {
+                el.parentNode && el.parentNode.removeChild(el);
+            }
+        }, 0);
+    }
 });
 
 function hasPerm(val) {
-  if (!val) {
-    throw new Error('请设置权限标识');
-  }
-  const permissions = store.getters && store.getters.buttons;
-  if (!permissions || !(permissions instanceof Array) || permissions.length <= 0) {
-    return false;
-  }
-  const hasPermissions = permissions.some(permission => {
-    return val instanceof Array && val.length > 0 ? val.includes(permission) : val === permission;
-  });
-  return hasPermissions;
+    if (!val) {
+        throw new Error('请设置权限标识');
+    }
+    const permissions = store.getters && store.getters.buttons;
+    if (!permissions || !(permissions instanceof Array) || permissions.length <= 0) {
+        return false;
+    }
+    const hasPermissions = permissions.some(permission => {
+        return val instanceof Array && val.length > 0 ? val.includes(permission) : val === permission;
+    });
+    return hasPermissions;
 }
 
 Vue.prototype.hasPerm = hasPerm;
