@@ -10,7 +10,7 @@
         "prd": "vite --mode prd",
         "start": "npm run dev",
         "lint": "eslint --ext .js,.vue src",
-        "build": "vite build",
+        "build": "vite build --mode prd",
         "build:dev": "vite build --mode dev",
         "build:qa": "vite build --mode qa",
         "build:prd": "vite build --mode prd"
@@ -42,6 +42,7 @@
         "fast-glob": "^3.3.2",
         "postcss": "^8.4.39",
         "sass": "^1.77.6",
+        "terser": "^5.48.0",
         "vite": "^5.3.3",
         "vite-plugin-svg-icons": "^2.0.1",
         "vue-eslint-parser": "^9.4.3"
