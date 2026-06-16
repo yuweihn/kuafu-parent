@@ -1,3 +1,3 @@
 export default {
-    title: 'Nginx配置平台'
+    title: import.meta.env.VITE_APP_TITLE
 }

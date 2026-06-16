@@ -293,7 +293,7 @@
 </script>
 
 <style scoped lang="scss">
-	// scss_vars 已在 vite.config.js 中全局注入
+	// scss_vars 已在 vite.config.mjs 中全局注入
 
 	.container {
         position: absolute;

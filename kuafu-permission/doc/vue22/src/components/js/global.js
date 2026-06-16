@@ -1,4 +1,4 @@
-let env = import.meta.env.MODE;
+let env = import.meta.env.VITE_ENV;
 
 let baseUrl = import.meta.env.VITE_BASE_URL;
 let signKey = import.meta.env.VITE_SIGN_KEY;

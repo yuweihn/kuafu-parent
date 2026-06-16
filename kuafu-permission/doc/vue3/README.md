@@ -15,7 +15,7 @@ yarn build:qa
 yarn build:prd
 
 # 前后端分离
-vite.config.js -> build -> outDir: 'dist'
+vite.config.mjs -> build -> outDir: 'dist'
 
 # 前后端不分离
-vite.config.js -> build -> outDir: '../src/main/resources/static'
+vite.config.mjs -> build -> outDir: '../src/main/resources/static'
