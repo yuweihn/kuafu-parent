@@ -44,7 +44,7 @@ export default defineConfig(({ mode }) => {
             }
         },
         build: {
-            // outDir: '../../src/main/resources',
+            // outDir: '../src/main/resources/static',
             outDir: 'dist',
             assetsDir: 'assets',
             sourcemap: mode !== 'prd',
