@@ -37,7 +37,8 @@
             <el-table-column prop="component" label="组件路径" width="180" :show-overflow-tooltip="true" />
 			<el-table-column prop="visible" label="状态" width="80">
                 <template #default="{row, $index}">
-                    <el-switch v-model="row.visible" :active-value="true" :inactive-value="false" disabled/>
+                    <el-switch v-model="row.visible" :active-value="true" :inactive-value="false"
+                            active-color="#13ce66" inactive-color="#ff4949" disabled/>
 				</template>
 			</el-table-column>
 			<el-table-column prop="creator" label="创建人" width="90" />
