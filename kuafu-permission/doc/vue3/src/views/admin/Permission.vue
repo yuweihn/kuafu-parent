@@ -38,8 +38,8 @@
 			<el-table-column prop="visible" label="状态" width="80">
                 <template #default="{row, $index}">
                     <el-switch v-model="row.visible" :active-value="true" :inactive-value="false"
-                                                active-color="#13ce66" inactive-color="#ff4949" disabled/>
-                </template>
+                            active-color="#13ce66" inactive-color="#ff4949" disabled/>
+				</template>
 			</el-table-column>
 			<el-table-column prop="creator" label="创建人" width="90" />
 			<el-table-column prop="createTime" label="创建时间" width="145" />
@@ -56,13 +56,10 @@
                             <el-button text circle :icon="MoreFilled" />
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <div @click="handleDel($index, row)" v-hasPerm="['sys.permission.delete']">
-                                        <el-dropdown-item>
-                                            <el-tooltip content="删除" placement="top">
-                                                <el-button text circle :icon="Delete"> 删除</el-button>
-                                            </el-tooltip>
-                                        </el-dropdown-item>
-                                    </div>
+                                    <el-dropdown-item @click="handleDel($index, row)" v-hasPerm="['sys.permission.delete']">
+                                        <el-icon><Delete /></el-icon>
+                                        <span>删除</span>
+                                    </el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>

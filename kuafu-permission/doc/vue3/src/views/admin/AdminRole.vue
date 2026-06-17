@@ -69,13 +69,10 @@
                             <el-button text circle :icon="MoreFilled" />
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <div @click="handleDel($index, row)" v-hasPerm="['sys.admin.role.delete']">
-                                        <el-dropdown-item>
-                                            <el-tooltip content="删除" placement="top">
-                                                <el-button text circle :icon="Delete"> 删除</el-button>
-                                            </el-tooltip>
-                                        </el-dropdown-item>
-                                    </div>
+                                    <el-dropdown-item @click="handleDel($index, row)" v-hasPerm="['sys.admin.role.delete']">
+                                        <el-icon><Delete /></el-icon>
+                                        <span>删除</span>
+                                    </el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>
