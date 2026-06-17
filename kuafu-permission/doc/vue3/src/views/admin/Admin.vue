@@ -71,27 +71,18 @@
                             <el-button text circle :icon="MoreFilled" />
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <div @click="handlePassword($index, row)" v-hasPerm="['sys.admin.change.password']">
-                                        <el-dropdown-item>
-                                            <el-tooltip content="修改密码" placement="top">
-                                                <el-button text circle :icon="Lock"> 修改密码</el-button>
-                                            </el-tooltip>
-                                        </el-dropdown-item>
-                                    </div>
-                                    <div @click="$refs.adminRole.show(row.id, row.accountNo)" v-hasPerm="['sys.admin.role.list']">
-                                        <el-dropdown-item>
-                                            <el-tooltip content="管理员角色" placement="top">
-                                                <el-button text circle :icon="User"> 管理员角色</el-button>
-                                            </el-tooltip>
-                                        </el-dropdown-item>
-                                    </div>
-                                    <div @click="handleDel($index, row)" v-hasPerm="['sys.admin.delete']">
-                                        <el-dropdown-item divided>
-                                            <el-tooltip content="删除" placement="top">
-                                                <el-button text circle :icon="Delete"> 删除</el-button>
-                                            </el-tooltip>
-                                        </el-dropdown-item>
-                                    </div>
+                                    <el-dropdown-item @click="handlePassword($index, row)" v-hasPerm="['sys.admin.change.password']">
+                                        <el-icon><Lock /></el-icon>
+                                        <span>修改密码</span>
+                                    </el-dropdown-item>
+                                    <el-dropdown-item @click="$refs.adminRole.show(row.id, row.accountNo)" v-hasPerm="['sys.admin.role.list']">
+                                        <el-icon><User /></el-icon>
+                                        <span>管理员角色</span>
+                                    </el-dropdown-item>
+                                    <el-dropdown-item divided @click="handleDel($index, row)" v-hasPerm="['sys.admin.delete']">
+                                        <el-icon><Delete /></el-icon>
+                                        <span>删除</span>
+                                    </el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>

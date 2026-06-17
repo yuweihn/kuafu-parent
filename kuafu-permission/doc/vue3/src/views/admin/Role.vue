@@ -62,20 +62,14 @@
                             <el-button text circle :icon="MoreFilled" />
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <div @click="$refs.rolePermission.show(row.id, row.roleName)"  v-hasPerm="['sys.role.permission.list']">
-                                        <el-dropdown-item>
-                                            <el-tooltip content="角色权限" placement="top">
-                                                <el-button text circle :icon="Wallet"> 角色权限</el-button>
-                                            </el-tooltip>
-                                        </el-dropdown-item>
-                                    </div>
-                                    <div @click="handleDel($index, row)" v-hasPerm="['sys.role.delete']">
-                                        <el-dropdown-item divided>
-                                            <el-tooltip content="删除" placement="top">
-                                                <el-button text circle :icon="Delete"> 删除</el-button>
-                                            </el-tooltip>
-                                        </el-dropdown-item>
-                                    </div>
+                                    <el-dropdown-item @click="$refs.rolePermission.show(row.id, row.roleName)"  v-hasPerm="['sys.role.permission.list']">
+                                        <el-icon><Wallet /></el-icon>
+                                        <span>角色权限</span>
+                                    </el-dropdown-item>
+                                    <el-dropdown-item divided @click="handleDel($index, row)" v-hasPerm="['sys.role.delete']">
+                                        <el-icon><Delete /></el-icon>
+                                        <span>删除</span>
+                                    </el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>
