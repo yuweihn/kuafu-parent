@@ -64,3 +64,20 @@
     --el-switch-on-color: #13ce66;
     --el-switch-off-color: #ff4949;
 }
+
+// ========== Element Plus 2.5.0+ el-select 宽度修复 ==========
+// 修复 inline form 中 el-select 宽度异常问题
+.el-form--inline .el-select {
+    width: auto !important;
+    min-width: 180px;
+}
+
+// 普通 el-select 保持 100% 宽度
+.el-select:not(.el-form--inline .el-select) {
+    width: 100%;
+}
+
+// 确保 el-select__wrapper 没有最小宽度限制
+.el-select__wrapper {
+    min-width: auto !important;
+}
