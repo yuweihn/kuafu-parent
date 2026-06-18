@@ -42,8 +42,9 @@ export default {
     mounted() {
         //页面加载时从cookie获取登录信息
         let account = this.getLocalStored("account");
-        let password = Base64.decode(this.getLocalStored("password"));
-        if (account === "undefined") {
+        let passwordStored = this.getLocalStored("password");
+        let password = passwordStored ? Base64.decode(passwordStored) : null;
+        if (account === "undefined" || !account) {
             account = null;
             password = null;
         }
