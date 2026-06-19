@@ -84,3 +84,12 @@
     min-width: auto !important;
 }
 
+// 修复 el-pagination 中 el-select 宽度异常
+.el-pagination .el-select {
+    width: 110px !important;
+}
+
+.el-pagination .el-select__wrapper {
+    min-width: 110px !important;
+}
+
