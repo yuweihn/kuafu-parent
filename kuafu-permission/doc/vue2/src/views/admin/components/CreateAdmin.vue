@@ -11,7 +11,7 @@
 				<el-input v-model="addForm.realName" clearable autocomplete="off" style="width: 100%" />
 			</el-form-item>
 			<el-form-item label="性别" prop="gender">
-				<el-select v-model="addForm.gender" placeholder="请选择" clearable filterable style="width: 100px">
+				<el-select v-model="addForm.gender" placeholder="请选择" clearable filterable style="width: 150px">
 					<el-option v-for="item in genderOptions" :key="item.val" :label="item.label" :value="item.val" />
 				</el-select>
 			</el-form-item>
