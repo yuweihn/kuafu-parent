@@ -79,7 +79,7 @@
 		</el-form>
 		<div slot="footer" class="dialog-footer">
 			<el-button @click.native="formVisible = false">取消</el-button>
-			<el-button type="primary" @click.native="editSubmit" :loading="loading" v-hasPerm="['sys.permission.update']">提交</el-button>
+			<el-button type="primary" @click.native="editSubmit" :loading="loading" v-if="hasPerm(['sys.permission.update'])">提交</el-button>
 		</div>
 	</el-dialog>
 </template>
