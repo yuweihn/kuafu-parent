@@ -32,7 +32,7 @@ router.beforeEach((to, from, next) => {
     // 先加载菜单，菜单完成后再加载按钮，避免并行 next() 竞争
     if (!store.getters.isDynamicMenuLoaded) {
         store.dispatch('GenerateMenus').then(aRoutes => {
-            aRoutes.forEach(rt => {
+            aRoutes.filter(rt => !rt.ifExt).forEach(rt => {
                 router.addRoute(rt);
             });
 
