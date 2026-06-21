@@ -12,10 +12,10 @@
                     </el-select>
                 </el-form-item>
 				<el-form-item>
-					<el-button type="primary" v-on:click="getPermissionList()" :icon="Search" v-hasPerm="['sys.permission.list']"> 查询</el-button>
+					<el-button type="primary" v-on:click="getPermissionList()" :icon="Search" v-if="hasPerm(['sys.permission.list'])"> 查询</el-button>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" @click="$refs.createPermission.show()" :icon="EditPen" v-hasPerm="['sys.permission.create']"> 新增</el-button>
+					<el-button type="primary" @click="$refs.createPermission.show()" :icon="EditPen" v-if="hasPerm(['sys.permission.create'])"> 新增</el-button>
 				</el-form-item>
 			</el-form>
 		</el-col>
@@ -49,14 +49,14 @@
 			<el-table-column label="操作" width="100" fixed="right">
                 <template #default="{row, $index}">
 					<el-tooltip content="编辑" placement="top">
-						<el-button text circle :icon="EditPen" @click="$refs.editPermission.show($index, row)" v-hasPerm="['sys.permission.update']" />
+						<el-button text circle :icon="EditPen" @click="$refs.editPermission.show($index, row)" v-if="hasPerm(['sys.permission.update'])" />
 					</el-tooltip>
                     <el-tooltip content="更多" placement="top">
-                        <el-dropdown trigger="click" v-hasPerm="['sys.permission.delete']">
+                        <el-dropdown trigger="click" v-if="hasPerm(['sys.permission.delete'])">
                             <el-button text circle :icon="MoreFilled" />
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item @click="handleDel($index, row)" v-hasPerm="['sys.permission.delete']">
+                                    <el-dropdown-item @click="handleDel($index, row)" v-if="hasPerm(['sys.permission.delete'])">
                                         <el-icon><Delete /></el-icon>
                                         <span>删除</span>
                                     </el-dropdown-item>
@@ -71,9 +71,9 @@
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar2">
-			<el-button type="danger" @click="batchRemove" :disabled="sels.length === 0" :icon="Delete" v-hasPerm="['sys.permission.delete']"> 批量删除</el-button>
-            <el-button type="success" v-on:click="doExport" :icon="Coin" v-hasPerm="['sys.permission.export']"> 导出</el-button>
-            <el-button type="danger" v-on:click="doImport" :icon="CirclePlus" v-hasPerm="['sys.permission.import']"> 导入</el-button>
+			<el-button type="danger" @click="batchRemove" :disabled="sels.length === 0" :icon="Delete" v-if="hasPerm(['sys.permission.delete'])"> 批量删除</el-button>
+            <el-button type="success" v-on:click="doExport" :icon="Coin" v-if="hasPerm(['sys.permission.export'])"> 导出</el-button>
+            <el-button type="danger" v-on:click="doImport" :icon="CirclePlus" v-if="hasPerm(['sys.permission.import'])"> 导入</el-button>
 		</el-col>
 
 		<!--新增界面-->

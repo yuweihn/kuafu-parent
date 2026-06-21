@@ -6,12 +6,16 @@
 				<el-form-item label="用户名：">
 					<el-input v-model="filters.keywords" clearable placeholder="" style="width: 255px;"></el-input>
 				</el-form-item>
-				<el-form-item>
-					<el-button type="primary" v-on:click="getAdminList(1)" :icon="Search" v-hasPerm="['sys.admin.list']"> 查询</el-button>
-				</el-form-item>
-				<el-form-item>
-					<el-button type="primary" @click="$refs.createAdmin.show()" :icon="EditPen" v-hasPerm="['sys.admin.create']"> 新增</el-button>
-				</el-form-item>
+				<template v-if="hasPerm(['sys.admin.list'])">
+					<el-form-item>
+						<el-button type="primary" v-on:click="getAdminList(1)" :icon="Search"> 查询</el-button>
+					</el-form-item>
+				</template>
+				<template v-if="hasPerm(['sys.admin.create'])">
+					<el-form-item>
+						<el-button type="primary" @click="$refs.createAdmin.show()" :icon="EditPen"> 新增</el-button>
+					</el-form-item>
+				</template>
 			</el-form>
 		</el-col>
 
@@ -63,30 +67,40 @@
 			-->
 			<el-table-column label="操作" width="100">
                 <template #default="{row, $index}">
-					<el-tooltip content="编辑" placement="top">
-						<el-button text circle :icon="EditPen" @click="$refs.editAdmin.show($index, row)" v-hasPerm="['sys.admin.update']" />
-					</el-tooltip>
-                    <el-tooltip content="更多" placement="top">
-                        <el-dropdown trigger="click" v-hasPerm="['sys.admin.change.password', 'sys.admin.role.list', 'sys.admin.delete']">
-                            <el-button text circle :icon="MoreFilled" />
-                            <template #dropdown>
-                                <el-dropdown-menu>
-                                    <el-dropdown-item @click="handlePassword($index, row)" v-hasPerm="['sys.admin.change.password']">
-                                        <el-icon><Lock /></el-icon>
-                                        <span>修改密码</span>
-                                    </el-dropdown-item>
-                                    <el-dropdown-item @click="$refs.adminRole.show(row.id, row.accountNo)" v-hasPerm="['sys.admin.role.list']">
-                                        <el-icon><User /></el-icon>
-                                        <span>管理员角色</span>
-                                    </el-dropdown-item>
-                                    <el-dropdown-item divided @click="handleDel($index, row)" v-hasPerm="['sys.admin.delete']">
-                                        <el-icon><Delete /></el-icon>
-                                        <span>删除</span>
-                                    </el-dropdown-item>
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
-                    </el-tooltip>
+					<template v-if="hasPerm(['sys.admin.update'])">
+						<el-tooltip content="编辑" placement="top">
+							<el-button text circle :icon="EditPen" @click="$refs.editAdmin.show($index, row)" />
+						</el-tooltip>
+					</template>
+					<template v-if="hasPerm(['sys.admin.change.password', 'sys.admin.role.list', 'sys.admin.delete'])">
+						<el-tooltip content="更多" placement="top">
+							<el-dropdown trigger="click">
+								<el-button text circle :icon="MoreFilled" />
+								<template #dropdown>
+									<el-dropdown-menu>
+										<template v-if="hasPerm(['sys.admin.change.password'])">
+											<el-dropdown-item @click="handlePassword($index, row)">
+												<el-icon><Lock /></el-icon>
+												<span>修改密码</span>
+											</el-dropdown-item>
+										</template>
+										<template v-if="hasPerm(['sys.admin.role.list'])">
+											<el-dropdown-item @click="$refs.adminRole.show(row.id, row.accountNo)">
+												<el-icon><User /></el-icon>
+												<span>管理员角色</span>
+											</el-dropdown-item>
+										</template>
+										<template v-if="hasPerm(['sys.admin.delete'])">
+											<el-dropdown-item divided @click="handleDel($index, row)">
+												<el-icon><Delete /></el-icon>
+												<span>删除</span>
+											</el-dropdown-item>
+										</template>
+									</el-dropdown-menu>
+								</template>
+							</el-dropdown>
+						</el-tooltip>
+					</template>
 				</template>
 			</el-table-column>
 			<el-table-column label="" />
@@ -94,7 +108,9 @@
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar2">
-			<el-button type="danger" @click="batchRemove" :disabled="sels.length === 0" :icon="Delete" v-hasPerm="['sys.admin.delete']"> 批量删除</el-button>
+			<template v-if="hasPerm(['sys.admin.delete'])">
+				<el-button type="danger" @click="batchRemove" :disabled="sels.length === 0" :icon="Delete"> 批量删除</el-button>
+			</template>
 			<el-pagination layout="total, sizes, prev, pager, next, jumper" background
 						@size-change="handleSizeChange" @current-change="handleCurrentChange" :pager-count="5"
 						:page-sizes="[10,20,50,100]" :current-page="pageNo" :page-size="pageSize" :total="total" style="float: right;" />
@@ -117,7 +133,9 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer" style="padding-right: 10px;">
 				<el-button @click.native="pwdFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="changePassword" :loading="pwdLoading" v-hasPerm="['sys.admin.change.password']">提交</el-button>
+				<template v-if="hasPerm(['sys.admin.change.password'])">
+					<el-button type="primary" @click.native="changePassword" :loading="pwdLoading">提交</el-button>
+				</template>
 			</div>
 		</el-dialog>
 	</section>
