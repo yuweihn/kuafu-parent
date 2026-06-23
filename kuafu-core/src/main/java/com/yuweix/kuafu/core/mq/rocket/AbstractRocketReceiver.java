@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
@@ -50,19 +51,22 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
         if (requestId == null || "".equals(requestId)) {
             requestId = spanId;
         }
-        spanId = spanId.length() <= 16 ? spanId : spanId.substring(spanId.length() - 16);
+        spanId = spanId.substring(Math.max(0, spanId.length() - 16));
+        String body = null;
         try {
             MdcUtil.setTraceId(traceId);
             MdcUtil.setRequestId(requestId);
             MdcUtil.setSpanId(spanId);
             before(message);
-            String body = new String(message.getBody());
+            body = new String(message.getBody(), StandardCharsets.UTF_8);
             log.info("Rocket消息Body: {}", body);
             T t = deserialize(body);
+            before(t);
             Object result = process(t);
+            after(t);
             log.info("Rocket消费完成, Result: {}", JsonUtil.toJson(result));
         } catch (Exception ex) {
-            log.error("Rocket消费异常message: {}, Exception: {}, ex: ", JsonUtil.toJson(message), ex.getMessage(), ex);
+            log.error("Rocket消费异常message: {}, Exception: {}, ex: ", body, ex.getMessage(), ex);
             handleException(message, ex);
         } finally {
             after(message);
@@ -79,6 +83,14 @@ public abstract class AbstractRocketReceiver<T> implements RocketMQListener<Mess
     protected abstract Object process(T t);
 
     protected void before(Message message) {
+
+    }
+
+    protected void before(T t) {
+
+    }
+
+    protected void after(T t) {
 
     }
 
