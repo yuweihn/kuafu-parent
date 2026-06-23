@@ -50,7 +50,7 @@ public abstract class AbstractBaseRabbitReceiver<T> {
         if (requestId == null || "".equals(requestId)) {
             requestId = spanId;
         }
-        spanId = spanId.length() <= 16 ? spanId : spanId.substring(spanId.length() - 16);
+        spanId = spanId.substring(Math.max(0, spanId.length() - 16));
         try {
             MdcUtil.setTraceId(traceId);
             MdcUtil.setRequestId(requestId);
@@ -69,7 +69,9 @@ public abstract class AbstractBaseRabbitReceiver<T> {
             }
             log.info("Rabbit消息Body: {}", body);
             T t = deserialize(body);
+            before(t);
             Object result = process(t);
+            after(t);
             channel.basicAck(deliveryTag, false);
             log.info("Rabbit消费完成, Result: {}", JsonUtil.toJson(result));
         } catch (Exception ex) {
@@ -90,6 +92,14 @@ public abstract class AbstractBaseRabbitReceiver<T> {
     protected abstract Object process(T t);
 
     protected void before(Message message, Channel channel) {
+
+    }
+
+    protected void before(T t) {
+
+    }
+
+    protected void after(T t) {
 
     }
 
