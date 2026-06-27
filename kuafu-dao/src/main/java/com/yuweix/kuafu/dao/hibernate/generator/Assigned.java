@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 
 /**
- * 强制要求实体在持久化（save）之前必须手动设置好主键 ID，否则抛出异常。
+ * 强制要求实体在持久化(save)之前必须手动设置好主键ID，否则抛出异常。
  * Hibernate6.0以后有效
  */
 @Target(FIELD)
