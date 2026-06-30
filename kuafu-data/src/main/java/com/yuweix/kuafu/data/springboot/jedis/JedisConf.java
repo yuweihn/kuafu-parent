@@ -104,8 +104,8 @@ public class JedisConf {
 		};
 	}
 
-	@ConditionalOnMissingBean(name = "redisCache")
-	@Bean(name = "redisCache")
+	@ConditionalOnMissingBean(JedisCache.class)
+	@Bean
 	public JedisCache redisCache(@Qualifier("redisTemplate") RedisTemplate<String, Object> template
 			, CacheSerializer serializer
 			, RedisMessageListenerContainer messageContainer) {

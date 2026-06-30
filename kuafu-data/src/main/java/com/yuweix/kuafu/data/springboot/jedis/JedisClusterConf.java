@@ -66,8 +66,8 @@ public class JedisClusterConf {
 		};
 	}
 
-	@ConditionalOnMissingBean(name = "redisCache")
-	@Bean(name = "redisCache")
+	@ConditionalOnMissingBean(JedisClusterCache.class)
+	@Bean
 	public JedisClusterCache redisClusterCache(@Qualifier("jedisCluster") JedisCluster jedisCluster
 			, CacheSerializer serializer) {
 		JedisClusterCache cache = new JedisClusterCache(serializer);
