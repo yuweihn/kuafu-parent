@@ -141,28 +141,34 @@ public abstract class FileUtil extends StreamUtil {
 		if (path == null) {
 			return null;
 		}
+
 		path = path.trim();
-		if (!path.startsWith("/")) {
-			path = "/" + path;
-		}
-		if ("/".equals(path)) {
-			return path;
-		}
-		if ("/.".equals(path) || "/..".equals(path)) {
+		if (path.isEmpty()) {
 			return "/";
 		}
-		if (path.endsWith("/.")) {
-			return path.substring(0, path.lastIndexOf("/."));
-		}
-		if (path.endsWith("/..")) {
-			String tempPath = path.substring(0, path.lastIndexOf("/.."));
-			if (tempPath.lastIndexOf("/") <= 0) {
-				return "/";
+
+		String[] parts = path.split("/");
+		java.util.Deque<String> stack = new java.util.ArrayDeque<>();
+
+		for (String part : parts) {
+			if (part.isEmpty() || ".".equals(part)) {
+				continue;
+			}
+			if ("..".equals(part)) {
+				if (!stack.isEmpty()) {
+					stack.pollLast();
+				}
 			} else {
-				return tempPath.substring(0, tempPath.lastIndexOf("/"));
+				stack.addLast(part);
 			}
 		}
-		return path;
+
+		StringBuilder result = new StringBuilder();
+		for (String dir : stack) {
+			result.append("/").append(dir);
+		}
+
+		return result.length() > 0 ? result.toString() : "/";
 	}
 
 	public static String buildAsciiFileName(String fileName) {
