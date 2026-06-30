@@ -26,17 +26,17 @@ public class AssignGenerator implements IdentifierGenerator, StandardGenerator {
 	public Object generate(SharedSessionContractImplementor session, Object obj) {
 		IdentifierGenerationException ex = new IdentifierGenerationException("Identifier for entity '" + entityName
 				+ "' must be manually assigned before making the entity persistent");
-		Object id = session.getEntityPersister(entityName, obj).getIdentifier(obj, session);
-		if (id == null) {
+		Object idObj = session.getEntityPersister(entityName, obj).getIdentifier(obj, session);
+		if (idObj == null) {
 			throw ex;
 		}
-		if (id instanceof Number) {
-			long l = Long.parseLong(id.toString());
-			if (l <= 0) {
+		if (idObj instanceof Number) {
+			long idl = Long.parseLong(idObj.toString());
+			if (idl <= 0) {
 				throw ex;
 			}
 		}
-		return id;
+		return idObj;
 	}
 
 	@Override
