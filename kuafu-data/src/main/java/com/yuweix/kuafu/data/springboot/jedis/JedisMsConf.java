@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisNode;
-import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.*;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -43,7 +40,8 @@ public class JedisMsConf {
 		return config;
 	}
 
-	@Bean(name = "redisSentinelConfiguration")
+	@ConditionalOnMissingBean(RedisSentinelConfiguration.class)
+	@Bean
 	public RedisSentinelConfiguration redisSentinelConfiguration(@Value("${kuafu.redis.master.name}") String masterName
 			, @Value("${kuafu.redis.sentinel.ip}") String host
 			, @Value("${kuafu.redis.sentinel.port}") int port
@@ -66,8 +64,7 @@ public class JedisMsConf {
 
 	@ConditionalOnMissingBean(RedisConnectionFactory.class)
 	@Bean
-	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
-			, @Qualifier("redisSentinelConfiguration") RedisSentinelConfiguration sentinelConfig) {
+	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig, RedisSentinelConfiguration sentinelConfig) {
 		return new JedisConnectionFactory(sentinelConfig, jedisPoolConfig);
 	}
 
