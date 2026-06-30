@@ -50,7 +50,8 @@ public class LettuceConf {
 		return clientConfig;
 	}
 
-	@Bean(name = "redisStandaloneConfiguration")
+	@ConditionalOnMissingBean(RedisStandaloneConfiguration.class)
+	@Bean
 	public RedisStandaloneConfiguration redisStandaloneConfiguration(@Value("${kuafu.redis.host:}") String host
 			, @Value("${kuafu.redis.port:0}") int port
 			, @Value("${kuafu.redis.db-index:0}") int dbIndex
@@ -73,8 +74,7 @@ public class LettuceConf {
 	@Primary
 	@ConditionalOnMissingBean(LettuceConnectionFactory.class)
 	@Bean
-	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
-			, @Qualifier("redisStandaloneConfiguration") RedisStandaloneConfiguration config) {
+	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig, RedisStandaloneConfiguration config) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
 		connFactory.setValidateConnection(false);
 		connFactory.setShareNativeConnection(true);

@@ -49,7 +49,8 @@ public class LettuceClusterConf {
 		return clientConfig;
 	}
 
-	@Bean(name = "redisClusterConfiguration")
+	@ConditionalOnMissingBean(RedisClusterConfiguration.class)
+	@Bean
 	public RedisClusterConfiguration redisClusterConfiguration(@Qualifier("redisNodeList") List<String> redisNodeList
 			, @Value("${kuafu.redis.cluster.timeout:300000}") int timeout
 			, @Value("${kuafu.redis.cluster.max-redirections:6}") int maxRedirections) {
@@ -60,8 +61,7 @@ public class LettuceClusterConf {
 
 	@ConditionalOnMissingBean(LettuceConnectionFactory.class)
 	@Bean
-	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
-			, @Qualifier("redisClusterConfiguration") RedisClusterConfiguration config) {
+	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig, RedisClusterConfiguration config) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
 		connFactory.setValidateConnection(false);
 		connFactory.setShareNativeConnection(true);

@@ -43,7 +43,8 @@ public class JedisMsConf {
 		return config;
 	}
 
-	@Bean(name = "redisSentinelConfiguration")
+	@ConditionalOnMissingBean(RedisSentinelConfiguration.class)
+	@Bean
 	public RedisSentinelConfiguration redisSentinelConfiguration(@Value("${kuafu.redis.master.name}") String masterName
 			, @Value("${kuafu.redis.sentinel.ip}") String host
 			, @Value("${kuafu.redis.sentinel.port}") int port
@@ -66,8 +67,7 @@ public class JedisMsConf {
 
 	@ConditionalOnMissingBean(RedisConnectionFactory.class)
 	@Bean
-	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
-			, @Qualifier("redisSentinelConfiguration") RedisSentinelConfiguration sentinelConfig) {
+	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig, RedisSentinelConfiguration sentinelConfig) {
 		return new JedisConnectionFactory(sentinelConfig, jedisPoolConfig);
 	}
 

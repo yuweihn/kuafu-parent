@@ -52,7 +52,8 @@ public class LettuceMsConf {
 		return clientConfig;
 	}
 
-	@Bean(name = "redisSentinelConfiguration")
+	@ConditionalOnMissingBean(RedisSentinelConfiguration.class)
+	@Bean
 	public RedisSentinelConfiguration redisSentinelConfiguration(@Value("${kuafu.redis.master.name}") String masterName
 			, @Value("${kuafu.redis.sentinel.ip}") String host
 			, @Value("${kuafu.redis.sentinel.port}") int port
@@ -75,8 +76,7 @@ public class LettuceMsConf {
 
 	@ConditionalOnMissingBean(LettuceConnectionFactory.class)
 	@Bean
-	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
-			, @Qualifier("redisSentinelConfiguration") RedisSentinelConfiguration config) {
+	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig, RedisSentinelConfiguration config) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
 		connFactory.setValidateConnection(false);
 		connFactory.setShareNativeConnection(true);

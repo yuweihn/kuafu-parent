@@ -40,7 +40,8 @@ public class JedisConf {
 		return config;
 	}
 
-	@Bean(name = "redisStandaloneConfiguration")
+	@ConditionalOnMissingBean(RedisStandaloneConfiguration.class)
+	@Bean
 	public RedisStandaloneConfiguration redisStandaloneConfiguration(@Value("${kuafu.redis.host:}") String host
 			, @Value("${kuafu.redis.port:0}") int port
 			, @Value("${kuafu.redis.db-index:0}") int dbIndex
@@ -62,8 +63,7 @@ public class JedisConf {
 
 	@ConditionalOnMissingBean(JedisConnectionFactory.class)
 	@Bean
-	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
-			, @Qualifier("redisStandaloneConfiguration") RedisStandaloneConfiguration config) {
+	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig, RedisStandaloneConfiguration config) {
 		JedisClientConfiguration jedisClientConfiguration = JedisClientConfiguration.builder().usePooling().poolConfig(jedisPoolConfig).build();
 		return new JedisConnectionFactory(config, jedisClientConfiguration);
 	}
