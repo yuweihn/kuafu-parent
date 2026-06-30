@@ -60,7 +60,8 @@ public class JedisConf {
 		return conf;
 	}
 
-	@Bean(name = "jedisConnectionFactory")
+	@ConditionalOnMissingBean(JedisConnectionFactory.class)
+	@Bean
 	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
 			, @Qualifier("redisStandaloneConfiguration") RedisStandaloneConfiguration config) {
 		JedisClientConfiguration jedisClientConfiguration = JedisClientConfiguration.builder().usePooling().poolConfig(jedisPoolConfig).build();
@@ -69,7 +70,7 @@ public class JedisConf {
 
 	@ConditionalOnMissingBean(RedisTemplate.class)
 	@Bean
-	public RedisTemplate<String, Object> redisTemplate(@Qualifier("jedisConnectionFactory") RedisConnectionFactory connFactory) {
+	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connFactory) {
 		RedisSerializer<?> redisSerializer = new StringRedisSerializer();
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(connFactory);
@@ -83,7 +84,7 @@ public class JedisConf {
 
 	@ConditionalOnMissingBean(RedisMessageListenerContainer.class)
 	@Bean
-	public RedisMessageListenerContainer messageContainer(@Qualifier("jedisConnectionFactory") RedisConnectionFactory connFactory) {
+	public RedisMessageListenerContainer messageContainer(RedisConnectionFactory connFactory) {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
 		container.setConnectionFactory(connFactory);
 		return container;

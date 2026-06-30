@@ -73,7 +73,8 @@ public class LettuceMsConf {
 		return conf;
 	}
 
-	@Bean(name = "lettuceConnectionFactory")
+	@ConditionalOnMissingBean(LettuceConnectionFactory.class)
+	@Bean
 	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
 			, @Qualifier("redisSentinelConfiguration") RedisSentinelConfiguration config) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
@@ -84,7 +85,7 @@ public class LettuceMsConf {
 
 	@ConditionalOnMissingBean(RedisTemplate.class)
 	@Bean
-	public RedisTemplate<String, Object> redisTemplate(@Qualifier("lettuceConnectionFactory") LettuceConnectionFactory connFactory) {
+	public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory connFactory) {
 		RedisSerializer<?> redisSerializer = new StringRedisSerializer();
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(connFactory);
@@ -98,7 +99,7 @@ public class LettuceMsConf {
 
 	@ConditionalOnMissingBean(RedisMessageListenerContainer.class)
 	@Bean
-	public RedisMessageListenerContainer messageContainer(@Qualifier("lettuceConnectionFactory") LettuceConnectionFactory connFactory) {
+	public RedisMessageListenerContainer messageContainer(LettuceConnectionFactory connFactory) {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
 		container.setConnectionFactory(connFactory);
 		return container;
