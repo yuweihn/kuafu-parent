@@ -118,8 +118,8 @@ public class LettuceConf {
 		};
 	}
 
-	@ConditionalOnMissingBean(name = "redisCache")
-	@Bean(name = "redisCache")
+	@ConditionalOnMissingBean(LettuceCache.class)
+	@Bean
 	public LettuceCache redisCache(@Qualifier("redisTemplate") RedisTemplate<String, Object> template
 			, CacheSerializer serializer
 			, RedisMessageListenerContainer messageContainer) {
