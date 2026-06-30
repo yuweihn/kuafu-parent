@@ -37,7 +37,8 @@ public class JedisClusterConf {
 		return config;
 	}
 
-	@Bean(name = "jedisCluster", initMethod = "init")
+	@ConditionalOnMissingBean(JedisCluster.class)
+	@Bean(initMethod = "init")
 	public JedisClusterFactory jedisClusterFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
 			, @Qualifier("redisNodeList") List<HostAndPort> redisNodeList
 			, @Value("${kuafu.redis.cluster.timeout:300000}") int timeout
@@ -68,8 +69,7 @@ public class JedisClusterConf {
 
 	@ConditionalOnMissingBean(JedisClusterCache.class)
 	@Bean
-	public JedisClusterCache redisClusterCache(@Qualifier("jedisCluster") JedisCluster jedisCluster
-			, CacheSerializer serializer) {
+	public JedisClusterCache redisClusterCache(JedisCluster jedisCluster, CacheSerializer serializer) {
 		JedisClusterCache cache = new JedisClusterCache(serializer);
 		cache.setJedisCluster(jedisCluster);
 		return cache;
