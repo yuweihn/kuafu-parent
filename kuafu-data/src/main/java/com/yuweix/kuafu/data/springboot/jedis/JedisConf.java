@@ -4,7 +4,6 @@ package com.yuweix.kuafu.data.springboot.jedis;
 import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.data.cache.redis.jedis.JedisCache;
 import com.yuweix.kuafu.data.serializer.CacheSerializer;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +24,8 @@ import redis.clients.jedis.JedisPoolConfig;
  * @author yuwei
  */
 public class JedisConf {
-	@Bean(name = "jedisPoolConfig")
+	@ConditionalOnMissingBean(JedisPoolConfig.class)
+	@Bean
 	public JedisPoolConfig jedisPoolConfig(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
@@ -63,7 +63,7 @@ public class JedisConf {
 
 	@ConditionalOnMissingBean(JedisConnectionFactory.class)
 	@Bean
-	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig, RedisStandaloneConfiguration config) {
+	public JedisConnectionFactory jedisConnectionFactory(JedisPoolConfig jedisPoolConfig, RedisStandaloneConfiguration config) {
 		JedisClientConfiguration jedisClientConfiguration = JedisClientConfiguration.builder().usePooling().poolConfig(jedisPoolConfig).build();
 		return new JedisConnectionFactory(config, jedisClientConfiguration);
 	}
