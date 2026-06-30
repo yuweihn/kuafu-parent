@@ -27,7 +27,8 @@ import java.util.List;
  * @author yuwei
  */
 public class LettuceClusterConf {
-	@Bean(name = "lettuceClientConfiguration")
+	@ConditionalOnMissingBean(LettuceClientConfiguration.class)
+	@Bean
 	public LettuceClientConfiguration clientConfiguration(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
@@ -61,7 +62,7 @@ public class LettuceClusterConf {
 
 	@ConditionalOnMissingBean(LettuceConnectionFactory.class)
 	@Bean
-	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig, RedisClusterConfiguration config) {
+	public LettuceConnectionFactory lettuceConnectionFactory(LettuceClientConfiguration clientConfig, RedisClusterConfiguration config) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
 		connFactory.setValidateConnection(false);
 		connFactory.setShareNativeConnection(true);

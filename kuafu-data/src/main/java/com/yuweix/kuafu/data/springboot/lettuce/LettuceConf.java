@@ -5,7 +5,6 @@ import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.data.cache.redis.lettuce.LettuceCache;
 import com.yuweix.kuafu.data.serializer.CacheSerializer;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +27,8 @@ import java.time.Duration;
  * @author yuwei
  */
 public class LettuceConf {
-	@Bean(name = "lettuceClientConfiguration")
+	@ConditionalOnMissingBean(LettuceClientConfiguration.class)
+	@Bean
 	public LettuceClientConfiguration clientConfiguration(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
@@ -74,7 +74,7 @@ public class LettuceConf {
 	@Primary
 	@ConditionalOnMissingBean(LettuceConnectionFactory.class)
 	@Bean
-	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig, RedisStandaloneConfiguration config) {
+	public LettuceConnectionFactory lettuceConnectionFactory(LettuceClientConfiguration clientConfig, RedisStandaloneConfiguration config) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
 		connFactory.setValidateConnection(false);
 		connFactory.setShareNativeConnection(true);

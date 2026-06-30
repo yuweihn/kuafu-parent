@@ -21,8 +21,8 @@ import java.util.List;
  * @author yuwei
  */
 public class JedisClusterConf {
-
-	@Bean(name = "jedisPoolConfig")
+	@ConditionalOnMissingBean(JedisPoolConfig.class)
+	@Bean
 	public JedisPoolConfig jedisPoolConfig(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
@@ -39,7 +39,7 @@ public class JedisClusterConf {
 
 	@ConditionalOnMissingBean(JedisCluster.class)
 	@Bean(initMethod = "init")
-	public JedisClusterFactory jedisClusterFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
+	public JedisClusterFactory jedisClusterFactory(JedisPoolConfig jedisPoolConfig
 			, @Qualifier("redisNodeList") List<HostAndPort> redisNodeList
 			, @Value("${kuafu.redis.cluster.timeout:300000}") int timeout
 			, @Value("${kuafu.redis.cluster.max-redirections:6}") int maxRedirections) {
