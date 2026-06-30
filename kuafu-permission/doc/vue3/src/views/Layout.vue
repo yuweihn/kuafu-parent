@@ -420,8 +420,4 @@ resolveUser();
         }
     }
 }
-.header-pop span {
-    margin: 2px 5px;
-    text-align: center;
-}
 </style>
