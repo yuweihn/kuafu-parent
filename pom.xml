@@ -17,7 +17,7 @@
         <activemq.core.version>5.7.0</activemq.core.version>
         <activemq.pool.version>5.15.0</activemq.pool.version>
         <aliyun.oss.version>3.12.0</aliyun.oss.version>
-        <aspectj.version>1.8.14</aspectj.version>
+        <aspectj.version>1.9.7</aspectj.version>
         <caffeine.version>3.0.5</caffeine.version>
         <commons.collections.version>3.2.2</commons.collections.version>
         <commons.fileupload.version>1.5</commons.fileupload.version>
@@ -30,7 +30,7 @@
         <hibernate.version>6.1.0.Final</hibernate.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.9</httpcore.version>
-        <jackson.version>2.10.3</jackson.version>
+        <jackson.version>2.14.1</jackson.version>
         <jakarta.annotation.api.version>2.1.1</jakarta.annotation.api.version>
         <jakarta.jms.api.version>3.1.0</jakarta.jms.api.version>
         <jedis.version>2.9.0</jedis.version>
@@ -61,7 +61,7 @@
         <spring.rocketmq.version>2.3.3</spring.rocketmq.version>
         <spring.version>6.0.8</spring.version>
         <undertow.websockets.jsr.version>2.0.17.Final</undertow.websockets.jsr.version>
-        <zookeeper.version>3.4.14</zookeeper.version>
+        <zookeeper.version>3.8.4</zookeeper.version>
         <zxing.version>3.3.0</zxing.version>
     </properties>
 
@@ -427,8 +427,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
+                    <release>${jdk.version}</release>
                     <encoding>utf-8</encoding>
                     <compilerArgs>
                         <arg>-parameters</arg>
@@ -454,7 +453,9 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <additionalJOption>-Xdoclint:none</additionalJOption>
+                            <additionalJOptions>
+                                <additionalJOption>-Xdoclint:none</additionalJOption>
+                            </additionalJOptions>
                         </configuration>
                     </execution>
                 </executions>
@@ -463,9 +464,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>${maven.source.plugin.version}</version>
-                <configuration>
-                    <attach>true</attach>
-                </configuration>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -501,3 +499,4 @@
         </plugins>
     </build>
 </project>
+
