@@ -4,6 +4,7 @@ package com.yuweix.kuafu.data.springboot.jedis;
 import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.data.cache.redis.jedis.JedisCache;
 import com.yuweix.kuafu.data.serializer.CacheSerializer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -24,8 +25,7 @@ import redis.clients.jedis.JedisPoolConfig;
  * @author yuwei
  */
 public class JedisConf {
-	@ConditionalOnMissingBean(JedisPoolConfig.class)
-	@Bean
+	@Bean(name = "jedisPoolConfig")
 	public JedisPoolConfig jedisPoolConfig(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
@@ -40,8 +40,7 @@ public class JedisConf {
 		return config;
 	}
 
-	@ConditionalOnMissingBean(RedisStandaloneConfiguration.class)
-	@Bean
+	@Bean(name = "redisStandaloneConfiguration")
 	public RedisStandaloneConfiguration redisStandaloneConfiguration(@Value("${kuafu.redis.host:}") String host
 			, @Value("${kuafu.redis.port:0}") int port
 			, @Value("${kuafu.redis.db-index:0}") int dbIndex
@@ -61,16 +60,15 @@ public class JedisConf {
 		return conf;
 	}
 
-	@ConditionalOnMissingBean(JedisConnectionFactory.class)
-	@Bean
-	public JedisConnectionFactory jedisConnectionFactory(JedisPoolConfig jedisPoolConfig, RedisStandaloneConfiguration config) {
+	@Bean(name = "jedisConnectionFactory")
+	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
+			, @Qualifier("redisStandaloneConfiguration") RedisStandaloneConfiguration config) {
 		JedisClientConfiguration jedisClientConfiguration = JedisClientConfiguration.builder().usePooling().poolConfig(jedisPoolConfig).build();
 		return new JedisConnectionFactory(config, jedisClientConfiguration);
 	}
 
-	@ConditionalOnMissingBean(RedisTemplate.class)
-	@Bean
-	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connFactory) {
+	@Bean(name = "redisTemplate")
+	public RedisTemplate<String, Object> redisTemplate(@Qualifier("jedisConnectionFactory") RedisConnectionFactory connFactory) {
 		RedisSerializer<?> redisSerializer = new StringRedisSerializer();
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(connFactory);
@@ -84,7 +82,7 @@ public class JedisConf {
 
 	@ConditionalOnMissingBean(RedisMessageListenerContainer.class)
 	@Bean
-	public RedisMessageListenerContainer messageContainer(RedisConnectionFactory connFactory) {
+	public RedisMessageListenerContainer messageContainer(@Qualifier("jedisConnectionFactory") RedisConnectionFactory connFactory) {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
 		container.setConnectionFactory(connFactory);
 		return container;
@@ -108,7 +106,8 @@ public class JedisConf {
 
 	@ConditionalOnMissingBean(JedisCache.class)
 	@Bean
-	public JedisCache redisCache(RedisTemplate<String, Object> template, CacheSerializer serializer
+	public JedisCache redisCache(@Qualifier("redisTemplate") RedisTemplate<String, Object> template
+			, CacheSerializer serializer
 			, RedisMessageListenerContainer messageContainer) {
 		JedisCache cache = new JedisCache(template, serializer);
 		cache.setMessageContainer(messageContainer);
