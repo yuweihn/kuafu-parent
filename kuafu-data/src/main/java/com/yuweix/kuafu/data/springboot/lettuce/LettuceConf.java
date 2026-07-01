@@ -5,6 +5,7 @@ import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.data.cache.redis.lettuce.LettuceCache;
 import com.yuweix.kuafu.data.serializer.CacheSerializer;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -27,8 +28,7 @@ import java.time.Duration;
  * @author yuwei
  */
 public class LettuceConf {
-	@ConditionalOnMissingBean(LettuceClientConfiguration.class)
-	@Bean
+	@Bean(name = "lettuceClientConfiguration")
 	public LettuceClientConfiguration clientConfiguration(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
@@ -50,8 +50,7 @@ public class LettuceConf {
 		return clientConfig;
 	}
 
-	@ConditionalOnMissingBean(RedisStandaloneConfiguration.class)
-	@Bean
+	@Bean(name = "redisStandaloneConfiguration")
 	public RedisStandaloneConfiguration redisStandaloneConfiguration(@Value("${kuafu.redis.host:}") String host
 			, @Value("${kuafu.redis.port:0}") int port
 			, @Value("${kuafu.redis.db-index:0}") int dbIndex
@@ -72,18 +71,18 @@ public class LettuceConf {
 	}
 
 	@Primary
-	@ConditionalOnMissingBean(LettuceConnectionFactory.class)
-	@Bean
-	public LettuceConnectionFactory lettuceConnectionFactory(LettuceClientConfiguration clientConfig, RedisStandaloneConfiguration config) {
+	@ConditionalOnMissingBean(name = "lettuceConnectionFactory")
+	@Bean(name = "lettuceConnectionFactory")
+	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
+			, @Qualifier("redisStandaloneConfiguration") RedisStandaloneConfiguration config) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
 		connFactory.setValidateConnection(false);
 		connFactory.setShareNativeConnection(true);
 		return connFactory;
 	}
 
-	@ConditionalOnMissingBean(RedisTemplate.class)
-	@Bean
-	public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory connFactory) {
+	@Bean(name = "redisTemplate")
+	public RedisTemplate<String, Object> redisTemplate(@Qualifier("lettuceConnectionFactory") LettuceConnectionFactory connFactory) {
 		RedisSerializer<?> redisSerializer = new StringRedisSerializer();
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(connFactory);
@@ -97,7 +96,7 @@ public class LettuceConf {
 
 	@ConditionalOnMissingBean(RedisMessageListenerContainer.class)
 	@Bean
-	public RedisMessageListenerContainer messageContainer(LettuceConnectionFactory connFactory) {
+	public RedisMessageListenerContainer messageContainer(@Qualifier("lettuceConnectionFactory") LettuceConnectionFactory connFactory) {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
 		container.setConnectionFactory(connFactory);
 		return container;
@@ -121,7 +120,8 @@ public class LettuceConf {
 
 	@ConditionalOnMissingBean(LettuceCache.class)
 	@Bean
-	public LettuceCache redisCache(RedisTemplate<String, Object> template, CacheSerializer serializer
+	public LettuceCache redisCache(@Qualifier("redisTemplate") RedisTemplate<String, Object> template
+			, CacheSerializer serializer
 			, RedisMessageListenerContainer messageContainer) {
 		LettuceCache cache = new LettuceCache(template, serializer);
 		cache.setMessageContainer(messageContainer);

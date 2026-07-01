@@ -21,8 +21,8 @@ import java.util.List;
  * @author yuwei
  */
 public class JedisClusterConf {
-	@ConditionalOnMissingBean(JedisPoolConfig.class)
-	@Bean
+
+	@Bean(name = "jedisPoolConfig")
 	public JedisPoolConfig jedisPoolConfig(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
@@ -37,9 +37,8 @@ public class JedisClusterConf {
 		return config;
 	}
 
-	@ConditionalOnMissingBean(JedisCluster.class)
-	@Bean(initMethod = "init")
-	public JedisClusterFactory jedisClusterFactory(JedisPoolConfig jedisPoolConfig
+	@Bean(name = "jedisCluster", initMethod = "init")
+	public JedisClusterFactory jedisClusterFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
 			, @Qualifier("redisNodeList") List<HostAndPort> redisNodeList
 			, @Value("${kuafu.redis.cluster.timeout:300000}") int timeout
 			, @Value("${kuafu.redis.cluster.max-redirections:6}") int maxRedirections) {
@@ -69,7 +68,8 @@ public class JedisClusterConf {
 
 	@ConditionalOnMissingBean(JedisClusterCache.class)
 	@Bean
-	public JedisClusterCache redisClusterCache(JedisCluster jedisCluster, CacheSerializer serializer) {
+	public JedisClusterCache redisClusterCache(@Qualifier("jedisCluster") JedisCluster jedisCluster
+			, CacheSerializer serializer) {
 		JedisClusterCache cache = new JedisClusterCache(serializer);
 		cache.setJedisCluster(jedisCluster);
 		return cache;

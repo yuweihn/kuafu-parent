@@ -27,8 +27,7 @@ import java.util.List;
  * @author yuwei
  */
 public class LettuceClusterConf {
-	@ConditionalOnMissingBean(LettuceClientConfiguration.class)
-	@Bean
+	@Bean(name = "lettuceClientConfiguration")
 	public LettuceClientConfiguration clientConfiguration(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
@@ -50,8 +49,7 @@ public class LettuceClusterConf {
 		return clientConfig;
 	}
 
-	@ConditionalOnMissingBean(RedisClusterConfiguration.class)
-	@Bean
+	@Bean(name = "redisClusterConfiguration")
 	public RedisClusterConfiguration redisClusterConfiguration(@Qualifier("redisNodeList") List<String> redisNodeList
 			, @Value("${kuafu.redis.cluster.timeout:300000}") int timeout
 			, @Value("${kuafu.redis.cluster.max-redirections:6}") int maxRedirections) {
@@ -60,18 +58,17 @@ public class LettuceClusterConf {
 		return conf;
 	}
 
-	@ConditionalOnMissingBean(LettuceConnectionFactory.class)
-	@Bean
-	public LettuceConnectionFactory lettuceConnectionFactory(LettuceClientConfiguration clientConfig, RedisClusterConfiguration config) {
+	@Bean(name = "lettuceConnectionFactory")
+	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
+			, @Qualifier("redisClusterConfiguration") RedisClusterConfiguration config) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
 		connFactory.setValidateConnection(false);
 		connFactory.setShareNativeConnection(true);
 		return connFactory;
 	}
 
-	@ConditionalOnMissingBean(RedisTemplate.class)
-	@Bean
-	public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory connFactory) {
+	@Bean(name = "redisTemplate")
+	public RedisTemplate<String, Object> redisTemplate(@Qualifier("lettuceConnectionFactory") LettuceConnectionFactory connFactory) {
 		RedisSerializer<?> redisSerializer = new StringRedisSerializer();
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(connFactory);
@@ -85,7 +82,7 @@ public class LettuceClusterConf {
 
 	@ConditionalOnMissingBean(RedisMessageListenerContainer.class)
 	@Bean
-	public RedisMessageListenerContainer messageContainer(LettuceConnectionFactory connFactory) {
+	public RedisMessageListenerContainer messageContainer(@Qualifier("lettuceConnectionFactory") LettuceConnectionFactory connFactory) {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
 		container.setConnectionFactory(connFactory);
 		return container;
@@ -109,7 +106,8 @@ public class LettuceClusterConf {
 
 	@ConditionalOnMissingBean(LettuceCache.class)
 	@Bean
-	public LettuceCache redisCache(RedisTemplate<String, Object> template, CacheSerializer serializer
+	public LettuceCache redisCache(@Qualifier("redisTemplate") RedisTemplate<String, Object> template
+			, CacheSerializer serializer
 			, RedisMessageListenerContainer messageContainer) {
 		LettuceCache cache = new LettuceCache(template, serializer);
 		cache.setMessageContainer(messageContainer);
