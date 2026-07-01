@@ -452,7 +452,9 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <additionalJOption>-Xdoclint:none</additionalJOption>
+                            <additionalJOptions>
+                                <additionalJOption>-Xdoclint:none</additionalJOption>
+                            </additionalJOptions>
                         </configuration>
                     </execution>
                 </executions>
@@ -461,9 +463,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>${maven.source.plugin.version}</version>
-                <configuration>
-                    <attach>true</attach>
-                </configuration>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -499,3 +498,4 @@
         </plugins>
     </build>
 </project>
+

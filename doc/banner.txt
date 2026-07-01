@@ -21,3 +21,4 @@
 ////////////////////////////////////////////////////////////////////
 :: JDK ::                (${java.version})
 :: Spring Boot ::        (${spring-boot.version})
+:: Spring Cloud ::       (@spring.cloud.version@)
