@@ -297,29 +297,32 @@ public abstract class ActionUtil {
 		response.setHeader(exposeHeaderKey, String.join(",", headerSet));
 	}
 
-	public static void output(byte[] bytes, String contentType) {
-		export(bytes, null, contentType);
+	public static void output(byte[] bytes) {
+		output(bytes, APPLICATION_OCTET_STREAM);
 	}
-	public static void export(byte[] bytes) {
-		export(bytes, null);
+	public static void output(byte[] bytes, String contentType) {
+		export(bytes, null, contentType, null, getResponse());
 	}
 	public static void export(byte[] bytes, String fileName) {
 		export(bytes, fileName, APPLICATION_OCTET_STREAM);
 	}
 	public static void export(byte[] bytes, String fileName, String contentType) {
-		export(bytes, fileName, contentType, null);
+		export(bytes, fileName, contentType, null, getResponse());
 	}
 	public static void export(byte[] bytes, String fileName, String contentType, Map<String, String> headers) {
 		export(bytes, fileName, contentType, headers, getResponse());
 	}
+	/**
+	 * @param bytes       要输出的字节数组
+	 * @param fileName    下载文件名（可选）
+	 * @param contentType 响应内容类型（可选）
+	 * @param headers     自定义响应头（可选）
+	 * @param resp        HttpServletResponse对象
+	 */
 	public static void export(byte[] bytes, String fileName, String contentType, Map<String, String> headers, HttpServletResponse resp) {
-		if (bytes == null) {
-			log.error("响应内容为空");
-			throw new RuntimeException("响应内容为空");
-		}
-		if (resp == null) {
-			log.error("HttpServletResponse为空，无法输出");
-			throw new RuntimeException("HttpServletResponse为空，无法输出");
+		if (bytes == null || resp == null) {
+			log.error("参数校验失败，bytes: {}, resp: {}", bytes == null, resp == null);
+			throw new IllegalArgumentException("bytes和resp不能为空");
 		}
 
 		resp.setCharacterEncoding(Constant.ENCODING_UTF_8);
@@ -343,7 +346,7 @@ public abstract class ActionUtil {
 
 		String trimmedFileName = fileName == null ? null : fileName.trim();
 		if (trimmedFileName != null && !trimmedFileName.isEmpty()) {
-			String encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8);
+			String encodedFileName = URLEncoder.encode(trimmedFileName, StandardCharsets.UTF_8).replace("+", "%20");
 			String asciiFileName = FileUtil.buildAsciiFileName(trimmedFileName);
 			resp.setHeader("Content-Disposition", "attachment; filename=\"" + asciiFileName + "\"; filename*=UTF-8''" + encodedFileName);
 			addExposeHeader(resp, "_filename", encodedFileName);

@@ -3,7 +3,6 @@ package com.yuweix.kuafu.core.csv;
 
 import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.DateUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -28,12 +27,12 @@ public abstract class CsvUtil {
 	private static final String CSV_CONTENT_TYPE = "text/csv";
 
 
-	public static<T> void export(List<T> dataList, String fileName, HttpServletResponse resp) {
-		export(dataList, fileName, CSV_CONTENT_TYPE, resp);
+	public static<T> void export(List<T> dataList, String fileName) {
+		export(dataList, fileName, CSV_CONTENT_TYPE);
 	}
-	public static<T> void export(List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
+	public static<T> void export(List<T> dataList, String fileName, String contentType) {
 		byte[] bytes = export(dataList);
-		ActionUtil.export(bytes, fileName, contentType, null, resp);
+		ActionUtil.export(bytes, fileName, contentType);
 	}
 
 	/**

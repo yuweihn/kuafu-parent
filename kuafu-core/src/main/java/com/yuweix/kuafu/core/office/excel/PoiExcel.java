@@ -3,7 +3,6 @@ package com.yuweix.kuafu.core.office.excel;
 
 import com.yuweix.kuafu.core.ActionUtil;
 import com.yuweix.kuafu.core.serialize.JsonUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -312,12 +311,12 @@ public abstract class PoiExcel {
 		return null;
 	}
 
-	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, HttpServletResponse resp) {
-		export(clz, dataList, fileName, XLSX_CONTENT_TYPE, resp);
+	public static<T> void export(Class<T> clz, List<T> dataList, String fileName) {
+		export(clz, dataList, fileName, XLSX_CONTENT_TYPE);
 	}
-	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, String contentType, HttpServletResponse resp) {
+	public static<T> void export(Class<T> clz, List<T> dataList, String fileName, String contentType) {
 		byte[] bytes = export(clz, dataList);
-		ActionUtil.export(bytes, fileName, contentType, null, resp);
+		ActionUtil.export(bytes, fileName, contentType);
 	}
 
 	/**
