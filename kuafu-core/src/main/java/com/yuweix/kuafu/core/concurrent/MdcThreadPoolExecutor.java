@@ -31,10 +31,16 @@ public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
         return super.submit(this.wrap(task));
     }
 
+    @Override
+    public void execute(Runnable task) {
+        super.execute(this.wrap(task));
+    }
+
     protected <T> Callable<T> wrap(final Callable<T> callable) {
         // 获取当前线程的MDC上下文信息
         Map<String, String> context = MDC.getCopyOfContextMap();
         return () -> {
+            Map<String, String> previous = MDC.getCopyOfContextMap();
             if (context != null) {
                 // 传递给子线程
                 MDC.setContextMap(context);
@@ -43,7 +49,11 @@ public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
                 return callable.call();
             } finally {
                 // 清除MDC上下文信息，避免造成内存泄漏
-                MDC.clear();
+                if (previous != null) {
+                    MDC.setContextMap(previous);
+                } else {
+                    MDC.clear();
+                }
             }
         };
     }
@@ -51,13 +61,18 @@ public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
     protected Runnable wrap(final Runnable runnable) {
         Map<String, String> context = MDC.getCopyOfContextMap();
         return () -> {
+            Map<String, String> previous = MDC.getCopyOfContextMap();
             if (context != null) {
                 MDC.setContextMap(context);
             }
             try {
                 runnable.run();
             } finally {
-                MDC.clear();
+                if (previous != null) {
+                    MDC.setContextMap(previous);
+                } else {
+                    MDC.clear();
+                }
             }
         };
     }
