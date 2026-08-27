@@ -1,11 +1,11 @@
 package com.yuweix.kuafu.core.concurrent;
 
 
+import com.yuweix.kuafu.core.MapUtil;
 import org.slf4j.MDC;
 
 import java.util.Map;
 import java.util.concurrent.*;
-
 
 /**
  * @author yuwei
@@ -16,10 +16,19 @@ public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     public MdcThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit
+            , BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
+    }
+
+    public MdcThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit
             , BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
     }
 
+    public MdcThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit
+            , BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+    }
 
     @Override
     public <T> Future<T> submit(Callable<T> task) {
@@ -37,43 +46,57 @@ public class MdcThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     protected <T> Callable<T> wrap(final Callable<T> callable) {
-        // 获取当前线程的MDC上下文信息
         Map<String, String> context = MDC.getCopyOfContextMap();
+        if (context == null || context.isEmpty()) {
+            return callable;
+        }
         return () -> {
-            Map<String, String> previous = MDC.getCopyOfContextMap();
-            if (context != null) {
-                // 传递给子线程
-                MDC.setContextMap(context);
-            }
-            try {
-                return callable.call();
-            } finally {
-                // 清除MDC上下文信息，避免造成内存泄漏
-                if (previous != null) {
-                    MDC.setContextMap(previous);
-                } else {
-                    MDC.clear();
-                }
-            }
+            runWithContext(context, callable);
+            return null;
         };
     }
 
     protected Runnable wrap(final Runnable runnable) {
         Map<String, String> context = MDC.getCopyOfContextMap();
-        return () -> {
-            Map<String, String> previous = MDC.getCopyOfContextMap();
-            if (context != null) {
-                MDC.setContextMap(context);
+        if (context == null || context.isEmpty()) {
+            return runnable;
+        }
+        return () -> runWithContext(context, runnable);
+    }
+
+    private static void runWithContext(Map<String, String> context, Runnable task) {
+        Map<String, String> previous = MDC.getCopyOfContextMap();
+        if (previous == null || previous.isEmpty()) {
+            MDC.setContextMap(context);
+        } else {
+            MDC.setContextMap(MapUtil.mergeIgnoreNull(previous, context));
+        }
+        try {
+            task.run();
+        } finally {
+            if (previous != null) {
+                MDC.setContextMap(previous);
+            } else {
+                MDC.clear();
             }
-            try {
-                runnable.run();
-            } finally {
-                if (previous != null) {
-                    MDC.setContextMap(previous);
-                } else {
-                    MDC.clear();
-                }
+        }
+    }
+
+    private static <T> void runWithContext(Map<String, String> context, Callable<T> task) throws Exception {
+        Map<String, String> previous = MDC.getCopyOfContextMap();
+        if (previous == null || previous.isEmpty()) {
+            MDC.setContextMap(context);
+        } else {
+            MDC.setContextMap(MapUtil.mergeIgnoreNull(previous, context));
+        }
+        try {
+            task.call();
+        } finally {
+            if (previous != null) {
+                MDC.setContextMap(previous);
+            } else {
+                MDC.clear();
             }
-        };
+        }
     }
 }
