@@ -97,7 +97,7 @@ public abstract class JacksonUtil {
             return null;
         }
     }
-    public static Object parse(String text) {
+    public static Object toObjectIgnoreE(String text) {
         if (text == null || text.isEmpty()) {
             return null;
         }
