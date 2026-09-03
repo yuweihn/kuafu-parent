@@ -49,7 +49,7 @@ public abstract class JsonUtil {
             return null;
         }
     }
-    public static Object parse(String text) {
+    public static Object toObjectIgnoreE(String text) {
         try {
             return JSON.parse(text);
         } catch (Exception ex) {
