@@ -1,16 +1,10 @@
 package com.yuweix.kuafu.http.request;
 
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.yuweix.kuafu.http.HttpConstant;
 import com.yuweix.kuafu.http.HttpMethod;
 import com.yuweix.kuafu.http.response.ErrorHttpResponse;
+import com.yuweix.kuafu.http.response.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -19,7 +13,15 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicNameValuePair;
-import com.yuweix.kuafu.http.response.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -27,6 +29,8 @@ import com.yuweix.kuafu.http.response.HttpResponse;
  * @author yuwei
  */
 public class HttpFormRequest extends AbstractHttpRequest<HttpFormRequest> {
+	private static final Logger log = LoggerFactory.getLogger(HttpFormRequest.class);
+
 	private List<FormField> fieldList;
 
 
@@ -88,8 +92,9 @@ public class HttpFormRequest extends AbstractHttpRequest<HttpFormRequest> {
 			URI uri = uriBuilder.build();
 			this.setHttpUriRequest(new HttpGet(uri));
 			return execute0();
-		} catch (URISyntaxException e) {
-			return new ErrorHttpResponse<>(HttpStatus.SC_NOT_FOUND, e.getMessage());
+		} catch (URISyntaxException ex) {
+			log.error("URISyntaxException, Error: {}", ex.getMessage(), ex);
+			return new ErrorHttpResponse<>(HttpStatus.SC_NOT_FOUND, ex.getMessage());
 		}
 	}
 
