@@ -22,3 +22,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.yuweix.kuafu.boot.schedule.ScheduleAutoConfiguration,\
   com.yuweix.kuafu.boot.feign.FeignFallbackAutoConfiguration,\
   com.yuweix.kuafu.boot.permission.PermissionAutoConfiguration
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.yuweix.kuafu.boot.EnvPostProcessor
