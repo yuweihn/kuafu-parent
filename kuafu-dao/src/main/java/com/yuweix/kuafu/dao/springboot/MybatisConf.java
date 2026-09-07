@@ -185,7 +185,7 @@ public class MybatisConf {
 	@Bean(name = "mapperScannerConf")
 	public MapperScannerConfigurer mapperScannerConf(@Qualifier("basePackage") String basePackage) {
 		MapperScannerConfigurer conf = new MapperScannerConfigurer();
-		conf.setSqlSessionFactoryBeanName("sqlSessionFactory");
+//		conf.setSqlSessionFactoryBeanName("sqlSessionFactory");
 		conf.setSqlSessionTemplateBeanName("sqlSessionTemplate");
 		conf.setBasePackage(basePackage != null ? basePackage : "");
 		return conf;
