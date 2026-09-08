@@ -1,0 +1,26 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.yuweix.kuafu.boot.DefaultAutoConfiguration,\
+  com.yuweix.kuafu.boot.serialize.FastjsonAutoConfiguration,\
+  com.yuweix.kuafu.boot.serialize.JacksonAutoConfiguration,\
+  com.yuweix.kuafu.boot.core.RabbitAutoConfiguration,\
+  com.yuweix.kuafu.boot.core.RocketAutoConfiguration,\
+  com.yuweix.kuafu.boot.sequence.SequenceAutoConfiguration,\
+  com.yuweix.kuafu.boot.dao.HibernateAutoConfiguration,\
+  com.yuweix.kuafu.boot.dao.MybatisAutoConfiguration,\
+  com.yuweix.kuafu.boot.redis.JedisAutoConfiguration,\
+  com.yuweix.kuafu.boot.redis.JedisMsAutoConfiguration,\
+  com.yuweix.kuafu.boot.redis.JedisClusterAutoConfiguration,\
+  com.yuweix.kuafu.boot.redis.LettuceAutoConfiguration,\
+  com.yuweix.kuafu.boot.redis.LettuceMsAutoConfiguration,\
+  com.yuweix.kuafu.boot.redis.LettuceClusterAutoConfiguration,\
+  com.yuweix.kuafu.boot.es.EsAutoConfiguration,\
+  com.yuweix.kuafu.boot.web.I18nAutoConfiguration,\
+  com.yuweix.kuafu.boot.web.FreeMarkerAutoConfiguration,\
+  com.yuweix.kuafu.boot.web.UndertowAutoConfiguration,\
+  com.yuweix.kuafu.boot.exception.ExceptionAutoConfiguration,\
+  com.yuweix.kuafu.boot.sharding.ShardingAutoConfiguration,\
+  com.yuweix.kuafu.boot.schedule.ScheduleAutoConfiguration,\
+  com.yuweix.kuafu.boot.feign.FeignFallbackAutoConfiguration,\
+  com.yuweix.kuafu.boot.permission.PermissionAutoConfiguration
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.yuweix.kuafu.boot.EnvPostProcessor
