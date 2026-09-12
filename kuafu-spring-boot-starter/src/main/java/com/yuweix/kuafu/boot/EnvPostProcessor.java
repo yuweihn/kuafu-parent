@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class EnvPostProcessor implements EnvironmentPostProcessor {
     private static final String PROPERTY_ALLOW_DEF_OVERRIDING = "spring.main.allow-bean-definition-overriding";
+    private static final String SPRING_ENV_DEFAULT_PROPERTIES_SOURCE_NAME = "spring.env.default.properties";
 
 
     @Override
@@ -21,7 +22,7 @@ public class EnvPostProcessor implements EnvironmentPostProcessor {
             map.put(PROPERTY_ALLOW_DEF_OVERRIDING, true);
         }
         if (!map.isEmpty()) {
-            environment.getPropertySources().addLast(new MapPropertySource("defaultProperties", map));
+            environment.getPropertySources().addLast(new MapPropertySource(SPRING_ENV_DEFAULT_PROPERTIES_SOURCE_NAME, map));
         }
     }
 }
