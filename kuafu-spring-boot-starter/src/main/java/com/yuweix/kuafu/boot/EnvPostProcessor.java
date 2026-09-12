@@ -16,9 +16,11 @@ public class EnvPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        Map<String, Object> map = new HashMap<>();
         if (!environment.containsProperty(PROPERTY_ALLOW_DEF_OVERRIDING)) {
-            Map<String, Object> map = new HashMap<>();
             map.put(PROPERTY_ALLOW_DEF_OVERRIDING, true);
+        }
+        if (!map.isEmpty()) {
             environment.getPropertySources().addLast(new MapPropertySource("defaultProperties", map));
         }
     }
