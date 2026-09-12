@@ -11,8 +11,10 @@ import java.util.Map;
 
 
 public class EnvPostProcessor implements EnvironmentPostProcessor {
-    private static final String PROPERTY_ALLOW_DEF_OVERRIDING = "spring.main.allow-bean-definition-overriding";
     private static final String SPRING_ENV_DEFAULT_PROPERTIES_SOURCE_NAME = "spring.env.default.properties";
+
+    private static final String PROPERTY_ALLOW_DEF_OVERRIDING = "spring.main.allow-bean-definition-overriding";
+    private static final String PROPERTY_ALLOW_CIRCULAR_REFERENCES = "spring.main.allow-circular-references";
 
 
     @Override
@@ -20,6 +22,9 @@ public class EnvPostProcessor implements EnvironmentPostProcessor {
         Map<String, Object> map = new HashMap<>();
         if (!environment.containsProperty(PROPERTY_ALLOW_DEF_OVERRIDING)) {
             map.put(PROPERTY_ALLOW_DEF_OVERRIDING, true);
+        }
+        if (!environment.containsProperty(PROPERTY_ALLOW_CIRCULAR_REFERENCES)) {
+            map.put(PROPERTY_ALLOW_CIRCULAR_REFERENCES, true);
         }
         if (!map.isEmpty()) {
             environment.getPropertySources().addLast(new MapPropertySource(SPRING_ENV_DEFAULT_PROPERTIES_SOURCE_NAME, map));
