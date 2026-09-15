@@ -1,9 +1,6 @@
 package com.yuweix.kuafu.http.strategy.connect;
 
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.http.HeaderElement;
 import org.apache.http.HeaderElementIterator;
 import org.apache.http.HttpResponse;
@@ -18,28 +15,9 @@ import org.apache.http.protocol.HttpContext;
  * @author yuwei
  */
 public class KeepAliveStrategy extends DefaultConnectionKeepAliveStrategy {
-	private static volatile KeepAliveStrategy instance = null;
-	private static final Lock lock = new ReentrantLock();
-	
-	private KeepAliveStrategy() {
+	public KeepAliveStrategy() {
 		
 	}
-	
-	public static KeepAliveStrategy get() {
-		if (instance == null) {
-			lock.lock();
-			try {
-				if (instance == null) {
-					instance = new KeepAliveStrategy();
-				}
-			} finally {
-				lock.unlock();
-			}
-		}
-		
-		return instance;
-	}
-
 
 	/**
 	 * 返回超时时间(ms)；

@@ -1,12 +1,10 @@
 package com.yuweix.kuafu.http.strategy.retry;
 
 
-import java.io.IOException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.protocol.HttpContext;
+
+import java.io.IOException;
 
 
 /**
@@ -14,26 +12,8 @@ import org.apache.http.protocol.HttpContext;
  * @author yuwei
  */
 public class NotNeedRetryHandler implements HttpRequestRetryHandler {
-	private static volatile NotNeedRetryHandler instance = null;
-	private static final Lock lock = new ReentrantLock();
+	public NotNeedRetryHandler() {
 
-	private NotNeedRetryHandler() {
-		
-	}
-
-	public static NotNeedRetryHandler get() {
-		if (instance == null) {
-			lock.lock();
-			try {
-				if (instance == null) {
-					instance = new NotNeedRetryHandler();
-				}
-			} finally {
-				lock.unlock();
-			}
-		}
-
-		return instance;
 	}
 
 	@Override
