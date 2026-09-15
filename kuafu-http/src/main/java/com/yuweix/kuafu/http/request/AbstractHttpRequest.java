@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.Cookie;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -62,24 +63,26 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
     private JsonParser jsonParser;
 
 
+	private static final JsonParser DEFAULT_JSON_PARSER = new JsonParser() {
+		@Override
+		public String toJson(Object obj) {
+			return JsonUtil.toJson(obj);
+		}
+
+		@Override
+		public <V> V toObject(String text, Type type) {
+			return JsonUtil.toObject(text, type);
+		}
+
+		@Override
+		public <V> V toObject(String text, Class<V> clz) {
+			return JsonUtil.toObject(text, clz);
+		}
+	};
+
 	protected AbstractHttpRequest() {
 		this.responseTypeClass = String.class;
-        this.jsonParser = new JsonParser() {
-            @Override
-            public String toJson(Object obj) {
-                return JsonUtil.toJson(obj);
-            }
-
-            @Override
-            public <V> V toObject(String text, Type type) {
-                return JsonUtil.toObject(text, type);
-            }
-
-            @Override
-            public <V> V toObject(String text, Class<V> clz) {
-                return JsonUtil.toObject(text, clz);
-            }
-        };
+        this.jsonParser = DEFAULT_JSON_PARSER;
 	}
 
 	protected void setHttpUriRequest(HttpUriRequest httpUriRequest) {
@@ -231,12 +234,10 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		 * cookie
 		 */
 		if (cookieList != null && cookieList.size() > 0) {
-			StringBuilder builder = new StringBuilder("");
-			for (Cookie cookie: cookieList) {
-				builder.append(cookie.getName()).append("=").append(cookie.getValue()).append(";");
-			}
-			builder.deleteCharAt(builder.length() - 1);
-			httpUriRequest.setHeader("Cookie", builder.toString());
+			String cookieStr = cookieList.stream()
+					.map(c -> c.getName() + "=" + c.getValue())
+					.collect(Collectors.joining(";"));
+			httpUriRequest.setHeader("Cookie", cookieStr);
 		}
 		/**
 		 * context
