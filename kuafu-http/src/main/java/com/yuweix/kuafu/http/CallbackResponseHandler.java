@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -37,6 +38,8 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 	private HttpClientContext context;
 	private String charset;
     private JsonParser jsonParser;
+
+	private static final ConcurrentHashMap<Class<?>, Constructor<?>> CONSTRUCTOR_CACHE = new ConcurrentHashMap<>();
 
 
 	private CallbackResponseHandler() {
@@ -151,14 +154,22 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 			body = (B) read(entity.getContent());
 		} else if (Decoder.class.isAssignableFrom(typeClass)) {
 			String txt = EntityUtils.toString(entity, charset != null ? charset : HttpConstant.ENCODING_UTF_8);
+			Constructor<?> constructor = CONSTRUCTOR_CACHE.computeIfAbsent(typeClass, k -> {
+				try {
+					Constructor<?> c = k.getDeclaredConstructor();
+					c.setAccessible(true);
+					return c;
+				} catch (Exception ex) {
+					log.error("获取构造方法失败, typeClass: {}, Error: {}", typeClass.getName(), ex.getMessage(), ex);
+					throw new RuntimeException(ex);
+				}
+			});
 			try {
-				Constructor<?> constructor = typeClass.getDeclaredConstructor();
-				constructor.setAccessible(true);
 				Decoder<?> decoder = (Decoder<?>) constructor.newInstance();
 				body = (B) decoder.decode(txt);
-			} catch (Exception e) {
-                log.error("Decoder解析失败, Error: {}", e.getMessage(), e);
-				throw new RuntimeException(e);
+			} catch (Exception ex) {
+				log.error("Decoder解析失败, Error: {}", ex.getMessage(), ex);
+				throw new RuntimeException(ex);
 			}
 		} else {
 			/**
@@ -178,7 +189,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
         ByteArrayOutputStream out = null;
         try {
             out = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[8192];
             int len;
             while ((len = is.read(buffer)) != -1) {
                 out.write(buffer, 0, len);
