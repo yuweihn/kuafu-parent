@@ -198,7 +198,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 			resp = httpClient.execute(httpUriRequest, handler, context);
 			return resp;
 		} catch (Exception ex) {
-			log.error("CloseableHttpClient.execute失败, Error: {}", ex.getMessage(), ex);
+			log.error("HttpClient.execute失败, Error: {}", ex.getMessage(), ex);
 			return new ErrorHttpResponse<>(HttpStatus.SC_INTERNAL_SERVER_ERROR, ex.toString());
 		} finally {
 			long endTime = System.currentTimeMillis();
