@@ -5,27 +5,15 @@ import com.yuweix.kuafu.core.serialize.JsonUtil;
 import com.yuweix.kuafu.http.*;
 import com.yuweix.kuafu.http.response.ErrorHttpResponse;
 import com.yuweix.kuafu.http.response.HttpResponse;
-import com.yuweix.kuafu.http.ssl.TrustAllSslSocketFactory;
-import com.yuweix.kuafu.http.strategy.connect.KeepAliveStrategy;
-import com.yuweix.kuafu.http.strategy.redirect.NeedRedirectStrategy;
-import com.yuweix.kuafu.http.strategy.retry.NotNeedRetryHandler;
 import org.apache.http.Header;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
@@ -41,7 +29,7 @@ import java.util.stream.Collectors;
  * @author yuwei
  */
 public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> implements HttpRequest {
-    private static final Logger log = LoggerFactory.getLogger(AbstractHttpRequest.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractHttpRequest.class);
 
 	private HttpUriRequest httpUriRequest;
 	private String url;
@@ -50,17 +38,10 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 	private Type responseType;
 	private List<Cookie> cookieList;
 	private List<Header> headerList;
-	private LayeredConnectionSocketFactory sslSocketFactory;
-	private ConnectionKeepAliveStrategy keepAliveStrategy;
 	private RequestConfig requestConfig;
-	private HttpRequestRetryHandler retryHandler;
-	private RedirectStrategy redirectStrategy;
-	private List<HttpRequestInterceptor> firstRequestInterceptorList;
-	private List<HttpRequestInterceptor> lastRequestInterceptorList;
-	private List<HttpResponseInterceptor> firstResponseInterceptorList;
-	private List<HttpResponseInterceptor> lastResponseInterceptorList;
 	private String charset;
-    private JsonParser jsonParser;
+	private JsonParser jsonParser;
+	private HttpClient httpClient;
 
 
 	private static final JsonParser DEFAULT_JSON_PARSER = new JsonParser() {
@@ -82,7 +63,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 
 	protected AbstractHttpRequest() {
 		this.responseTypeClass = String.class;
-        this.jsonParser = DEFAULT_JSON_PARSER;
+		this.jsonParser = DEFAULT_JSON_PARSER;
 	}
 
 	protected void setHttpUriRequest(HttpUriRequest httpUriRequest) {
@@ -133,56 +114,8 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 	}
 
 	@SuppressWarnings("unchecked")
-	public T sslSocketFactory(LayeredConnectionSocketFactory sslSocketFactory) {
-		this.sslSocketFactory = sslSocketFactory;
-		return (T) this;
-	}
-
-	@SuppressWarnings("unchecked")
-	public T keepAliveStrategy(ConnectionKeepAliveStrategy keepAliveStrategy) {
-		this.keepAliveStrategy = keepAliveStrategy;
-		return (T) this;
-	}
-
-	@SuppressWarnings("unchecked")
 	public T requestConfig(RequestConfig requestConfig) {
 		this.requestConfig = requestConfig;
-		return (T) this;
-	}
-
-	@SuppressWarnings("unchecked")
-	public T retryHandler(HttpRequestRetryHandler retryHandler) {
-		this.retryHandler = retryHandler;
-		return (T) this;
-	}
-
-	@SuppressWarnings("unchecked")
-	public T redirectStrategy(RedirectStrategy redirectStrategy) {
-		this.redirectStrategy = redirectStrategy;
-		return (T) this;
-	}
-
-	@SuppressWarnings("unchecked")
-	public T firstRequestInterceptorList(List<HttpRequestInterceptor> firstRequestInterceptorList) {
-		this.firstRequestInterceptorList = firstRequestInterceptorList;
-		return (T) this;
-	}
-
-	@SuppressWarnings("unchecked")
-	public T lastRequestInterceptorList(List<HttpRequestInterceptor> lastRequestInterceptorList) {
-		this.lastRequestInterceptorList = lastRequestInterceptorList;
-		return (T) this;
-	}
-
-	@SuppressWarnings("unchecked")
-	public T firstResponseInterceptorList(List<HttpResponseInterceptor> firstResponseInterceptorList) {
-		this.firstResponseInterceptorList = firstResponseInterceptorList;
-		return (T) this;
-	}
-
-	@SuppressWarnings("unchecked")
-	public T lastResponseInterceptorList(List<HttpResponseInterceptor> lastResponseInterceptorList) {
-		this.lastResponseInterceptorList = lastResponseInterceptorList;
 		return (T) this;
 	}
 
@@ -195,26 +128,34 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		return charset;
 	}
 
-    @SuppressWarnings("unchecked")
-    public T jsonParser(JsonParser jsonParser) {
-        this.jsonParser = jsonParser;
-        return (T) this;
-    }
+	@SuppressWarnings("unchecked")
+	public T jsonParser(JsonParser jsonParser) {
+		this.jsonParser = jsonParser;
+		return (T) this;
+	}
+
+	public T httpClient(HttpClient httpClient) {
+		this.httpClient = httpClient;
+		return (T) this;
+	}
 
 	protected ContentType getHeaderContentType() {
 		return null;
 	}
 
 	protected HttpEntityEnclosingRequestBase getRequestBase() {
+		HttpEntityEnclosingRequestBase requestBase = null;
 		if (HttpMethod.POST.equals(method)) {
-			return new HttpPost(url);
+			requestBase = new HttpPost(url);
 		} else if (HttpMethod.PUT.equals(method)) {
-			return new HttpPut(url);
+			requestBase = new HttpPut(url);
 		} else if (HttpMethod.DELETE.equals(method)) {
-			return new DefaultHttpDelete(url);
+			requestBase = new DefaultHttpDelete(url);
 		} else {
-			return new HttpPost(url);
+			requestBase = new HttpPost(url);
 		}
+		requestBase.setConfig(requestConfig);
+		return requestBase;
 	}
 
 	protected <B>HttpResponse<B> execute0() {
@@ -244,76 +185,26 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		 */
 		HttpContextAdaptor context = HttpContextAdaptor.create();
 
-		HttpClientBuilder builder = HttpClients.custom()
-											.setDefaultRequestConfig(requestConfig)
-											.setKeepAliveStrategy(keepAliveStrategy == null ? KeepAliveStrategy.get() : keepAliveStrategy)
-											.setDefaultCookieStore(context.getCookieStore())
-											.setRetryHandler(retryHandler == null ? NotNeedRetryHandler.get() : retryHandler)
-											.setRedirectStrategy(redirectStrategy == null ? NeedRedirectStrategy.get() : redirectStrategy)
-											.setSSLSocketFactory(sslSocketFactory == null ? TrustAllSslSocketFactory.get() : sslSocketFactory);
-
-		/**
-		 * add first http request interceptor list
-		 */
-		if (firstRequestInterceptorList != null && firstRequestInterceptorList.size() > 0) {
-			for (HttpRequestInterceptor interceptor: firstRequestInterceptorList) {
-				builder.addInterceptorFirst(interceptor);
-			}
-		}
-
-		/**
-		 * add last http request interceptor list
-		 */
-		if (lastRequestInterceptorList != null && lastRequestInterceptorList.size() > 0) {
-			for (HttpRequestInterceptor interceptor: lastRequestInterceptorList) {
-				builder.addInterceptorLast(interceptor);
-			}
-		}
-
-		/**
-		 * add first http response interceptor list
-		 */
-		if (firstResponseInterceptorList != null && firstResponseInterceptorList.size() > 0) {
-			for (HttpResponseInterceptor interceptor: firstResponseInterceptorList) {
-				builder.addInterceptorFirst(interceptor);
-			}
-		}
-
-		/**
-		 * add last http response interceptor list
-		 */
-		if (lastResponseInterceptorList != null && lastResponseInterceptorList.size() > 0) {
-			for (HttpResponseInterceptor interceptor: lastResponseInterceptorList) {
-				builder.addInterceptorLast(interceptor);
-			}
-		}
-
-		CloseableHttpClient client = builder.build();
 		CallbackResponseHandler<B> handler = CallbackResponseHandler.<B>create()
-																.responseType(responseTypeClass)
-																.responseType(responseType)
-																.context(context)
-																.charset(charset)
-                                                                .jsonParser(jsonParser);
-        HttpResponse<B> resp = null;
-        long startTime = System.currentTimeMillis();
+				.responseType(responseTypeClass)
+				.responseType(responseType)
+				.context(context)
+				.charset(charset)
+				.jsonParser(jsonParser);
+		HttpResponse<B> resp = null;
+		long startTime = System.currentTimeMillis();
 		try {
-            log.info("Http请求开始, url: {}, method: {}", url, method);
-            resp = client.execute(httpUriRequest, handler, context);
-            return resp;
-        } catch (Exception ex) {
-            log.error("CloseableHttpClient.execute失败, Error: {}", ex.getMessage(), ex);
+			log.info("Http请求开始, url: {}, method: {}", url, method);
+			resp = httpClient.execute(httpUriRequest, handler, context);
+			return resp;
+		} catch (Exception ex) {
+			log.error("CloseableHttpClient.execute失败, Error: {}", ex.getMessage(), ex);
 			return new ErrorHttpResponse<>(HttpStatus.SC_INTERNAL_SERVER_ERROR, ex.toString());
 		} finally {
-            long endTime = System.currentTimeMillis();
-            log.info("Http请求结束, url: {}, method: {}, status: {}, body: {}, 耗时: {}ms", url, method
-                    , resp == null ? "" : resp.getStatus(), resp == null || resp.getBody() == null ? "" : jsonParser.toJson(resp.getBody())
-                    , endTime - startTime);
-            try {
-                client.close();
-            } catch (Exception ex) {
-                log.error("CloseableHttpClient.close失败, Error: {}", ex.getMessage(), ex);
-            }
-        }
+			long endTime = System.currentTimeMillis();
+			log.info("Http请求结束, url: {}, method: {}, status: {}, body: {}, 耗时: {}ms", url, method
+					, resp == null ? "" : resp.getStatus(), resp == null || resp.getBody() == null ? "" : jsonParser.toJson(resp.getBody())
+					, endTime - startTime);
+		}
 	}
 }

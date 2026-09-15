@@ -1,14 +1,6 @@
 package com.yuweix.kuafu.http.strategy.retry;
 
 
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.UnknownHostException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.net.ssl.SSLException;
-
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -16,40 +8,34 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.protocol.HttpContext;
 
+import javax.net.ssl.SSLException;
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.UnknownHostException;
+
 
 /**
  * 异常恢复机制 连接失败后，可以针对相应的异常进行相应的处理措施；
  * @author yuwei
  */
 public class NeedRetryHandler implements HttpRequestRetryHandler {
-	private static volatile NeedRetryHandler instance = null;
-	private static final Lock lock = new ReentrantLock();
+	private int maxRetries;
 
-	private NeedRetryHandler() {
-		
+
+	public NeedRetryHandler() {
+		this.maxRetries = 3;
 	}
 
-	public static NeedRetryHandler get() {
-		if (instance == null) {
-			lock.lock();
-			try {
-				if (instance == null) {
-					instance = new NeedRetryHandler();
-				}
-			} finally {
-				lock.unlock();
-			}
-		}
-
-		return instance;
+	public void setMaxRetries(int maxRetries) {
+		this.maxRetries = maxRetries;
 	}
 
 	@Override
 	public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
 		/**
-		 * 如果连接次数超过5次，就不进行重复连接
+		 * 如果连接次数超过××次，就不进行重复连接
 		 */
-		if (executionCount >= 5) {
+		if (executionCount >= this.maxRetries) {
 			return false;
 		}
 		/**

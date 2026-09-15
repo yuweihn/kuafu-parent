@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.security.cert.X509Certificate;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -22,27 +20,17 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TrustAllSslSocketFactory extends SSLConnectionSocketFactory {
 	private static final Logger log = LoggerFactory.getLogger(TrustAllSslSocketFactory.class);
 
-	private static volatile TrustAllSslSocketFactory instance = null;
-	private static final String[] SUPPORTED_PROTOCOLS = new String[] {"TLSv1.1", "TLSv1.2"};
-	private static final Lock lock = new ReentrantLock();
+	private static final String[] DEFAULT_SUPPORTED_PROTOCOLS = new String[] {"TLSv1.1", "TLSv1.2"};
 
-	private TrustAllSslSocketFactory(SSLContext sslContext) {
-		super(sslContext, SUPPORTED_PROTOCOLS, null, NoopHostnameVerifier.INSTANCE);
+
+	public TrustAllSslSocketFactory() {
+		this(createSslContext(), DEFAULT_SUPPORTED_PROTOCOLS);
 	}
-
-	public static TrustAllSslSocketFactory get() {
-		if (instance == null) {
-			lock.lock();
-			try {
-				if (instance == null) {
-					instance = new TrustAllSslSocketFactory(createSslContext());
-				}
-			} finally {
-				lock.unlock();
-			}
-		}
-
-		return instance;
+	public TrustAllSslSocketFactory(String[] supportedProtocols) {
+		this(createSslContext(), supportedProtocols);
+	}
+	public TrustAllSslSocketFactory(SSLContext sslContext, String[] supportedProtocols) {
+		super(sslContext, supportedProtocols, null, NoopHostnameVerifier.INSTANCE);
 	}
 
 	/**
