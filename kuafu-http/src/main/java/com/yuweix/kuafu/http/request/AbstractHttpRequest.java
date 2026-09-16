@@ -20,12 +20,15 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -140,6 +143,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		return (T) this;
 	}
 
+	@SuppressWarnings("unchecked")
 	public T httpClient(HttpClient httpClient) {
 		this.httpClient = httpClient;
 		return (T) this;
@@ -192,6 +196,13 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		HttpClientContext context = new HttpClientContext(new BasicHttpContext());
 		context.setCookieStore(new BasicCookieStore());
 
+		CloseableHttpClient defaultClient = null;
+		HttpClient client = this.httpClient;
+		if (client == null) {
+			defaultClient = HttpClients.custom().build();
+			client = defaultClient;
+		}
+
 		CallbackResponseHandler<B> handler = CallbackResponseHandler.<B>create()
 				.responseType(responseTypeClass)
 				.responseType(responseType)
@@ -202,7 +213,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		long startTime = System.currentTimeMillis();
 		try {
 			log.info("Http请求开始, url: {}, method: {}", url, method);
-			resp = httpClient.execute(httpUriRequest, handler, context);
+			resp = client.execute(httpUriRequest, handler, context);
 			return resp;
 		} catch (Exception ex) {
 			log.error("HttpClient.execute失败, Error: {}", ex.getMessage(), ex);
@@ -212,6 +223,13 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 			log.info("Http请求结束, url: {}, method: {}, status: {}, body: {}, 耗时: {}ms", url, method
 					, resp == null ? "" : resp.getStatus(), resp == null || resp.getBody() == null ? "" : jsonParser.toJson(resp.getBody())
 					, endTime - startTime);
+			if (defaultClient != null) {
+				try {
+					defaultClient.close();
+				} catch (IOException ex) {
+					log.error("关闭默认HttpClient失败, Error: {}", ex.getMessage(), ex);
+				}
+			}
 		}
 	}
 }
