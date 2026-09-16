@@ -50,7 +50,7 @@ public class HttpBodyRequest extends AbstractHttpRequest<HttpBodyRequest> {
 		HttpEntityEnclosingRequestBase requestBase = getRequestBase();
 		requestBase.setEntity(entity);
 		this.setHttpUriRequest(requestBase);
-		return execute0();
+		return doExecute();
 	}
 
 	@Override

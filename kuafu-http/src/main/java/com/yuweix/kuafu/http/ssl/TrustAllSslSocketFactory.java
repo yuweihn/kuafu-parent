@@ -20,7 +20,7 @@ import java.security.cert.X509Certificate;
 public class TrustAllSslSocketFactory extends SSLConnectionSocketFactory {
 	private static final Logger log = LoggerFactory.getLogger(TrustAllSslSocketFactory.class);
 
-	private static final String[] DEFAULT_SUPPORTED_PROTOCOLS = new String[] {"TLSv1.1", "TLSv1.2"};
+	private static final String[] DEFAULT_SUPPORTED_PROTOCOLS = new String[] {"TLSv1.1", "TLSv1.2", "TLSv1.3"};
 
 
 	public TrustAllSslSocketFactory() {
@@ -30,7 +30,9 @@ public class TrustAllSslSocketFactory extends SSLConnectionSocketFactory {
 		this(createSslContext(), supportedProtocols);
 	}
 	public TrustAllSslSocketFactory(SSLContext sslContext, String[] supportedProtocols) {
-		super(sslContext, supportedProtocols, null, NoopHostnameVerifier.INSTANCE);
+		super(sslContext
+				, supportedProtocols == null || supportedProtocols.length == 0 ? DEFAULT_SUPPORTED_PROTOCOLS : supportedProtocols
+				, null, NoopHostnameVerifier.INSTANCE);
 	}
 
 	/**
