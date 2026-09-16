@@ -2,7 +2,10 @@ package com.yuweix.kuafu.http.request;
 
 
 import com.yuweix.kuafu.core.serialize.JsonUtil;
-import com.yuweix.kuafu.http.*;
+import com.yuweix.kuafu.http.CallbackResponseHandler;
+import com.yuweix.kuafu.http.DefaultHttpDelete;
+import com.yuweix.kuafu.http.HttpMethod;
+import com.yuweix.kuafu.http.JsonParser;
 import com.yuweix.kuafu.http.response.ErrorHttpResponse;
 import com.yuweix.kuafu.http.response.HttpResponse;
 import org.apache.http.Header;
@@ -13,8 +16,11 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,7 +189,8 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		/**
 		 * context
 		 */
-		HttpContextAdaptor context = HttpContextAdaptor.create();
+		HttpClientContext context = new HttpClientContext(new BasicHttpContext());
+		context.setCookieStore(new BasicCookieStore());
 
 		CallbackResponseHandler<B> handler = CallbackResponseHandler.<B>create()
 				.responseType(responseTypeClass)
