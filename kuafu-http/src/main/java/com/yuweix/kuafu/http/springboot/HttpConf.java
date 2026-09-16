@@ -92,8 +92,8 @@ public class HttpConf {
             try {
                 cm.closeExpiredConnections();
                 cm.closeIdleConnections(idleTimeout, TimeUnit.MILLISECONDS);
-            } catch (Exception e) {
-                log.error("HttpClient connection pool cleanup failed", e);
+            } catch (Exception ex) {
+                log.error("HttpClient connection pool cleanup failed, Error: {}", ex.getMessage(), ex);
             }
         }, checkInterval, checkInterval, TimeUnit.MILLISECONDS);
 
