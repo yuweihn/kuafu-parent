@@ -164,7 +164,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		return requestBase;
 	}
 
-	protected <B>HttpResponse<B> execute0() {
+	protected <B>HttpResponse<B> doExecute() {
 		/**
 		 * header
 		 */

@@ -1,6 +1,7 @@
 package com.yuweix.kuafu.http.springboot;
 
 
+import com.yuweix.kuafu.http.conn.CloseablePoolingHttpClientConnectionManager;
 import com.yuweix.kuafu.http.ssl.TrustAllSslSocketFactory;
 import com.yuweix.kuafu.http.strategy.connect.KeepAliveStrategy;
 import com.yuweix.kuafu.http.strategy.redirect.NeedRedirectStrategy;
@@ -10,12 +11,15 @@ import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +29,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -40,8 +41,13 @@ public class HttpConf {
 	@ConditionalOnMissingBean(name = "defaultRequestConfig")
 	@Bean(name = "defaultRequestConfig")
 	public RequestConfig defaultRequestConfig(@Value("${kuafu.http.client.default-request-config.connect-timeout:3000}") int connectTimeout
-			, @Value("${kuafu.http.client.default-request-config.socket-timeout:5000}") int socketTimeout) {
-		return RequestConfig.custom().setConnectTimeout(connectTimeout).setSocketTimeout(socketTimeout).build();
+			, @Value("${kuafu.http.client.default-request-config.socket-timeout:5000}") int socketTimeout
+			, @Value("${kuafu.http.client.default-request-config.connection-request-timeout:3000}") int connectionRequestTimeout) {
+		return RequestConfig.custom()
+				.setConnectTimeout(connectTimeout)
+				.setSocketTimeout(socketTimeout)
+				.setConnectionRequestTimeout(connectionRequestTimeout)
+				.build();
 	}
 
 	@ConditionalOnMissingBean(KeepAliveStrategy.class)
@@ -66,45 +72,35 @@ public class HttpConf {
 
 	@ConditionalOnMissingBean(name = "sslSocketFactory")
 	@Bean
-	public LayeredConnectionSocketFactory sslSocketFactory(@Value("${kuafu.http.client.ssl.protocols:TLSv1.1,TLSv1.2}") String[] protocols) {
+	public LayeredConnectionSocketFactory sslSocketFactory(@Value("${kuafu.http.client.ssl.protocols:TLSv1.1,TLSv1.2,TLSv1.3}") String[] protocols) {
 		return new TrustAllSslSocketFactory(protocols);
 	}
 
 	@ConditionalOnMissingBean(name = "httpClientConnectionManager")
-	@Bean(name = "httpClientConnectionManager")
+	@Bean(name = "httpClientConnectionManager", destroyMethod = "shutdown")
 	public HttpClientConnectionManager httpClientConnectionManager(@Value("${kuafu.http.client.pooling.max-total:200}") int maxTotal
 			, @Value("${kuafu.http.client.pooling.max-per-route:20}") int maxPerRoute
 			, @Value("${kuafu.http.client.pooling.idle-timeout:30000}") long idleTimeout
-			, @Value("${kuafu.http.client.pooling.check-interval:5000}") long checkInterval) {
-		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+			, @Value("${kuafu.http.client.pooling.check-interval:5000}") long checkInterval
+			, LayeredConnectionSocketFactory sslSocketFactory) {
+		Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
+				.register("https", sslSocketFactory)
+				.register("http", PlainConnectionSocketFactory.INSTANCE)
+				.build();
+
+		CloseablePoolingHttpClientConnectionManager cm = new CloseablePoolingHttpClientConnectionManager(registry);
 		cm.setMaxTotal(maxTotal);
 		cm.setDefaultMaxPerRoute(maxPerRoute);
-
-		/**
-		 * 定期清理过期/空闲连接
-		 */
-		ScheduledExecutorService idleEvictor = Executors.newSingleThreadScheduledExecutor(r -> {
-			Thread t = new Thread(r, "http-client-idle-evictor");
-			t.setDaemon(true);
-			return t;
-		});
-		idleEvictor.scheduleWithFixedDelay(() -> {
-			try {
-				cm.closeExpiredConnections();
-				cm.closeIdleConnections(idleTimeout, TimeUnit.MILLISECONDS);
-			} catch (Exception ex) {
-				log.error("HttpClient connection pool cleanup failed, Error: {}", ex.getMessage(), ex);
-			}
-		}, checkInterval, checkInterval, TimeUnit.MILLISECONDS);
-
+		cm.startEvictor(idleTimeout, checkInterval);
 		return cm;
 	}
 
 	@ConditionalOnMissingBean(CloseableHttpClient.class)
-	@Bean(name = "closeableHttpClient")
+	@Bean(name = "closeableHttpClient", destroyMethod = "close")
 	public CloseableHttpClient closeableHttpClient(@Qualifier("defaultRequestConfig") RequestConfig defaultRequestConfig
 			, KeepAliveStrategy keepAliveStrategy, HttpRequestRetryHandler httpRequestRetryHandler, RedirectStrategy redirectStrategy
-			, LayeredConnectionSocketFactory sslSocketFactory, HttpClientConnectionManager httpClientConnectionManager
+//            , LayeredConnectionSocketFactory sslSocketFactory
+			, HttpClientConnectionManager httpClientConnectionManager
 			, @Autowired(required = false) @Qualifier("firstRequestInterceptorList") List<HttpRequestInterceptor> firstRequestInterceptorList
 			, @Autowired(required = false) @Qualifier("lastRequestInterceptorList") List<HttpRequestInterceptor> lastRequestInterceptorList
 			, @Autowired(required = false) @Qualifier("firstResponseInterceptorList") List<HttpResponseInterceptor> firstResponseInterceptorList
@@ -115,8 +111,9 @@ public class HttpConf {
 				.setKeepAliveStrategy(keepAliveStrategy)
 				.setRetryHandler(httpRequestRetryHandler)
 				.setRedirectStrategy(redirectStrategy)
-				.setSSLSocketFactory(sslSocketFactory)
-				.setConnectionManager(httpClientConnectionManager);
+//                .setSSLSocketFactory(sslSocketFactory)
+				.setConnectionManager(httpClientConnectionManager)
+				.setConnectionManagerShared(true);
 
 		/**
 		 * add first http request interceptor list

@@ -91,7 +91,7 @@ public class HttpFormRequest extends AbstractHttpRequest<HttpFormRequest> {
 
 			URI uri = uriBuilder.build();
 			this.setHttpUriRequest(new HttpGet(uri));
-			return execute0();
+			return doExecute();
 		} catch (URISyntaxException ex) {
 			log.error("URISyntaxException, Error: {}", ex.getMessage(), ex);
 			return new ErrorHttpResponse<>(HttpStatus.SC_NOT_FOUND, ex.getMessage());
@@ -130,7 +130,7 @@ public class HttpFormRequest extends AbstractHttpRequest<HttpFormRequest> {
 			HttpEntityEnclosingRequestBase requestBase = getRequestBase();
 			requestBase.setEntity(entity);
 			this.setHttpUriRequest(requestBase);
-			return execute0();
+			return doExecute();
 		}
 	}
 
