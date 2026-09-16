@@ -196,11 +196,11 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		HttpClientContext context = new HttpClientContext(new BasicHttpContext());
 		context.setCookieStore(new BasicCookieStore());
 
-		CloseableHttpClient defaultClient = null;
+		CloseableHttpClient clientInstance = null;
 		HttpClient client = this.httpClient;
 		if (client == null) {
-			defaultClient = HttpClients.custom().build();
-			client = defaultClient;
+			clientInstance = HttpClients.custom().build();
+			client = clientInstance;
 		}
 
 		CallbackResponseHandler<B> handler = CallbackResponseHandler.<B>create()
@@ -223,9 +223,9 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 			log.info("Http请求结束, url: {}, method: {}, status: {}, body: {}, 耗时: {}ms", url, method
 					, resp == null ? "" : resp.getStatus(), resp == null || resp.getBody() == null ? "" : jsonParser.toJson(resp.getBody())
 					, endTime - startTime);
-			if (defaultClient != null) {
+			if (clientInstance != null) {
 				try {
-					defaultClient.close();
+					clientInstance.close();
 				} catch (IOException ex) {
 					log.error("关闭默认HttpClient失败, Error: {}", ex.getMessage(), ex);
 				}
