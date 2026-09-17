@@ -23,13 +23,13 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
-import javax.annotation.PreDestroy;
 import java.util.List;
 
 
@@ -161,8 +161,8 @@ public class HttpConf {
 		return new HttpClientShutdownHook();
 	}
 
-	public static class HttpClientShutdownHook {
-		@PreDestroy
+	public static class HttpClientShutdownHook implements DisposableBean {
+		@Override
 		public void destroy() {
 			AbstractHttpRequest.shutdownDefaultHttpClient();
 		}
