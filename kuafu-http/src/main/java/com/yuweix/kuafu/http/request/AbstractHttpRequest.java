@@ -6,8 +6,13 @@ import com.yuweix.kuafu.http.CallbackResponseHandler;
 import com.yuweix.kuafu.http.DefaultHttpDelete;
 import com.yuweix.kuafu.http.HttpMethod;
 import com.yuweix.kuafu.http.JsonParser;
+import com.yuweix.kuafu.http.conn.CloseablePoolingHttpClientConnectionManager;
 import com.yuweix.kuafu.http.response.ErrorHttpResponse;
 import com.yuweix.kuafu.http.response.HttpResponse;
+import com.yuweix.kuafu.http.ssl.TrustAllSslSocketFactory;
+import com.yuweix.kuafu.http.strategy.connect.KeepAliveStrategy;
+import com.yuweix.kuafu.http.strategy.redirect.NeedRedirectStrategy;
+import com.yuweix.kuafu.http.strategy.retry.NeedRetryHandler;
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -17,9 +22,15 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.BasicHttpContext;
@@ -28,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,6 +79,12 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 			return JsonUtil.toObject(text, clz);
 		}
 	};
+
+	/**
+	 * 默认HttpClient单例
+	 */
+	private static volatile CloseableHttpClient DEFAULT_HTTP_CLIENT;
+
 
 	protected AbstractHttpRequest() {
 		this.responseTypeClass = String.class;
@@ -196,11 +212,9 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		HttpClientContext context = new HttpClientContext(new BasicHttpContext());
 		context.setCookieStore(new BasicCookieStore());
 
-		CloseableHttpClient clientInstance = null;
 		HttpClient client = this.httpClient;
 		if (client == null) {
-			clientInstance = HttpClients.custom().build();
-			client = clientInstance;
+			client = getDefaultHttpClient();
 		}
 
 		CallbackResponseHandler<B> handler = CallbackResponseHandler.<B>create()
@@ -223,13 +237,67 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 			log.info("Http请求结束, url: {}, method: {}, status: {}, body: {}, 耗时: {}ms", url, method
 					, resp == null ? "" : resp.getStatus(), resp == null || resp.getBody() == null ? "" : jsonParser.toJson(resp.getBody())
 					, endTime - startTime);
-			if (clientInstance != null) {
-				try {
-					clientInstance.close();
-				} catch (IOException ex) {
-					log.error("关闭默认HttpClient失败, Error: {}", ex.getMessage(), ex);
+		}
+	}
+
+	/**
+	 * 获取默认的HttpClient（单例）
+	 */
+	private static CloseableHttpClient getDefaultHttpClient() {
+		if (DEFAULT_HTTP_CLIENT == null) {
+			synchronized (AbstractHttpRequest.class) {
+				if (DEFAULT_HTTP_CLIENT == null) {
+					DEFAULT_HTTP_CLIENT = createDefaultHttpClient();
 				}
 			}
 		}
+		return DEFAULT_HTTP_CLIENT;
+	}
+	private static CloseableHttpClient createDefaultHttpClient() {
+		log.info("创建默认的HttpClient开始");
+		RequestConfig defaultRequestConfig = RequestConfig.custom()
+				.setConnectTimeout(3000)
+				.setSocketTimeout(10000)
+				.setConnectionRequestTimeout(3000)
+				.build();
+
+		NeedRetryHandler retryHandler = new NeedRetryHandler();
+		retryHandler.setMaxRetries(3);
+
+		LayeredConnectionSocketFactory sslSocketFactory = new TrustAllSslSocketFactory();
+		Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
+				.register("https", sslSocketFactory)
+				.register("http", PlainConnectionSocketFactory.INSTANCE)
+				.build();
+		CloseablePoolingHttpClientConnectionManager connectionManager = new CloseablePoolingHttpClientConnectionManager(registry);
+		connectionManager.setMaxTotal(200);
+		connectionManager.setDefaultMaxPerRoute(20);
+		connectionManager.startEvictor(30000, 5000);
+
+		HttpClientBuilder builder = HttpClients.custom()
+				.setDefaultRequestConfig(defaultRequestConfig)
+				.setKeepAliveStrategy(new KeepAliveStrategy())
+				.setRetryHandler(retryHandler)
+				.setRedirectStrategy(new NeedRedirectStrategy())
+				.setConnectionManager(connectionManager);
+		CloseableHttpClient httpClient = builder.build();
+		log.info("创建默认的HttpClient结束");
+		return httpClient;
+	}
+
+	public static void shutdownDefaultHttpClient() {
+		if (DEFAULT_HTTP_CLIENT != null) {
+			try {
+				DEFAULT_HTTP_CLIENT.close();
+			} catch (Exception ex) {
+				log.error("关闭默认HttpClient失败, Error: {}", ex.getMessage(), ex);
+			} finally {
+				DEFAULT_HTTP_CLIENT = null;
+			}
+		}
+	}
+
+	static {
+		Runtime.getRuntime().addShutdownHook(new Thread(AbstractHttpRequest::shutdownDefaultHttpClient));
 	}
 }

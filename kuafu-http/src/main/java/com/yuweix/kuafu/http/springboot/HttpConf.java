@@ -2,6 +2,7 @@ package com.yuweix.kuafu.http.springboot;
 
 
 import com.yuweix.kuafu.http.conn.CloseablePoolingHttpClientConnectionManager;
+import com.yuweix.kuafu.http.request.AbstractHttpRequest;
 import com.yuweix.kuafu.http.ssl.TrustAllSslSocketFactory;
 import com.yuweix.kuafu.http.strategy.connect.KeepAliveStrategy;
 import com.yuweix.kuafu.http.strategy.redirect.NeedRedirectStrategy;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
+import javax.annotation.PreDestroy;
 import java.util.List;
 
 
@@ -152,5 +154,17 @@ public class HttpConf {
 		}
 
 		return builder.build();
+	}
+
+	@Bean
+	public HttpClientShutdownHook httpClientShutdownHook() {
+		return new HttpClientShutdownHook();
+	}
+
+	public static class HttpClientShutdownHook {
+		@PreDestroy
+		public void destroy() {
+			AbstractHttpRequest.shutdownDefaultHttpClient();
+		}
 	}
 }
