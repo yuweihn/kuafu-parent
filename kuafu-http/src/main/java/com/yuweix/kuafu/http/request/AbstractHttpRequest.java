@@ -281,6 +281,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 		CloseablePoolingHttpClientConnectionManager connectionManager = new CloseablePoolingHttpClientConnectionManager(registry);
 		connectionManager.setMaxTotal(200);
 		connectionManager.setDefaultMaxPerRoute(20);
+		connectionManager.setValidateAfterInactivity(5000);
 		connectionManager.startEvictor(30000, 5000);
 
 		HttpClientBuilder builder = HttpClients.custom()
