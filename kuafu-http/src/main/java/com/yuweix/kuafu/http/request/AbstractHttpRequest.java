@@ -16,6 +16,8 @@ import com.yuweix.kuafu.http.strategy.retry.NeedRetryHandler;
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
@@ -267,7 +269,9 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 				.setConnectionRequestTimeout(3000)
 				.build();
 
-		NeedRetryHandler retryHandler = new NeedRetryHandler(3);
+		KeepAliveStrategy keepAliveStrategy = new KeepAliveStrategy();
+		HttpRequestRetryHandler retryHandler = new NeedRetryHandler(3);
+		RedirectStrategy redirectStrategy = new NeedRedirectStrategy();
 
 		LayeredConnectionSocketFactory sslSocketFactory = new TrustAllSslSocketFactory();
 		Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
@@ -281,9 +285,9 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 
 		HttpClientBuilder builder = HttpClients.custom()
 				.setDefaultRequestConfig(defaultRequestConfig)
-				.setKeepAliveStrategy(new KeepAliveStrategy())
+				.setKeepAliveStrategy(keepAliveStrategy)
 				.setRetryHandler(retryHandler)
-				.setRedirectStrategy(new NeedRedirectStrategy())
+				.setRedirectStrategy(redirectStrategy)
 				.setConnectionManager(connectionManager);
 		CloseableHttpClient httpClient = builder.build();
 		log.info("创建默认的HttpClient结束");
