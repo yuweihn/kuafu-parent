@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -83,7 +84,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
     /**
      * 默认HttpClient单例
      */
-    private static volatile CloseableHttpClient DEFAULT_HTTP_CLIENT;
+    private static final AtomicReference<CloseableHttpClient> DEFAULT_HTTP_CLIENT_REF = new AtomicReference<>();
 
 
     protected AbstractHttpRequest() {
@@ -244,14 +245,19 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
      * 获取默认的HttpClient（单例）
      */
     private static CloseableHttpClient getDefaultHttpClient() {
-        if (DEFAULT_HTTP_CLIENT == null) {
-            synchronized (AbstractHttpRequest.class) {
-                if (DEFAULT_HTTP_CLIENT == null) {
-                    DEFAULT_HTTP_CLIENT = createDefaultHttpClient();
-                }
-            }
+        CloseableHttpClient client = DEFAULT_HTTP_CLIENT_REF.get();
+        if (client != null) {
+            return client;
         }
-        return DEFAULT_HTTP_CLIENT;
+        synchronized (AbstractHttpRequest.class) {
+            client = DEFAULT_HTTP_CLIENT_REF.get();
+            if (client != null) {
+                return client;
+            }
+            client = createDefaultHttpClient();
+            DEFAULT_HTTP_CLIENT_REF.set(client);
+            return client;
+        }
     }
     private static CloseableHttpClient createDefaultHttpClient() {
         log.info("创建默认的HttpClient开始");
@@ -286,13 +292,12 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
     }
 
     public static void shutdownDefaultHttpClient() {
-        if (DEFAULT_HTTP_CLIENT != null) {
+        CloseableHttpClient client = DEFAULT_HTTP_CLIENT_REF.getAndSet(null);
+        if (client != null) {
             try {
-                DEFAULT_HTTP_CLIENT.close();
+                client.close();
             } catch (Exception ex) {
                 log.error("关闭默认HttpClient失败, Error: {}", ex.getMessage(), ex);
-            } finally {
-                DEFAULT_HTTP_CLIENT = null;
             }
         }
     }

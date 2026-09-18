@@ -14,9 +14,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -151,7 +149,7 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 			/**
 			 * 返回字节数组类型
 			 **/
-			body = (B) read(entity.getContent());
+			body = (B) EntityUtils.toByteArray(entity);
 		} else if (Decoder.class.isAssignableFrom(typeClass)) {
 			String txt = EntityUtils.toString(entity, charset != null ? charset : HttpConstant.ENCODING_UTF_8);
 			Constructor<?> constructor = CONSTRUCTOR_CACHE.computeIfAbsent(typeClass, k -> {
@@ -184,30 +182,6 @@ public class CallbackResponseHandler<B> implements ResponseHandler<HttpResponse<
 		}
 		return createBasicHttpResponse(status, errorMessage.toString(), body, headerList, cookieList, contentType);
 	}
-
-	private static byte[] read(InputStream is) {
-        ByteArrayOutputStream out = null;
-        try {
-            out = new ByteArrayOutputStream();
-            byte[] buffer = new byte[8192];
-            int len;
-            while ((len = is.read(buffer)) != -1) {
-                out.write(buffer, 0, len);
-            }
-            return out.toByteArray();
-        } catch (Exception e) {
-            log.error("读取流内容失败, Error: {}", e.getMessage() , e);
-            throw new RuntimeException(e);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    log.error("关闭输出流失败, Error: {}", e.getMessage(), e);
-                }
-            }
-        }
-    }
 
 	private BasicHttpResponse createBasicHttpResponse(int status, String errorMessage, B body
 			, List<Header> headerList, List<Cookie> cookieList, Header contentType) {
