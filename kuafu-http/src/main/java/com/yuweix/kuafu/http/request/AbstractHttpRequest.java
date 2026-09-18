@@ -267,8 +267,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
 				.setConnectionRequestTimeout(3000)
 				.build();
 
-		NeedRetryHandler retryHandler = new NeedRetryHandler();
-		retryHandler.setMaxRetries(3);
+		NeedRetryHandler retryHandler = new NeedRetryHandler(3);
 
 		LayeredConnectionSocketFactory sslSocketFactory = new TrustAllSslSocketFactory();
 		Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()

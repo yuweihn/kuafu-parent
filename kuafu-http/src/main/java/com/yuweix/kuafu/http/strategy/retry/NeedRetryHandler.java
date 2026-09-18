@@ -23,7 +23,10 @@ public class NeedRetryHandler implements HttpRequestRetryHandler {
 
 
 	public NeedRetryHandler() {
-		this.maxRetries = 3;
+		this(3);
+	}
+	public NeedRetryHandler(int maxRetries) {
+		this.maxRetries = maxRetries;
 	}
 
 	public void setMaxRetries(int maxRetries) {
