@@ -2,7 +2,6 @@ package com.yuweix.kuafu.http.springboot;
 
 
 import com.yuweix.kuafu.http.conn.CloseablePoolingHttpClientConnectionManager;
-import com.yuweix.kuafu.http.request.AbstractHttpRequest;
 import com.yuweix.kuafu.http.ssl.TrustAllSslSocketFactory;
 import com.yuweix.kuafu.http.strategy.connect.KeepAliveStrategy;
 import com.yuweix.kuafu.http.strategy.redirect.NeedRedirectStrategy;
@@ -23,7 +22,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -154,17 +152,5 @@ public class HttpConf {
 		}
 
 		return builder.build();
-	}
-
-	@Bean
-	public HttpClientShutdownHook httpClientShutdownHook() {
-		return new HttpClientShutdownHook();
-	}
-
-	public static class HttpClientShutdownHook implements DisposableBean {
-		@Override
-		public void destroy() {
-			AbstractHttpRequest.shutdownDefaultHttpClient();
-		}
 	}
 }
