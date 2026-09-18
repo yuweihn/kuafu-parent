@@ -13,13 +13,13 @@ import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,8 +78,9 @@ public class HttpConf {
 
 	@ConditionalOnMissingBean(name = "httpClientConnectionManager")
 	@Bean(name = "httpClientConnectionManager", destroyMethod = "shutdown")
-	public HttpClientConnectionManager httpClientConnectionManager(@Value("${kuafu.http.client.pooling.max-total:200}") int maxTotal
+	public PoolingHttpClientConnectionManager httpClientConnectionManager(@Value("${kuafu.http.client.pooling.max-total:200}") int maxTotal
 			, @Value("${kuafu.http.client.pooling.max-per-route:20}") int maxPerRoute
+			, @Value("${kuafu.http.client.pooling.validate-after-inactivity:5000}") int validateAfterInactivity
 			, @Value("${kuafu.http.client.pooling.idle-timeout:30000}") long idleTimeout
 			, @Value("${kuafu.http.client.pooling.check-interval:5000}") long checkInterval
 			, LayeredConnectionSocketFactory sslSocketFactory) {
@@ -91,6 +92,7 @@ public class HttpConf {
 		CloseablePoolingHttpClientConnectionManager cm = new CloseablePoolingHttpClientConnectionManager(registry);
 		cm.setMaxTotal(maxTotal);
 		cm.setDefaultMaxPerRoute(maxPerRoute);
+		cm.setValidateAfterInactivity(validateAfterInactivity);
 		cm.startEvictor(idleTimeout, checkInterval);
 		return cm;
 	}
@@ -100,7 +102,7 @@ public class HttpConf {
 	public CloseableHttpClient closeableHttpClient(@Qualifier("defaultRequestConfig") RequestConfig defaultRequestConfig
 			, KeepAliveStrategy keepAliveStrategy, HttpRequestRetryHandler httpRequestRetryHandler, RedirectStrategy redirectStrategy
 //            , LayeredConnectionSocketFactory sslSocketFactory
-			, HttpClientConnectionManager httpClientConnectionManager
+			, PoolingHttpClientConnectionManager httpClientConnectionManager
 			, @Autowired(required = false) @Qualifier("firstRequestInterceptorList") List<HttpRequestInterceptor> firstRequestInterceptorList
 			, @Autowired(required = false) @Qualifier("lastRequestInterceptorList") List<HttpRequestInterceptor> lastRequestInterceptorList
 			, @Autowired(required = false) @Qualifier("firstResponseInterceptorList") List<HttpResponseInterceptor> firstResponseInterceptorList
