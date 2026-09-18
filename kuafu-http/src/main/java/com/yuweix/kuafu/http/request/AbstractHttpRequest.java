@@ -6,7 +6,6 @@ import com.yuweix.kuafu.http.CallbackResponseHandler;
 import com.yuweix.kuafu.http.DefaultHttpDelete;
 import com.yuweix.kuafu.http.HttpMethod;
 import com.yuweix.kuafu.http.JsonParser;
-import com.yuweix.kuafu.http.conn.CloseablePoolingHttpClientConnectionManager;
 import com.yuweix.kuafu.http.response.ErrorHttpResponse;
 import com.yuweix.kuafu.http.response.HttpResponse;
 import com.yuweix.kuafu.http.ssl.TrustAllSslSocketFactory;
@@ -35,6 +34,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -278,18 +279,19 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
                 .register("https", sslSocketFactory)
                 .register("http", PlainConnectionSocketFactory.INSTANCE)
                 .build();
-        CloseablePoolingHttpClientConnectionManager connectionManager = new CloseablePoolingHttpClientConnectionManager(registry);
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(registry);
         connectionManager.setMaxTotal(200);
-        connectionManager.setDefaultMaxPerRoute(20);
+        connectionManager.setDefaultMaxPerRoute(50);
         connectionManager.setValidateAfterInactivity(5000);
-        connectionManager.startEvictor(30000, 5000);
 
         HttpClientBuilder builder = HttpClients.custom()
                 .setDefaultRequestConfig(defaultRequestConfig)
                 .setKeepAliveStrategy(keepAliveStrategy)
                 .setRetryHandler(retryHandler)
                 .setRedirectStrategy(redirectStrategy)
-                .setConnectionManager(connectionManager);
+                .setConnectionManager(connectionManager)
+                .evictExpiredConnections()
+                .evictIdleConnections(30000, TimeUnit.MILLISECONDS);
         CloseableHttpClient httpClient = builder.build();
         log.info("创建默认的HttpClient结束");
         return httpClient;

@@ -1,7 +1,6 @@
 package com.yuweix.kuafu.http.springboot;
 
 
-import com.yuweix.kuafu.http.conn.CloseablePoolingHttpClientConnectionManager;
 import com.yuweix.kuafu.http.ssl.TrustAllSslSocketFactory;
 import com.yuweix.kuafu.http.strategy.connect.KeepAliveStrategy;
 import com.yuweix.kuafu.http.strategy.redirect.NeedRedirectStrategy;
@@ -29,6 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -79,21 +79,18 @@ public class HttpConf {
     @ConditionalOnMissingBean(name = "httpClientConnectionManager")
     @Bean(name = "httpClientConnectionManager", destroyMethod = "shutdown")
     public PoolingHttpClientConnectionManager httpClientConnectionManager(@Value("${kuafu.http.client.pooling.max-total:200}") int maxTotal
-            , @Value("${kuafu.http.client.pooling.max-per-route:20}") int maxPerRoute
+            , @Value("${kuafu.http.client.pooling.max-per-route:50}") int maxPerRoute
             , @Value("${kuafu.http.client.pooling.validate-after-inactivity:5000}") int validateAfterInactivity
-            , @Value("${kuafu.http.client.pooling.idle-timeout:30000}") long idleTimeout
-            , @Value("${kuafu.http.client.pooling.check-interval:5000}") long checkInterval
             , LayeredConnectionSocketFactory sslSocketFactory) {
         Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
                 .register("https", sslSocketFactory)
                 .register("http", PlainConnectionSocketFactory.INSTANCE)
                 .build();
 
-        CloseablePoolingHttpClientConnectionManager cm = new CloseablePoolingHttpClientConnectionManager(registry);
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(registry);
         cm.setMaxTotal(maxTotal);
         cm.setDefaultMaxPerRoute(maxPerRoute);
         cm.setValidateAfterInactivity(validateAfterInactivity);
-        cm.startEvictor(idleTimeout, checkInterval);
         return cm;
     }
 
@@ -103,6 +100,7 @@ public class HttpConf {
             , KeepAliveStrategy keepAliveStrategy, HttpRequestRetryHandler httpRequestRetryHandler, RedirectStrategy redirectStrategy
 //            , LayeredConnectionSocketFactory sslSocketFactory
             , PoolingHttpClientConnectionManager httpClientConnectionManager
+            , @Value("${kuafu.http.client.pooling.idle-timeout:30000}") long idleTimeout
             , @Autowired(required = false) @Qualifier("firstRequestInterceptorList") List<HttpRequestInterceptor> firstRequestInterceptorList
             , @Autowired(required = false) @Qualifier("lastRequestInterceptorList") List<HttpRequestInterceptor> lastRequestInterceptorList
             , @Autowired(required = false) @Qualifier("firstResponseInterceptorList") List<HttpResponseInterceptor> firstResponseInterceptorList
@@ -115,7 +113,9 @@ public class HttpConf {
                 .setRedirectStrategy(redirectStrategy)
 //                .setSSLSocketFactory(sslSocketFactory)
                 .setConnectionManager(httpClientConnectionManager)
-                .setConnectionManagerShared(true);
+                .setConnectionManagerShared(true)
+                .evictExpiredConnections()
+                .evictIdleConnections(idleTimeout, TimeUnit.MILLISECONDS);
 
         /**
          * add first http request interceptor list
