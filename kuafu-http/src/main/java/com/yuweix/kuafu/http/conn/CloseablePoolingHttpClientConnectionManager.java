@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CloseablePoolingHttpClientConnectionManager extends PoolingHttpClientConnectionManager {
 	private static final Logger log = LoggerFactory.getLogger(CloseablePoolingHttpClientConnectionManager.class);
+
 	private final Object lock = new Object();
 	private volatile ScheduledExecutorService executor;
 	private volatile ScheduledFuture<?> future;
