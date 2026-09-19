@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
-import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
@@ -63,7 +62,7 @@ public class LettuceClusterConf {
 
 	@Bean(name = "lettuceConnectionFactory")
 	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
-			, @Qualifier("redisSentinelConfiguration") RedisSentinelConfiguration config
+			, @Qualifier("redisClusterConfiguration") RedisClusterConfiguration config
 			, @Value("${kuafu.redis.conn.validate-connection:false}") boolean validateConnection
 			, @Value("${kuafu.redis.conn.share-native-connection:true}") boolean shareNativeConnection) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
