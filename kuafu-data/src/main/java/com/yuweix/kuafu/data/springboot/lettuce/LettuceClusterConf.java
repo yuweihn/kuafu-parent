@@ -37,7 +37,8 @@ public class LettuceClusterConf {
 			, @Value("${kuafu.redis.pool.time-between-eviction-runs-millis:30000}") long timeBetweenEvictionRunsMillis
 			, @Value("${kuafu.redis.pool.test-on-borrow:false}") boolean testOnBorrow
 			, @Value("${kuafu.redis.pool.test-while-idle:true}") boolean testWhileIdle
-			, @Value("${kuafu.redis.command-timeout-millis:5000}") long commandTimeoutMillis) {
+			, @Value("${kuafu.redis.socket.connect-timeout-millis:3000}") long connectTimeoutMillis
+			, @Value("${kuafu.redis.socket.command-timeout-millis:5000}") long commandTimeoutMillis) {
 		GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
 		poolConfig.setMaxTotal(maxTotal);
 		poolConfig.setMaxIdle(maxIdle);
@@ -55,7 +56,7 @@ public class LettuceClusterConf {
 				.build();
 		SocketOptions socketOptions = SocketOptions.builder()
 				.keepAlive(keepAliveOptions) // 使用新的 KeepAliveOptions
-				.connectTimeout(Duration.ofSeconds(5)) // 连接建立超时
+				.connectTimeout(Duration.ofMillis(connectTimeoutMillis)) // 连接建立超时
 				.tcpNoDelay(true) // 禁用 Nagle 算法，减少小包延迟
 				.build();
 		ClientOptions clientOptions = ClientOptions.builder()
