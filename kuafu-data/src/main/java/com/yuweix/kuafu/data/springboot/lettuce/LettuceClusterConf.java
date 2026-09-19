@@ -86,7 +86,7 @@ public class LettuceClusterConf {
 	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
 			, @Qualifier("redisClusterConfiguration") RedisClusterConfiguration config
 			, @Value("${kuafu.redis.conn.validate-connection:false}") boolean validateConnection
-			, @Value("${kuafu.redis.conn.share-native-connection:true}") boolean shareNativeConnection) {
+			, @Value("${kuafu.redis.conn.share-native-connection:false}") boolean shareNativeConnection) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
 		connFactory.setValidateConnection(validateConnection);
 		connFactory.setShareNativeConnection(shareNativeConnection);
