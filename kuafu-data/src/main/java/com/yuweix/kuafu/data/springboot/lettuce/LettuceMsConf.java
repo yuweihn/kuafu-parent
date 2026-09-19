@@ -50,8 +50,16 @@ public class LettuceMsConf {
 		poolConfig.setTestOnBorrow(testOnBorrow);
 		poolConfig.setTestWhileIdle(testWhileIdle);
 
+		SocketOptions.KeepAliveOptions keepAliveOptions = SocketOptions.KeepAliveOptions.builder()
+				.enable() // 启用 TCP KeepAlive
+				.idle(Duration.ofMinutes(5)) // 连接空闲 5 分钟后开始发送第一个探测包
+				.interval(Duration.ofSeconds(10)) // 探测包发送间隔为 10 秒
+				.count(3) // 最多发送 3 次探测包，如果都无响应则判定连接失效
+				.build();
 		SocketOptions socketOptions = SocketOptions.builder()
-				.keepAlive(true)
+				.keepAlive(keepAliveOptions) // 使用新的 KeepAliveOptions
+				.connectTimeout(Duration.ofSeconds(5)) // 连接建立超时
+				.tcpNoDelay(true) // 禁用 Nagle 算法，减少小包延迟
 				.build();
 		ClientOptions clientOptions = ClientOptions.builder()
 				.socketOptions(socketOptions)
