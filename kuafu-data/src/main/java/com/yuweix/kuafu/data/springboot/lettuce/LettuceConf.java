@@ -4,6 +4,8 @@ package com.yuweix.kuafu.data.springboot.lettuce;
 import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.data.cache.redis.lettuce.LettuceCache;
 import com.yuweix.kuafu.data.serializer.CacheSerializer;
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.SocketOptions;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,9 +47,18 @@ public class LettuceConf {
 		poolConfig.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
 		poolConfig.setTestOnBorrow(testOnBorrow);
 		poolConfig.setTestWhileIdle(testWhileIdle);
+
+		SocketOptions socketOptions = SocketOptions.builder()
+				.keepAlive(true)
+				.build();
+		ClientOptions clientOptions = ClientOptions.builder()
+				.socketOptions(socketOptions)
+				.build();
+
 		LettuceClientConfiguration clientConfig = LettucePoolingClientConfiguration.builder()
 				.commandTimeout(Duration.ofMillis(commandTimeoutMillis))
 				.poolConfig(poolConfig)
+				.clientOptions(clientOptions)
 				.build();
 		return clientConfig;
 	}
@@ -78,7 +89,7 @@ public class LettuceConf {
 	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
 			, @Qualifier("redisStandaloneConfiguration") RedisStandaloneConfiguration config
 			, @Value("${kuafu.redis.conn.validate-connection:false}") boolean validateConnection
-			, @Value("${kuafu.redis.conn.share-native-connection:true}") boolean shareNativeConnection) {
+			, @Value("${kuafu.redis.conn.share-native-connection:false}") boolean shareNativeConnection) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
 		connFactory.setValidateConnection(validateConnection);
 		connFactory.setShareNativeConnection(shareNativeConnection);
