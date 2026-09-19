@@ -26,7 +26,7 @@ public class JedisClusterConf {
 	public JedisPoolConfig jedisPoolConfig(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
-			, @Value("${kuafu.redis.pool.max-wait-millis:10000}") long maxWaitMillis
+			, @Value("${kuafu.redis.pool.max-wait-millis:3000}") long maxWaitMillis
 			, @Value("${kuafu.redis.pool.time-between-eviction-runs-millis:30000}") long timeBetweenEvictionRunsMillis
 			, @Value("${kuafu.redis.pool.test-on-borrow:false}") boolean testOnBorrow
 			, @Value("${kuafu.redis.pool.test-while-idle:true}") boolean testWhileIdle) {
