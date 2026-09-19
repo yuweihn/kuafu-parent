@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisPassword;
+import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -76,10 +77,12 @@ public class LettuceConf {
 	@ConditionalOnMissingBean(name = "lettuceConnectionFactory")
 	@Bean(name = "lettuceConnectionFactory")
 	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
-			, @Qualifier("redisStandaloneConfiguration") RedisStandaloneConfiguration config) {
+			, @Qualifier("redisSentinelConfiguration") RedisSentinelConfiguration config
+			, @Value("${kuafu.redis.conn.validate-connection:false}") boolean validateConnection
+			, @Value("${kuafu.redis.conn.share-native-connection:true}") boolean shareNativeConnection) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
-		connFactory.setValidateConnection(false);
-		connFactory.setShareNativeConnection(true);
+		connFactory.setValidateConnection(validateConnection);
+		connFactory.setShareNativeConnection(shareNativeConnection);
 		return connFactory;
 	}
 
