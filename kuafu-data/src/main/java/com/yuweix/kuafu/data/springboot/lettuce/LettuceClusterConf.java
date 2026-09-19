@@ -32,7 +32,7 @@ public class LettuceClusterConf {
 	@Bean(name = "lettuceClientConfiguration")
 	public LettuceClientConfiguration clientConfiguration(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
-			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
+			, @Value("${kuafu.redis.pool.min-idle:2}") int minIdle
 			, @Value("${kuafu.redis.pool.max-wait-millis:3000}") long maxWaitMillis
 			, @Value("${kuafu.redis.pool.time-between-eviction-runs-millis:30000}") long timeBetweenEvictionRunsMillis
 			, @Value("${kuafu.redis.pool.test-on-borrow:false}") boolean testOnBorrow
@@ -52,6 +52,9 @@ public class LettuceClusterConf {
 				.build();
 		ClientOptions clientOptions = ClientOptions.builder()
 				.socketOptions(socketOptions)
+				.autoReconnect(true)
+				.requestQueueSize(1024)
+				.disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
 				.build();
 
 		LettuceClientConfiguration clientConfig = LettucePoolingClientConfiguration.builder()
