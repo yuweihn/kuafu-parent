@@ -67,7 +67,7 @@ public class LettuceConf {
 	public RedisStandaloneConfiguration redisStandaloneConfiguration(@Value("${kuafu.redis.host:}") String host
 			, @Value("${kuafu.redis.port:0}") int port
 			, @Value("${kuafu.redis.db-index:0}") int dbIndex
-			, @Value("${kuafu.redis.need-password:false}") boolean needPassword
+			, @Value("${kuafu.redis.password-required:false}") boolean passwordRequired
 			, @Value("${kuafu.redis.password:}") String password) {
 		RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
 		conf.setHostName(host);
@@ -77,7 +77,7 @@ public class LettuceConf {
 		if (dbIndex >= 0) {
 			conf.setDatabase(dbIndex);
 		}
-		if (needPassword) {
+		if (passwordRequired) {
 			conf.setPassword(RedisPassword.of(password));
 		}
 		return conf;

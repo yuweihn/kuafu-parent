@@ -70,13 +70,13 @@ public class LettuceMsConf {
 			, @Value("${kuafu.redis.sentinel.ip}") String host
 			, @Value("${kuafu.redis.sentinel.port}") int port
 			, @Value("${kuafu.redis.db-index:0}") int dbIndex
-			, @Value("${kuafu.redis.need-password:false}") boolean needPassword
+			, @Value("${kuafu.redis.password-required:false}") boolean passwordRequired
 			, @Value("${kuafu.redis.password:}") String password) {
 		RedisSentinelConfiguration conf = new RedisSentinelConfiguration();
 		RedisNode redisNode = new RedisNode.RedisNodeBuilder().withName(masterName).build();
 		conf.setMaster(redisNode);
 		conf.setDatabase(dbIndex);
-		if (needPassword) {
+		if (passwordRequired) {
 			conf.setPassword(RedisPassword.of(password));
 		}
 
