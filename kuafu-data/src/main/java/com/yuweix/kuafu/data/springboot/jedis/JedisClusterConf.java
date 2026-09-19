@@ -44,7 +44,7 @@ public class JedisClusterConf {
 	@Bean(name = "jedisCluster", initMethod = "init")
 	public JedisClusterFactory jedisClusterFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
 			, @Qualifier("redisNodeList") List<HostAndPort> redisNodeList
-			, @Value("${kuafu.redis.cluster.timeout:300000}") int timeout
+			, @Value("${kuafu.redis.cluster.timeout:5000}") int timeout
 			, @Value("${kuafu.redis.cluster.max-redirections:6}") int maxRedirections) {
 		JedisClusterFactory factory = new JedisClusterFactory();
 		factory.setJedisPoolConfig(jedisPoolConfig);
