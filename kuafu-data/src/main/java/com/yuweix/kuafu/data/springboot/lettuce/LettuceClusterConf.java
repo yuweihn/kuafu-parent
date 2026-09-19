@@ -32,9 +32,10 @@ public class LettuceClusterConf {
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:10}") int minIdle
 			, @Value("${kuafu.redis.pool.max-wait-millis:10000}") long maxWaitMillis
-			, @Value("${kuafu.redis.pool.time-between-eviction-runs-millis:-1}") long timeBetweenEvictionRunsMillis
+			, @Value("${kuafu.redis.pool.time-between-eviction-runs-millis:30000}") long timeBetweenEvictionRunsMillis
 			, @Value("${kuafu.redis.pool.test-on-borrow:false}") boolean testOnBorrow
-			, @Value("${kuafu.redis.timeoutMillis:5000}") long timeoutMillis) {
+			, @Value("${kuafu.redis.pool.test-while-idle:true}") boolean testWhileIdle
+			, @Value("${kuafu.redis.command-timeout-millis:5000}") long commandTimeoutMillis) {
 		GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
 		poolConfig.setMaxTotal(maxTotal);
 		poolConfig.setMaxIdle(maxIdle);
@@ -42,8 +43,9 @@ public class LettuceClusterConf {
 		poolConfig.setMaxWaitMillis(maxWaitMillis);
 		poolConfig.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
 		poolConfig.setTestOnBorrow(testOnBorrow);
+		poolConfig.setTestWhileIdle(testWhileIdle);
 		LettuceClientConfiguration clientConfig = LettucePoolingClientConfiguration.builder()
-				.commandTimeout(Duration.ofMillis(timeoutMillis))
+				.commandTimeout(Duration.ofMillis(commandTimeoutMillis))
 				.poolConfig(poolConfig)
 				.build();
 		return clientConfig;
