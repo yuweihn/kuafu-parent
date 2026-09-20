@@ -40,6 +40,10 @@ public class LettuceMsConf {
 			, @Value("${kuafu.redis.pool.time-between-eviction-runs-millis:30000}") long timeBetweenEvictionRunsMillis
 			, @Value("${kuafu.redis.pool.test-on-borrow:false}") boolean testOnBorrow
 			, @Value("${kuafu.redis.pool.test-while-idle:true}") boolean testWhileIdle
+			, @Value("${kuafu.redis.pool.min-evictable-idle-time-millis:60000}") long minEvictableIdleTimeMillis
+			, @Value("${kuafu.redis.pool.soft-min-evictable-idle-time-millis:60000}") long softMinEvictableIdleTimeMillis
+			, @Value("${kuafu.redis.pool.num-tests-per-eviction-run:3}") int numTestsPerEvictionRun
+			, @Value("${kuafu.redis.pool.eviction-policy-class-name:}") String evictionPolicyClassName
 			, @Value("${kuafu.redis.socket.connect-timeout-millis:3000}") long connectTimeoutMillis
 			, @Value("${kuafu.redis.socket.command-timeout-millis:5000}") long commandTimeoutMillis
 			, @Value("${kuafu.redis.socket.idle-millis:30000}") long socketIdleMillis
@@ -50,10 +54,22 @@ public class LettuceMsConf {
 		poolConfig.setMaxTotal(maxTotal);
 		poolConfig.setMaxIdle(maxIdle);
 		poolConfig.setMinIdle(minIdle);
-		poolConfig.setMaxWaitMillis(maxWaitMillis);
-		poolConfig.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
+		poolConfig.setMaxWait(Duration.ofMillis(maxWaitMillis));
+		poolConfig.setTimeBetweenEvictionRuns(Duration.ofMillis(timeBetweenEvictionRunsMillis));
 		poolConfig.setTestOnBorrow(testOnBorrow);
 		poolConfig.setTestWhileIdle(testWhileIdle);
+
+		// ==================== Evict 策略配置 ====================
+		// 连接空闲达到该时间后，可被驱逐线程回收（默认 60 秒）
+		poolConfig.setMinEvictableIdleTime(Duration.ofMillis(minEvictableIdleTimeMillis));
+		// 软驱逐：当空闲连接数 > minIdle 时，达到该时间也可被驱逐（与 minEvictableIdleTime 取更严格的）
+		poolConfig.setSoftMinEvictableIdleTime(Duration.ofMillis(softMinEvictableIdleTimeMillis));
+		// 每次驱逐线程运行时检测的连接数，-1 表示检测全部（生产环境建议保持 3 或根据池大小调整）
+		poolConfig.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
+		// 使用默认驱逐策略（如需自定义，可改为自定义类全限定名）
+		if (evictionPolicyClassName != null && !evictionPolicyClassName.isEmpty()) {
+			poolConfig.setEvictionPolicyClassName(evictionPolicyClassName);
+		}
 
 		SocketOptions.KeepAliveOptions keepAliveOptions = SocketOptions.KeepAliveOptions.builder()
 				.enable() // 启用 TCP KeepAlive
@@ -106,7 +122,7 @@ public class LettuceMsConf {
 	public LettuceConnectionFactory lettuceConnectionFactory(@Qualifier("lettuceClientConfiguration") LettuceClientConfiguration clientConfig
 			, @Qualifier("redisSentinelConfiguration") RedisSentinelConfiguration config
 			, @Value("${kuafu.redis.conn.validate-connection:false}") boolean validateConnection
-			, @Value("${kuafu.redis.conn.share-native-connection:false}") boolean shareNativeConnection) {
+			, @Value("${kuafu.redis.conn.share-native-connection:true}") boolean shareNativeConnection) {
 		LettuceConnectionFactory connFactory = new LettuceConnectionFactory(config, clientConfig);
 		connFactory.setValidateConnection(validateConnection);
 		connFactory.setShareNativeConnection(shareNativeConnection);
