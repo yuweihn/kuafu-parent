@@ -33,7 +33,7 @@
         <jackson.version>2.14.1</jackson.version>
         <jakarta.annotation.api.version>2.1.1</jakarta.annotation.api.version>
         <jakarta.jms.api.version>3.1.0</jakarta.jms.api.version>
-        <jedis.version>2.9.0</jedis.version>
+        <jedis.version>3.9.0</jedis.version>
         <jasypt.version>1.9.3</jasypt.version>
         <lettuce.version>6.1.10.RELEASE</lettuce.version>
         <maven.compiler.encoding>utf-8</maven.compiler.encoding>
