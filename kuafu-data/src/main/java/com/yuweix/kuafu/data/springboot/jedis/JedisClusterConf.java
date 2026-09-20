@@ -3,7 +3,6 @@ package com.yuweix.kuafu.data.springboot.jedis;
 
 import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.data.cache.redis.jedis.JedisClusterCache;
-import com.yuweix.kuafu.data.cache.redis.jedis.JedisClusterFactory;
 import com.yuweix.kuafu.data.serializer.CacheSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +13,7 @@ import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -22,7 +22,6 @@ import java.util.List;
  * @author yuwei
  */
 public class JedisClusterConf {
-
 	@Bean(name = "jedisPoolConfig")
 	public JedisPoolConfig jedisPoolConfig(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
@@ -59,17 +58,14 @@ public class JedisClusterConf {
 		return config;
 	}
 
-	@Bean(name = "jedisCluster", initMethod = "init")
-	public JedisClusterFactory jedisClusterFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
+	@Bean(name = "jedisCluster")
+	public JedisCluster jedisCluster(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
 			, @Qualifier("redisNodeList") List<HostAndPort> redisNodeList
-			, @Value("${kuafu.redis.cluster.timeout:5000}") int timeout
-			, @Value("${kuafu.redis.cluster.max-redirections:6}") int maxRedirections) {
-		JedisClusterFactory factory = new JedisClusterFactory();
-		factory.setJedisPoolConfig(jedisPoolConfig);
-		factory.setRedisNodeList(redisNodeList);
-		factory.setTimeout(timeout);
-		factory.setMaxRedirections(maxRedirections);
-		return factory;
+			, @Value("${kuafu.redis.socket.connect-timeout-millis:3000}") long connectTimeoutMillis
+			, @Value("${kuafu.redis.socket.command-timeout-millis:5000}") long commandTimeoutMillis
+			, @Value("${kuafu.redis.socket.max-attempts:3}") int maxAttempts) {
+		return new JedisCluster(new HashSet<>(redisNodeList), (int) connectTimeoutMillis, (int) commandTimeoutMillis
+				, maxAttempts, jedisPoolConfig);
 	}
 
 	@ConditionalOnMissingBean(CacheSerializer.class)

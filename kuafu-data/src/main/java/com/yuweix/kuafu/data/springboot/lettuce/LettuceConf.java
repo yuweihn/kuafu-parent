@@ -46,7 +46,7 @@ public class LettuceConf {
 			, @Value("${kuafu.redis.socket.command-timeout-millis:5000}") long commandTimeoutMillis
 			, @Value("${kuafu.redis.socket.idle-millis:30000}") long socketIdleMillis
 			, @Value("${kuafu.redis.socket.interval-millis:5000}") long socketIntervalMillis
-			, @Value("${kuafu.redis.socket.max-probe-times:3}") int maxProbeTimes
+			, @Value("${kuafu.redis.socket.max-attempts:3}") int maxAttempts
 			, @Value("${kuafu.redis.client.request-queue-size:1024}") int requestQueueSize) {
 		GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
 		poolConfig.setMaxTotal(maxTotal);
@@ -73,7 +73,7 @@ public class LettuceConf {
 				.enable() // 启用 TCP KeepAlive
 				.idle(Duration.ofMillis(socketIdleMillis)) // 连接空闲××时间后开始发送第一个探测包
 				.interval(Duration.ofMillis(socketIntervalMillis)) // 探测包发送间隔为××秒
-				.count(maxProbeTimes) // 最多发送××次探测包，如果都无响应则判定连接失效
+				.count(maxAttempts) // 最多发送××次探测包，如果都无响应则判定连接失效
 				.build();
 		SocketOptions socketOptions = SocketOptions.builder()
 				.keepAlive(keepAliveOptions) // 使用新的 KeepAliveOptions

@@ -4,6 +4,7 @@ package com.yuweix.kuafu.data.springboot.jedis;
 import com.yuweix.kuafu.core.serialize.Serializer;
 import com.yuweix.kuafu.data.cache.redis.jedis.JedisCache;
 import com.yuweix.kuafu.data.serializer.CacheSerializer;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -12,12 +13,12 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import redis.clients.jedis.JedisPoolConfig;
 
 import java.time.Duration;
 import java.util.HashSet;
@@ -29,8 +30,8 @@ import java.util.Set;
  * @author yuwei
  */
 public class JedisMsConf {
-	@Bean(name = "jedisPoolConfig")
-	public JedisPoolConfig jedisPoolConfig(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
+	@Bean(name = "jedisClientConfiguration")
+	public JedisClientConfiguration jedisClientConfiguration(@Value("${kuafu.redis.pool.max-total:20}") int maxTotal
 			, @Value("${kuafu.redis.pool.max-idle:10}") int maxIdle
 			, @Value("${kuafu.redis.pool.min-idle:2}") int minIdle
 			, @Value("${kuafu.redis.pool.max-wait-millis:3000}") long maxWaitMillis
@@ -40,29 +41,37 @@ public class JedisMsConf {
 			, @Value("${kuafu.redis.pool.min-evictable-idle-time-millis:60000}") long minEvictableIdleTimeMillis
 			, @Value("${kuafu.redis.pool.soft-min-evictable-idle-time-millis:60000}") long softMinEvictableIdleTimeMillis
 			, @Value("${kuafu.redis.pool.num-tests-per-eviction-run:3}") int numTestsPerEvictionRun
-			, @Value("${kuafu.redis.pool.eviction-policy-class-name:}") String evictionPolicyClassName) {
-		JedisPoolConfig config = new JedisPoolConfig();
-		config.setMaxTotal(maxTotal);
-		config.setMaxIdle(maxIdle);
-		config.setMinIdle(minIdle);
-		config.setMaxWait(Duration.ofMillis(maxWaitMillis));
-		config.setTimeBetweenEvictionRuns(Duration.ofMillis(timeBetweenEvictionRunsMillis));
-		config.setTestOnBorrow(testOnBorrow);
-		config.setTestWhileIdle(testWhileIdle);
+			, @Value("${kuafu.redis.pool.eviction-policy-class-name:}") String evictionPolicyClassName
+			, @Value("${kuafu.redis.socket.connect-timeout-millis:3000}") long connectTimeoutMillis
+			, @Value("${kuafu.redis.socket.command-timeout-millis:5000}") long commandTimeoutMillis) {
+		GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+		poolConfig.setMaxTotal(maxTotal);
+		poolConfig.setMaxIdle(maxIdle);
+		poolConfig.setMinIdle(minIdle);
+		poolConfig.setMaxWait(Duration.ofMillis(maxWaitMillis));
+		poolConfig.setTimeBetweenEvictionRuns(Duration.ofMillis(timeBetweenEvictionRunsMillis));
+		poolConfig.setTestOnBorrow(testOnBorrow);
+		poolConfig.setTestWhileIdle(testWhileIdle);
 
 		// ==================== Evict 策略配置 ====================
 		// 连接空闲达到该时间后，可被驱逐线程回收（默认 60 秒）
-		config.setMinEvictableIdleTime(Duration.ofMillis(minEvictableIdleTimeMillis));
+		poolConfig.setMinEvictableIdleTime(Duration.ofMillis(minEvictableIdleTimeMillis));
 		// 软驱逐：当空闲连接数 > minIdle 时，达到该时间也可被驱逐（与 minEvictableIdleTime 取更严格的）
-		config.setSoftMinEvictableIdleTime(Duration.ofMillis(softMinEvictableIdleTimeMillis));
+		poolConfig.setSoftMinEvictableIdleTime(Duration.ofMillis(softMinEvictableIdleTimeMillis));
 		// 每次驱逐线程运行时检测的连接数，-1 表示检测全部（生产环境建议保持 3 或根据池大小调整）
-		config.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
+		poolConfig.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
 		// 使用默认驱逐策略（如需自定义，可改为自定义类全限定名）
 		if (evictionPolicyClassName != null && !evictionPolicyClassName.isEmpty()) {
-			config.setEvictionPolicyClassName(evictionPolicyClassName);
+			poolConfig.setEvictionPolicyClassName(evictionPolicyClassName);
 		}
 
-		return config;
+		JedisClientConfiguration clientConfig = JedisClientConfiguration.builder()
+				.connectTimeout(Duration.ofMillis(connectTimeoutMillis))
+				.readTimeout(Duration.ofMillis(commandTimeoutMillis))
+				.usePooling()
+				.poolConfig(poolConfig)
+				.build();
+		return clientConfig;
 	}
 
 	@Bean(name = "redisSentinelConfiguration")
@@ -87,9 +96,9 @@ public class JedisMsConf {
 	}
 
 	@Bean(name = "jedisConnectionFactory")
-	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig
+	public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisClientConfiguration") JedisClientConfiguration clientConfig
 			, @Qualifier("redisSentinelConfiguration") RedisSentinelConfiguration sentinelConfig) {
-		return new JedisConnectionFactory(sentinelConfig, jedisPoolConfig);
+		return new JedisConnectionFactory(sentinelConfig, clientConfig);
 	}
 
 	@Bean(name = "redisTemplate")
