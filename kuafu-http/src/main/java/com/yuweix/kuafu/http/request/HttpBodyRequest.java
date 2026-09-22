@@ -49,7 +49,7 @@ public class HttpBodyRequest extends AbstractHttpRequest<HttpBodyRequest> {
 
 		HttpEntityEnclosingRequestBase requestBase = getRequestBase();
 		requestBase.setEntity(entity);
-		this.setHttpUriRequest(requestBase);
+		this.setHttpRequest(requestBase);
 		return doExecute();
 	}
 

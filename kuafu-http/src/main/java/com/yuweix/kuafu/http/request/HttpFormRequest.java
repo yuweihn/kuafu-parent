@@ -90,7 +90,7 @@ public class HttpFormRequest extends AbstractHttpRequest<HttpFormRequest> {
 			}
 
 			URI uri = uriBuilder.build();
-			this.setHttpUriRequest(new HttpGet(uri));
+			this.setHttpRequest(new HttpGet(uri));
 			return doExecute();
 		} catch (URISyntaxException ex) {
 			log.error("URISyntaxException, Error: {}", ex.getMessage(), ex);
@@ -129,7 +129,7 @@ public class HttpFormRequest extends AbstractHttpRequest<HttpFormRequest> {
 
 			HttpEntityEnclosingRequestBase requestBase = getRequestBase();
 			requestBase.setEntity(entity);
-			this.setHttpUriRequest(requestBase);
+			this.setHttpRequest(requestBase);
 			return doExecute();
 		}
 	}
