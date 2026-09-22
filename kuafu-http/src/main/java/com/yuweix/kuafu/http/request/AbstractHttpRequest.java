@@ -22,7 +22,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> implements HttpRequest {
     private static final Logger log = LoggerFactory.getLogger(AbstractHttpRequest.class);
 
-    private HttpUriRequest httpUriRequest;
+    private HttpRequestBase httpRequest;
     private String url;
     private HttpMethod method;
     private Class<?> responseTypeClass;
@@ -95,8 +95,8 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
         this.jsonParser = DEFAULT_JSON_PARSER;
     }
 
-    protected void setHttpUriRequest(HttpUriRequest httpUriRequest) {
-        this.httpUriRequest = httpUriRequest;
+    protected void setHttpRequest(HttpRequestBase httpRequest) {
+        this.httpRequest = httpRequest;
     }
 
 
@@ -184,21 +184,23 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
         } else {
             requestBase = new HttpPost(url);
         }
-        requestBase.setConfig(requestConfig);
         return requestBase;
     }
 
     protected <B>HttpResponse<B> doExecute() {
+        if (requestConfig != null) {
+            httpRequest.setConfig(requestConfig);
+        }
         /**
          * header
          */
         ContentType hct = getHeaderContentType();
         if (hct != null) {
-            httpUriRequest.setHeader(new BasicHeader(HTTP.CONTENT_TYPE, hct.toString()));
+            httpRequest.setHeader(new BasicHeader(HTTP.CONTENT_TYPE, hct.toString()));
         }
         if (headerList != null && headerList.size() > 0) {
             for (Header header: headerList) {
-                httpUriRequest.setHeader(header);
+                httpRequest.setHeader(header);
             }
         }
         /**
@@ -208,7 +210,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
             String cookieStr = cookieList.stream()
                     .map(c -> c.getName() + "=" + c.getValue())
                     .collect(Collectors.joining(";"));
-            httpUriRequest.setHeader("Cookie", cookieStr);
+            httpRequest.setHeader("Cookie", cookieStr);
         }
         /**
          * context
@@ -231,7 +233,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
         long startTime = System.currentTimeMillis();
         try {
             log.info("Http请求开始, url: {}, method: {}", url, method);
-            resp = client.execute(httpUriRequest, handler, context);
+            resp = client.execute(httpRequest, handler, context);
             return resp;
         } catch (Exception ex) {
             log.error("HttpClient.execute失败, Error: {}", ex.getMessage(), ex);
