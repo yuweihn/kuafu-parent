@@ -265,9 +265,9 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
     private static CloseableHttpClient createDefaultHttpClient() {
         log.info("创建默认的HttpClient开始");
         RequestConfig defaultRequestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(3000)
                 .setConnectTimeout(3000)
                 .setSocketTimeout(10000)
-                .setConnectionRequestTimeout(3000)
                 .build();
 
         KeepAliveStrategy keepAliveStrategy = new KeepAliveStrategy();

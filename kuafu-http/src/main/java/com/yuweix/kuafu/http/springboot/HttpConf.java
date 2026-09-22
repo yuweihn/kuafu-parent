@@ -40,13 +40,13 @@ public class HttpConf {
 
     @ConditionalOnMissingBean(name = "defaultRequestConfig")
     @Bean(name = "defaultRequestConfig")
-    public RequestConfig defaultRequestConfig(@Value("${kuafu.http.client.default-request-config.connect-timeout:3000}") int connectTimeout
-            , @Value("${kuafu.http.client.default-request-config.socket-timeout:10000}") int socketTimeout
-            , @Value("${kuafu.http.client.default-request-config.connection-request-timeout:3000}") int connectionRequestTimeout) {
+    public RequestConfig defaultRequestConfig(@Value("${kuafu.http.client.default-request-config.connection-request-timeout:3000}") int connectionRequestTimeout
+            , @Value("${kuafu.http.client.default-request-config.connect-timeout:3000}") int connectTimeout
+            , @Value("${kuafu.http.client.default-request-config.socket-timeout:10000}") int socketTimeout) {
         return RequestConfig.custom()
+                .setConnectionRequestTimeout(connectionRequestTimeout)
                 .setConnectTimeout(connectTimeout)
                 .setSocketTimeout(socketTimeout)
-                .setConnectionRequestTimeout(connectionRequestTimeout)
                 .build();
     }
 
