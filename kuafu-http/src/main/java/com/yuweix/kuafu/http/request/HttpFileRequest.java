@@ -119,7 +119,7 @@ public class HttpFileRequest extends AbstractHttpRequest<HttpFileRequest> {
 		}
 		HttpEntity entity = builder.build();
 
-		HttpEntityEnclosingRequestBase requestBase = getRequestBase();
+		HttpEntityEnclosingRequestBase requestBase = createHttpRequest();
 		requestBase.addHeader("Content-Disposition", "attachment");
 		requestBase.setEntity(entity);
 		this.setHttpRequest(requestBase);

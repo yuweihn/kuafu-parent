@@ -47,7 +47,7 @@ public class HttpBodyRequest extends AbstractHttpRequest<HttpBodyRequest> {
 		entity.setContentType(contentType.getMimeType());
 		entity.setContentEncoding(charset);
 
-		HttpEntityEnclosingRequestBase requestBase = getRequestBase();
+		HttpEntityEnclosingRequestBase requestBase = createHttpRequest();
 		requestBase.setEntity(entity);
 		this.setHttpRequest(requestBase);
 		return doExecute();
