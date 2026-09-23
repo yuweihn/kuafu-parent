@@ -173,7 +173,7 @@ public abstract class AbstractHttpRequest<T extends AbstractHttpRequest<T>> impl
         return null;
     }
 
-    protected HttpEntityEnclosingRequestBase getRequestBase() {
+    protected HttpEntityEnclosingRequestBase createHttpRequest() {
         HttpEntityEnclosingRequestBase requestBase = null;
         if (HttpMethod.POST.equals(method)) {
             requestBase = new HttpPost(url);

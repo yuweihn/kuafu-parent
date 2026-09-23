@@ -127,7 +127,7 @@ public class HttpFormRequest extends AbstractHttpRequest<HttpFormRequest> {
 			List<NameValuePair> list = toNameValuePairList(fieldList);
 			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(list, Charset.forName(charset));
 
-			HttpEntityEnclosingRequestBase requestBase = getRequestBase();
+			HttpEntityEnclosingRequestBase requestBase = createHttpRequest();
 			requestBase.setEntity(entity);
 			this.setHttpRequest(requestBase);
 			return doExecute();
