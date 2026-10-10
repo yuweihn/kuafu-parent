@@ -28,7 +28,7 @@ public abstract class QrCodeUtil {
 	private static final Logger log = LoggerFactory.getLogger(QrCodeUtil.class);
 
 
-	private static final String CHARSET = "utf-8";
+	private static final String CHARSET = "UTF-8";
 	private static final String DEFAULT_IMAGE_TYPE = "jpg";
 	/**
 	 * 二维码尺寸
