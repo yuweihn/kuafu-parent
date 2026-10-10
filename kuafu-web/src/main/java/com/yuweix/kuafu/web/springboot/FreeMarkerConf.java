@@ -33,7 +33,7 @@ public class FreeMarkerConf {
 		viewResolver.setViewClass(FreeMarkerView.class);
 		viewResolver.setPrefix("");
 		viewResolver.setSuffix(".ftl");
-		viewResolver.setContentType("text/html;charset=utf-8");
+		viewResolver.setContentType("text/html;charset=UTF-8");
 		viewResolver.setExposeSpringMacroHelpers(true);
 		viewResolver.setExposeRequestAttributes(true);
 		viewResolver.setExposeSessionAttributes(true);
@@ -48,8 +48,8 @@ public class FreeMarkerConf {
 	public FreeMarkerConfigurer freemarkerConfig(
 			@Value("${kuafu.freemarker.template.path:classpath:/templates/}") String template_path,
 			@Value("${kuafu.freemarker.template.update.delay:0}") String template_update_delay,
-			@Value("${kuafu.freemarker.default.encoding:utf-8}") String default_encoding,
-			@Value("${kuafu.freemarker.output.encoding:utf-8}") String output_encoding,
+			@Value("${kuafu.freemarker.default.encoding:UTF-8}") String default_encoding,
+			@Value("${kuafu.freemarker.output.encoding:UTF-8}") String output_encoding,
 			@Value("${kuafu.freemarker.locale:zh_CN}") String locale,
 			@Value("${kuafu.freemarker.number.format:0.##########}") String number_format,
 			@Value("${kuafu.freemarker.date.format:yyyy-MM-dd}") String date_format,

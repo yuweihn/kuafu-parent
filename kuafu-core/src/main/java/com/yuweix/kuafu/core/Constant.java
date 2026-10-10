@@ -10,7 +10,7 @@ import java.time.ZoneId;
  * @author yuwei
  **/
 public class Constant {
-	public static final String ENCODING_UTF_8 = "utf-8";
+	public static final String ENCODING_UTF_8 = "UTF-8";
 	public static final String LOCALE_ZH_CN = "zh_CN";
 	public static final String LOCALE_EN_US = "en_US";
 	public static final String SESSION_USER_ID = "sessionUserId";
