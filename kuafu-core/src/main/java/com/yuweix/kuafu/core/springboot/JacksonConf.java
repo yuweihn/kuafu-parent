@@ -41,7 +41,7 @@ public class JacksonConf {
             , @Value("${kuafu.json.jackson.mapper.serializer-modifiers:}") String serializerModifiers) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"));
         mapper.setTimeZone(TimeZone.getTimeZone(timeZone));
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);

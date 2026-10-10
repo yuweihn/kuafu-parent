@@ -44,7 +44,7 @@ public abstract class JacksonUtil {
 
     private static void initSerializeMapper() {
         SERIALIZE_MAPPER.registerModule(new JavaTimeModule());
-        SERIALIZE_MAPPER.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        SERIALIZE_MAPPER.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"));
         SERIALIZE_MAPPER.setTimeZone(TimeZone.getTimeZone(Constant.DEFAULT_TIME_ZONE));
         SERIALIZE_MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         SERIALIZE_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -65,7 +65,7 @@ public abstract class JacksonUtil {
     }
     private static void initBaseMapper() {
         BASE_MAPPER.registerModule(new JavaTimeModule());
-        BASE_MAPPER.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        BASE_MAPPER.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"));
         BASE_MAPPER.setTimeZone(TimeZone.getTimeZone(Constant.DEFAULT_TIME_ZONE));
         BASE_MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         BASE_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
