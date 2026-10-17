@@ -63,9 +63,10 @@ public abstract class AbstractTask {
 		boolean release = getRelease();
 		Elector.R res = elector.tryAcquire(lockName);
 		if (res.isSuccess()) {
-			before();
 			try {
+				before();
 				executeTask();
+				after();
 			} catch (Exception e) {
 				handle(e);
 			} finally {
@@ -76,7 +77,6 @@ public abstract class AbstractTask {
 					}
 				}
 			}
-			after();
 			long timeCost = System.currentTimeMillis() - startTime;
 			log.info("Job executed here, Job name: {}, Local node: {}, Time cost: {}"
 					, this.getClass().getName(), res.getLocal(), timeCost >= 1000 ? (timeCost / 1000.0) + "s" : timeCost + "ms");
