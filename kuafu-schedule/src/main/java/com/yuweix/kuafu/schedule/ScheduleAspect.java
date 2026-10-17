@@ -23,9 +23,8 @@ public class ScheduleAspect {
         Object target = point.getTarget();
         if (!(target instanceof AbstractTask)) {
             return point.proceed();
-        } else {
-            ((AbstractTask) target).start();
-            return null;
         }
+
+        return ((AbstractTask) target).execute(point::proceed);
     }
 }

@@ -45,13 +45,16 @@ public abstract class AbstractTask {
 
 	}
 
-	public void execute() {
-		this.start();
+	@FunctionalInterface
+	public interface ExecutionBody {
+		Object run() throws Throwable;
 	}
-
-	public final void start() {
+	/**
+	 * 选主骨架：抢到主才执行 body，未抢到返回 null
+	 */
+	public final Object execute(ExecutionBody body) throws Throwable {
 		if (!isEnabled()) {
-			return;
+			return null;
 		}
 		long startTime = System.currentTimeMillis();
 		Elector elector = getLeaderElector();
@@ -62,27 +65,30 @@ public abstract class AbstractTask {
 		String lockName = getLockName();
 		boolean release = getRelease();
 		Elector.R res = elector.tryAcquire(lockName);
-		if (res.isSuccess()) {
-			try {
-				before();
-				executeTask();
-				after();
-			} catch (Exception e) {
-				handle(e);
-			} finally {
-				if (release) {
-					try {
-						elector.release(lockName);
-					} catch (Exception ignored) {
-					}
+		if (!res.isSuccess()) {
+			log.info("Not leader, job didn't execute! Job name: {}, Leader: {}", this.getClass().getName(), res.getLeader());
+			return null;
+		}
+
+		Object result = null;
+		try {
+			before();
+			result = body.run();
+		} catch (Exception ex) {
+			handle(ex);
+		} finally {
+			if (release) {
+				try {
+					elector.release(lockName);
+				} catch (Exception ignored) {
 				}
 			}
+			after();
 			long timeCost = System.currentTimeMillis() - startTime;
 			log.info("Job executed here, Job name: {}, Local node: {}, Time cost: {}"
 					, this.getClass().getName(), res.getLocal(), timeCost >= 1000 ? (timeCost / 1000.0) + "s" : timeCost + "ms");
-		} else {
-			log.warn("Not leader, job didn't execute! Job name: {}, Leader: {}", this.getClass().getName(), res.getLeader());
 		}
+		return result;
 	}
 
 	protected boolean isEnabled() {
@@ -98,7 +104,6 @@ public abstract class AbstractTask {
 	protected void after() {
 
 	}
-	protected abstract void executeTask();
 	protected String getLockName() {
 		return this.getClass().getName();
 	}
