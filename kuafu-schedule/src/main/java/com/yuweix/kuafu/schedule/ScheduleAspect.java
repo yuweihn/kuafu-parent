@@ -18,7 +18,12 @@ public class ScheduleAspect {
 
     }
 
-    @Around("executable()")
+    @Pointcut("@annotation(org.springframework.scheduling.annotation.Scheduled)")
+    public void scheduled() {
+
+    }
+
+    @Around("executable() || scheduled()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         Object target = point.getTarget();
         if (!(target instanceof AbstractTask)) {
