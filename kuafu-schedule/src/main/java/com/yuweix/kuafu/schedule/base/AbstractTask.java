@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -149,7 +150,7 @@ public abstract class AbstractTask {
 		while (clazz != null) {
 			Field[] fields = clazz.getDeclaredFields();
 			for (Field f: fields) {
-				if (f.getType() == Elector.class) {
+				if (!Modifier.isStatic(f.getModifiers()) && f.getType() == Elector.class) {
 					f.setAccessible(true);
 					try {
 						return new ElectorWrapper((Elector) f.get(this));
