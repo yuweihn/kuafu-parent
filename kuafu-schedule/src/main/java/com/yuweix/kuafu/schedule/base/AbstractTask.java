@@ -52,19 +52,22 @@ public abstract class AbstractTask {
 	/**
 	 * 选主骨架：抢到主才执行 body，未抢到返回 null
 	 */
-	public final Object execute(ExecutionBody body) throws Throwable {
+	public final Object execute(Elector elector, ExecutionBody body) throws Throwable {
 		if (!isEnabled()) {
 			return null;
 		}
 		long startTime = System.currentTimeMillis();
-		Elector elector = getLeaderElector();
-		if (elector == null) {
-			elector = DEFAULT_LEADER_ELECTOR;
+		Elector localElector = getLeaderElector();
+		if (localElector == null) {
+			localElector = elector;
+		}
+		if (localElector == null) {
+			localElector = DEFAULT_LEADER_ELECTOR;
 		}
 
 		String lockName = getLockName();
 		boolean release = getRelease();
-		Elector.R res = elector.tryAcquire(lockName);
+		Elector.R res = localElector.tryAcquire(lockName);
 		if (!res.isSuccess()) {
 			log.info("Not leader, job didn't execute! Job name: {}, Leader: {}", this.getClass().getName(), res.getLeader());
 			return null;
@@ -79,7 +82,7 @@ public abstract class AbstractTask {
 		} finally {
 			if (release) {
 				try {
-					elector.release(lockName);
+					localElector.release(lockName);
 				} catch (Exception ignored) {
 				}
 			}
