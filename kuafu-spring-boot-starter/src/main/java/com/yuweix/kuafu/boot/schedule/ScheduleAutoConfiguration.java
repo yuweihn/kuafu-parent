@@ -5,13 +5,15 @@ import com.yuweix.kuafu.schedule.springboot.ScheduleConf;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 /**
  * @author yuwei
  */
 @Configuration
-@ConditionalOnProperty(name = "kuafu.boot.schedule.enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = "kuafu.boot.schedule.enabled")
+@EnableScheduling
 @Import({ScheduleConf.class})
 public class ScheduleAutoConfiguration {
 
