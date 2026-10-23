@@ -38,6 +38,7 @@ public class ScheduleAspect {
             return point.proceed();
         }
 
-        return ((AbstractTask) target).execute(elector, point::proceed);
+        String methodName = point.getSignature().getName();
+        return ((AbstractTask) target).execute(elector, methodName, point::proceed);
     }
 }
