@@ -5,10 +5,10 @@ import com.yuweix.kuafu.data.elect.Elector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -32,15 +32,7 @@ public abstract class AbstractTask {
 		}
 	};
 
-	private static SoftReference<Map<Class<? extends AbstractTask>, ElectorWrapper>> ELECTOR_MAP_REF;
-	private static final Object electorLock = new Object();
-	private static final class ElectorWrapper {
-		private Elector elector = null;
-		ElectorWrapper(Elector elector) {
-			this.elector = elector;
-		}
-	}
-	private static final ElectorWrapper EMPTY_ELECTOR = new ElectorWrapper(null);
+	private static final Map<Class<?>, Optional<Elector>> ELECTOR_CACHE = new ConcurrentHashMap<>();
 
 	public AbstractTask() {
 
@@ -51,29 +43,27 @@ public abstract class AbstractTask {
 		Object run() throws Throwable;
 	}
 	/**
-	 * 选主骨架：抢到主才执行 body，未抢到返回 null
+	 * 选主骨架：抢到主才执行body，未抢到返回null
 	 */
-	public final Object execute(Elector elector, ExecutionBody body) throws Throwable {
+	public final Object execute(Elector injected, ExecutionBody body) throws Throwable {
+		return execute(injected, null, body);
+	}
+
+	public final Object execute(Elector injected, String methodName, ExecutionBody body) throws Throwable {
 		if (!isEnabled()) {
 			return null;
 		}
-		long startTime = System.currentTimeMillis();
-		Elector localElector = getLeaderElector();
-		if (localElector == null) {
-			localElector = elector;
-		}
-		if (localElector == null) {
-			localElector = DEFAULT_LEADER_ELECTOR;
-		}
 
-		String lockName = getLockName();
-		boolean release = getRelease();
-		Elector.R res = localElector.tryAcquire(lockName);
+		Elector elector = resolveElector(injected);
+		String lockName = getLockName(methodName);
+		Elector.R res = elector.tryAcquire(lockName);
 		if (!res.isSuccess()) {
-			log.info("Not leader, job didn't execute! Job name: {}, Leader: {}", this.getClass().getName(), res.getLeader());
+			log.info("Not leader, job didn't execute! Job name: {}, Leader: {}", getClass().getName(), res.getLeader());
 			return null;
 		}
 
+		long startTime = System.currentTimeMillis();
+		boolean release = getRelease();
 		Object result = null;
 		try {
 			before();
@@ -83,14 +73,14 @@ public abstract class AbstractTask {
 		} finally {
 			if (release) {
 				try {
-					localElector.release(lockName);
+					elector.release(lockName);
 				} catch (Exception ignored) {
 				}
 			}
 			after();
 			long timeCost = System.currentTimeMillis() - startTime;
 			log.info("Job executed here, Job name: {}, Local node: {}, Time cost: {}"
-					, this.getClass().getName(), res.getLocal(), timeCost >= 1000 ? (timeCost / 1000.0) + "s" : timeCost + "ms");
+					, getClass().getName(), res.getLocal(), timeCost >= 1000 ? (timeCost / 1000.0) + "s" : timeCost + "ms");
 		}
 		return result;
 	}
@@ -111,6 +101,10 @@ public abstract class AbstractTask {
 	protected String getLockName() {
 		return this.getClass().getName();
 	}
+	protected String getLockName(String methodName) {
+		String base = getLockName();
+		return methodName == null || methodName.isEmpty() ? base : base + "#" + methodName;
+	}
 
 	/**
 	 * 是否释放Leader选择器
@@ -119,48 +113,36 @@ public abstract class AbstractTask {
 		return true;
 	}
 
-	private static Map<Class<? extends AbstractTask>, ElectorWrapper> getElectorWrapperMap() {
-		Map<Class<? extends AbstractTask>, ElectorWrapper> map = null;
-		if (ELECTOR_MAP_REF == null || (map = ELECTOR_MAP_REF.get()) == null) {
-			synchronized (electorLock) {
-				if (ELECTOR_MAP_REF == null || (map = ELECTOR_MAP_REF.get()) == null) {
-					map = new ConcurrentHashMap<>();
-					ELECTOR_MAP_REF = new SoftReference<>(map);
-				}
-			}
+	private Elector resolveElector(Elector injected) {
+		Elector elector = getLeaderElector();
+		if (elector != null) {
+			return elector;
 		}
-		return map;
+		if (injected != null) {
+			return injected;
+		}
+		return DEFAULT_LEADER_ELECTOR;
 	}
+
 	protected Elector getLeaderElector() {
-		Class<? extends AbstractTask> clz = this.getClass();
-		Map<Class<? extends AbstractTask>, ElectorWrapper> map = getElectorWrapperMap();
-		ElectorWrapper wrapper = map.get(clz);
-		if (wrapper == null) {
-			synchronized (this) {
-				wrapper = map.get(clz);
-				if (wrapper == null) {
-					wrapper = reflectElector(clz);
-					map.put(clz, wrapper);
-				}
-			}
-		}
-		return wrapper.elector;
+		return ELECTOR_CACHE.computeIfAbsent(this.getClass(), k -> Optional.ofNullable(reflectElector(k))).orElse(null);
 	}
-	private ElectorWrapper reflectElector(Class<?> clazz) {
+
+	private Elector reflectElector(Class<?> clazz) {
 		while (clazz != null) {
-			Field[] fields = clazz.getDeclaredFields();
-			for (Field f: fields) {
+			for (Field f : clazz.getDeclaredFields()) {
 				if (!Modifier.isStatic(f.getModifiers()) && f.getType() == Elector.class) {
 					f.setAccessible(true);
 					try {
-						return new ElectorWrapper((Elector) f.get(this));
-					} catch (IllegalAccessException e) {
-						throw new RuntimeException(e);
+						return (Elector) f.get(this);
+					} catch (IllegalAccessException ex) {
+						log.error("Reflect elector error, {}", ex.getMessage(), ex);
+						throw new RuntimeException(ex);
 					}
 				}
 			}
 			clazz = clazz.getSuperclass();
 		}
-		return EMPTY_ELECTOR;
+		return null;
 	}
 }
