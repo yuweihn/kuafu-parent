@@ -78,7 +78,7 @@ public abstract class AbstractTask {
 		try {
 			before();
 			result = body.run();
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			handle(ex);
 		} finally {
 			if (release) {
