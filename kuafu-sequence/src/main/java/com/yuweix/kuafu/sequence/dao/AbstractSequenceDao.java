@@ -89,7 +89,7 @@ public abstract class AbstractSequenceDao implements SequenceDao {
 			.append(createTimeColumnName)
 			.append(",")
 			.append(updateTimeColumnName)
-			.append(") values(?,?,?,?,?);");
+			.append(") values(?,?,?,?,?)");
 		return buf.toString();
 	}
 	private String getSeqUpdateSql() {
