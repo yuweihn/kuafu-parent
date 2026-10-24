@@ -6,9 +6,8 @@
 -- 1. SEQUENCE 在 Oracle 中是非保留关键字，可直接作为表名，无需加引号；
 --    Oracle 会把未加引号的标识符统一折叠为大写（SEQUENCE），与运行期拼接的
 --    "select ... from sequence" 折叠结果一致，故默认 tableName 可直接使用。
--- 2. 本脚本仅建表，运行期插入语句尾部的分号（getSeqInsertSql 中的
---    values(?,?,?,?,?);）会导致 Oracle 报 ORA-00911，需另行去掉该分号，
---    详见 AbstractSequenceDao 的适配说明。
+-- 2. 运行期插入语句（getSeqInsertSql）尾部不带分号，避免 Oracle JDBC 报
+--    ORA-00911；该分号已在 AbstractSequenceDao 中去除，无需再另行处理。
 -- 3. MySQL 的 bigint unsigned 对应 Oracle 的 NUMBER(19)；datetime 对应 TIMESTAMP
 --    （运行期通过 setTimestamp 绑定）。
 -- ============================================================================
