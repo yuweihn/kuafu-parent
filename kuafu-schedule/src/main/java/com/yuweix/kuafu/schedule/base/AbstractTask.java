@@ -93,7 +93,7 @@ public abstract class AbstractTask {
 
 	}
 	protected void handle(Throwable t) {
-		log.error("任务执行失败, Error: {}", t.getMessage(), t);
+		log.error("Job execute error, Job name: {}, Error: {}", getClass().getName(), t.getMessage(), t);
 	}
 	protected void after() {
 
