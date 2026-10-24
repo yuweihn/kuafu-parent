@@ -45,11 +45,11 @@ public abstract class AbstractTask {
 	/**
 	 * 选主骨架：抢到主才执行body，未抢到返回null
 	 */
-	public final Object execute(Elector injected, ExecutionBody body) throws Throwable {
+	public final Object execute(Elector injected, ExecutionBody body) {
 		return execute(injected, null, body);
 	}
 
-	public final Object execute(Elector injected, String methodName, ExecutionBody body) throws Throwable {
+	public final Object execute(Elector injected, String methodName, ExecutionBody body) {
 		if (!isEnabled()) {
 			return null;
 		}
