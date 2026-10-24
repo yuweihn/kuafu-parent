@@ -1,16 +1,8 @@
 package com.yuweix.kuafu.sequence.base;
 
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.yuweix.kuafu.sequence.dao.SequenceDao;
 import com.yuweix.kuafu.sequence.exception.SequenceException;
-
 import com.yuweix.kuafu.sequence.utils.FieldUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +12,13 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -202,7 +201,7 @@ public class SequenceBeanProcessor implements BeanDefinitionRegistryPostProcesso
 	 * 检查注解：{@link SeqField#isDao()}
 	 */
 	private Field checkSequenceDao(Class<? extends AbstractSequence> clz) {
-		List<Field> fields = FieldUtil.getAllFieldsList(clz);
+		List<Field> fields = FieldUtil.getAllFieldList(clz);
 		if (fields == null || fields.size() <= 0) {
 			throw new SequenceException("Field [sequenceDao] not Found.");
 		}
@@ -218,7 +217,7 @@ public class SequenceBeanProcessor implements BeanDefinitionRegistryPostProcesso
 	 * 检查注解：{@link SeqField#isName()}
 	 */
 	private Field checkSequenceName(Class<? extends AbstractSequence> clz) {
-		List<Field> fields = FieldUtil.getAllFieldsList(clz);
+		List<Field> fields = FieldUtil.getAllFieldList(clz);
 		if (fields == null || fields.size() <= 0) {
 			throw new SequenceException("Field [name] not Found.");
 		}
@@ -234,7 +233,7 @@ public class SequenceBeanProcessor implements BeanDefinitionRegistryPostProcesso
 	 * 检查注解：{@link SeqField#isMinValue()}
 	 */
 	private Field checkSequenceMinValue(Class<? extends AbstractSequence> clz) {
-		List<Field> fields = FieldUtil.getAllFieldsList(clz);
+		List<Field> fields = FieldUtil.getAllFieldList(clz);
 		if (fields == null || fields.size() <= 0) {
 			throw new SequenceException("Field [minValue] not Found.");
 		}
