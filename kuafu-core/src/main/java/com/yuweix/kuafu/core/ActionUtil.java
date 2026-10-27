@@ -82,7 +82,7 @@ public abstract class ActionUtil {
 	/**
 	 * 判断是否为本地地址
 	 */
-	private static boolean isLocalAddress(String ip) {
+	public static boolean isLocalAddress(String ip) {
 		if (ip == null || ip.isEmpty()) {
 			return true;
 		}
