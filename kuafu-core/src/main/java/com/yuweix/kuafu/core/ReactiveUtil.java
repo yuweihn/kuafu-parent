@@ -27,7 +27,7 @@ public abstract class ReactiveUtil {
 			return null;
 		}
 		HttpHeaders headers = request.getHeaders();
-		String[] headerNames = {"X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "X-Real-IP"};
+		String[] headerNames = {"X-GW-Client-IP", "X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "X-Real-IP"};
 		String ip = null;
 		for (String header : headerNames) {
 			ip = headers.getFirst(header);

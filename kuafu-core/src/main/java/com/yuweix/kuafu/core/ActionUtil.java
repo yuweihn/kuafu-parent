@@ -42,7 +42,7 @@ public abstract class ActionUtil {
 		if (request == null) {
 			return null;
 		}
-		String[] headers = {"X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "X-Real-IP"};
+		String[] headers = {"X-GW-Client-IP", "X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "X-Real-IP"};
 		String ip = null;
 		for (String header : headers) {
 			ip = request.getHeader(header);
