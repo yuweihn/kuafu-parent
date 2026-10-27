@@ -218,7 +218,7 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 			baseLogMap.put("params", params);
 		}
 		Object bodyInfo = getRequestBody(request);
-		if (bodyInfo == null || "".equals(bodyInfo)) {
+		if (bodyInfo != null && !"".equals(bodyInfo)) {
 			baseLogMap.put("requestBody", bodyInfo);
 		}
 
