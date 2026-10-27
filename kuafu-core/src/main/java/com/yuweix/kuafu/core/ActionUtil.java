@@ -39,24 +39,59 @@ public abstract class ActionUtil {
 	 */
 	public static String getRequestIP() {
 		HttpServletRequest request = getRequest();
-		String ip = request.getHeader("x-forwarded-for");
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("Proxy-Client-IP");
+		if (request == null) {
+			return null;
 		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("WL-Proxy-Client-IP");
+		String[] headers = {"X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "X-Real-IP"};
+		String ip = null;
+		for (String header : headers) {
+			ip = request.getHeader(header);
+			if (isValidIP(ip)) {
+				break;
+			}
 		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("X-Real-IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+
+		if (!isValidIP(ip)) {
 			ip = request.getRemoteAddr();
 		}
 
-		if (ip == null) {
+		if (!isValidIP(ip)) {
 			return null;
 		}
-		return ip.split(",")[0];
+
+		// 处理多级代理情况，取第一个IP
+		String clientIP = ip.split(",")[0].trim();
+
+		// 处理本地地址
+		if (isLocalAddress(clientIP)) {
+			String localIP = getLocalInnerIP();
+			if (isValidIP(localIP)) {
+				return localIP;
+			}
+		}
+
+		return clientIP;
+	}
+	/**
+	 * 判断IP是否有效
+	 */
+	private static boolean isValidIP(String ip) {
+		return ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip);
+	}
+
+	/**
+	 * 判断是否为本地地址
+	 */
+	private static boolean isLocalAddress(String ip) {
+		if (ip == null || ip.isEmpty()) {
+			return true;
+		}
+		try {
+			InetAddress address = InetAddress.getByName(ip);
+			return address.isLoopbackAddress() || address.isSiteLocalAddress();
+		} catch (UnknownHostException e) {
+			return false;
+		}
 	}
 
 	/**
