@@ -159,6 +159,9 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 			traceId = traceId.trim();
 		}
 		if (traceId == null || traceId.isEmpty()) {
+			traceId = MdcUtil.getTraceId();
+		}
+		if (traceId == null || traceId.isEmpty()) {
 			traceId = UUID.randomUUID().toString().replace("-", "").toLowerCase(Locale.ENGLISH);
 		}
 		MdcUtil.setTraceId(traceId);
