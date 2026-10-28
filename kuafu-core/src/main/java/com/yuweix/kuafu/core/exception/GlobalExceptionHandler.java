@@ -27,16 +27,9 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-	@Value("${kuafu.exception.error-code:500}")
+	@Value("${kuafu.exception.error-code:}")
 	protected String errorCode;
 
-
-	@ExceptionHandler(RuntimeException.class)
-	@ResponseStatus(HttpStatus.OK)
-	public Response<String, Void> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
-		log.error("RuntimeException | URI: {}, Error: {}", request.getRequestURI(), ex.getMessage(), ex);
-		return Response.of(errorCode, ex.getMessage());
-	}
 
 	@ExceptionHandler({
 			MethodArgumentNotValidException.class,
@@ -64,7 +57,8 @@ public class GlobalExceptionHandler {
 			msg = "请求体格式错误";
 		}
 		log.error("ValidationException: {} | URI: {}", msg, request.getRequestURI());
-		return Response.of(errorCode, msg);
+		String errorCode0 = errorCode == null || "".equals(errorCode) ? "400" : errorCode;
+		return Response.of(errorCode0, msg);
 	}
 
 	@ExceptionHandler({
@@ -83,20 +77,31 @@ public class GlobalExceptionHandler {
 			msg = "资源不存在";
 		}
 		log.error("HttpException: {} | URI: {}", msg, request.getRequestURI());
-		return Response.of(errorCode, msg);
+		String errorCode0 = errorCode == null || "".equals(errorCode) ? "400" : errorCode;
+		return Response.of(errorCode0, msg);
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public Response<String, Void> handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest request) {
 		log.error("IllegalArgumentException: {} | URI: {}", ex.getMessage(), request.getRequestURI());
-		return Response.of(errorCode, ex.getMessage());
+		String errorCode0 = errorCode == null || "".equals(errorCode) ? "400" : errorCode;
+		return Response.of(errorCode0, ex.getMessage());
+	}
+
+	@ExceptionHandler(RuntimeException.class)
+	@ResponseStatus(HttpStatus.OK)
+	public Response<String, Void> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
+		log.error("RuntimeException | URI: {}, Error: {}", request.getRequestURI(), ex.getMessage(), ex);
+		String errorCode0 = errorCode == null || "".equals(errorCode) ? "500" : errorCode;
+		return Response.of(errorCode0, ex.getMessage());
 	}
 
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public Response<String, Void> handleException(Exception ex, HttpServletRequest request) {
 		log.error("Unhandled Exception | URI: {}, Error: {}", request.getRequestURI(), ex.getMessage(), ex);
-		return Response.of(errorCode, "系统内部错误");
+		String errorCode0 = errorCode == null || "".equals(errorCode) ? "500" : errorCode;
+		return Response.of(errorCode0, ex.getMessage());
 	}
 }
