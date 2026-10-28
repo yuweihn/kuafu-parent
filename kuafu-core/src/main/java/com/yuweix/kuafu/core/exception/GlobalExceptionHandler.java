@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
 	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	@Value("${kuafu.exception.error-code:500}")
-	private String errorCode;
+	protected String errorCode;
 
 
 	@ExceptionHandler(RuntimeException.class)
