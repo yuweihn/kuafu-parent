@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * @author yuwei
  */
 @Configuration
-@ConditionalOnProperty(name = "kuafu.boot.exception.enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = "kuafu.boot.exception.enabled")
 public class ExceptionAutoConfiguration {
 	@ConditionalOnMissingBean(GlobalExceptionHandler.class)
 	@Bean
