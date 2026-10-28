@@ -154,17 +154,17 @@ public abstract class AbstractFilter<R extends HttpServletRequest, T extends Htt
 	}
 
 	private void initTraceProperties(HttpServletRequest request) {
-		String requestId = request.getHeader(Constant.REQUEST_HEADER_X_REQUEST_ID);
-		if (requestId == null || "".equals(requestId)) {
-			requestId = MdcUtil.getTraceId();
+		String traceId = request.getHeader(Constant.HEADER_X_TRACE_ID);
+		if (traceId != null) {
+			traceId = traceId.trim();
 		}
-		if (requestId == null || "".equals(requestId)) {
-			requestId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+		if (traceId == null || traceId.isEmpty()) {
+			traceId = UUID.randomUUID().toString().replace("-", "").toLowerCase(Locale.ENGLISH);
 		}
-		MdcUtil.setRequestId(requestId);
+		MdcUtil.setTraceId(traceId);
 	}
 	private void removeTraceProperties() {
-		MdcUtil.removeRequestId();
+		MdcUtil.removeTraceId();
 	}
 
 	@SuppressWarnings("unchecked")
