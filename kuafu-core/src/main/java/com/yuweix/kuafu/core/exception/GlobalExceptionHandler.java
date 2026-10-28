@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(RuntimeException.class)
 	@ResponseStatus(HttpStatus.OK)
 	public Response<String, Void> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
-		log.error("RuntimeException | URI: {}", request.getRequestURI(), ex);
+		log.error("RuntimeException | URI: {}, Error: {}", request.getRequestURI(), ex.getMessage(), ex);
 		return Response.of(errorCode, ex.getMessage());
 	}
 
@@ -96,7 +96,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public Response<String, Void> handleException(Exception ex, HttpServletRequest request) {
-		log.error("Unhandled Exception | URI: {}", request.getRequestURI(), ex);
+		log.error("Unhandled Exception | URI: {}, Error: {}", request.getRequestURI(), ex.getMessage(), ex);
 		return Response.of(errorCode, "系统内部错误");
 	}
 }
