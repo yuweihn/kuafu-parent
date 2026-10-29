@@ -7,6 +7,11 @@ import com.yuweix.kuafu.sharding.context.TableSetting;
 
 
 /**
+ * 全局槽位路由：将分片空间视为 databaseSize × tableSize 的网格，
+ * 槽位 slot = hash % (databaseSize * tableSize)，库下标 = slot / tableSize，表下标 = slot % tableSize。
+ * 只要 hash 均匀分布，任意物理库、物理表均可达，不要求 tableSize 是 databaseSize 的整数倍。
+ * 分片下标由 slot 统一计算，保证同一 shardingVal 的库/表坐标一致；
+ * 库名的 split/suffixLength 取自 {@link DatabaseSetting}，表名的取自 {@link TableSetting}。
  * @author yuwei
  */
 public class DefaultStrategy implements Strategy {
@@ -20,7 +25,8 @@ public class DefaultStrategy implements Strategy {
         if (tsetting == null) {
             throw new RuntimeException("[" + tableName + "]'s sharding-conf is required.");
         }
-        return dbName + dsetting.getSplit() + String.format("%0" + dsetting.getSuffixLength() + "d", hash(shardingVal) % tsetting.getDatabaseSize());
+        int slot = slot(tsetting.getDatabaseSize(), tsetting.getTableSize(), shardingVal);
+        return dbName + dsetting.getSplit() + format(slot / tsetting.getTableSize(), dsetting.getSuffixLength());
     }
 
     @Override
@@ -29,7 +35,22 @@ public class DefaultStrategy implements Strategy {
         if (setting == null) {
             throw new RuntimeException("[" + tableName + "]'s sharding-conf is required.");
         }
-        return tableName + setting.getSplit() + String.format("%0" + setting.getSuffixLength() + "d", (hash(shardingVal) / setting.getDatabaseSize()) % setting.getTableSize());
+        int slot = slot(setting.getDatabaseSize(), setting.getTableSize(), shardingVal);
+        return tableName + setting.getSplit() + format(slot % setting.getTableSize(), setting.getSuffixLength());
+    }
+
+    /**
+     * 计算全局槽位，均匀落在 [0, databaseSize * tableSize) 的每一个值。
+     */
+    private <T>int slot(int databaseSize, int tableSize, T shardingVal) {
+        if (databaseSize <= 0 || tableSize <= 0) {
+            throw new RuntimeException("database-size and table-size must be greater than 0.");
+        }
+        return hash(shardingVal) % (databaseSize * tableSize);
+    }
+
+    private String format(int index, int suffixLength) {
+        return String.format("%0" + suffixLength + "d", index);
     }
 
     private int hash(Object str) {
