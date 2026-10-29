@@ -6,6 +6,9 @@ import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /**
  * 动态修改表名拦截器
@@ -26,7 +29,7 @@ public class DynamicTableInspector implements StatementInspector {
 			return sql;
 		}
 		log.info("Original SQL: {}", sql);
-		String actualSql = sql.replaceAll(srcName, targetName);
+		String actualSql = sql.replaceAll("\\b" + Pattern.quote(srcName) + "\\b", Matcher.quoteReplacement(targetName));
 		log.info("Actual SQL: {}", actualSql);
 		return actualSql;
 	}

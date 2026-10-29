@@ -40,6 +40,9 @@ public abstract class StrUtil {
 	public static final String IP_REG = "^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\.(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\.(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\.(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$";
 	public static final Pattern IP_PATTERN = Pattern.compile(IP_REG);
 
+	private static Pattern PATTERN_W = Pattern.compile("_(\\w)");
+	private static Pattern PATTERN_AZ = Pattern.compile("[A-Z]");
+
 
 	public static void trim(String[] strs) {
 		if (null == strs) {
@@ -247,8 +250,7 @@ public abstract class StrUtil {
 	 * @return
 	 */
 	public static String toCamel(String str) {
-		Pattern pattern = Pattern.compile("_(\\w)");
-		Matcher matcher = pattern.matcher(str);
+		Matcher matcher = PATTERN_W.matcher(str);
 		StringBuffer buf = new StringBuffer(str);
 		if (!matcher.find()) {
 			return buf.toString();
@@ -267,8 +269,7 @@ public abstract class StrUtil {
 	 * @return
 	 */
 	public static String toUnderline(String str) {
-		Pattern pattern = Pattern.compile("[A-Z]");
-		Matcher matcher = pattern.matcher(str);
+		Matcher matcher = PATTERN_AZ.matcher(str);
 		StringBuffer buf = new StringBuffer(str);
 		if (!matcher.find()) {
 			return buf.toString();

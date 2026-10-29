@@ -36,6 +36,8 @@ public class DefaultStrategy implements Strategy {
         if (str == null) {
             return 0;
         }
-        return Math.abs(str.hashCode());
+        int h = str.hashCode();
+        h = h ^ (h >>> 16);
+        return h & Integer.MAX_VALUE;
     }
 }

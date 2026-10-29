@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -42,7 +44,7 @@ public class SQLInterceptor implements Interceptor {
 			return originalSql;
 		}
 		log.info("Original SQL: {}", originalSql);
-		String actualSql = originalSql.replaceAll(srcName, targetName);
+		String actualSql = originalSql.replaceAll("\\b" + Pattern.quote(srcName) + "\\b", Matcher.quoteReplacement(targetName));
 		log.info("Actual SQL: {}", actualSql);
 		return actualSql;
 	}

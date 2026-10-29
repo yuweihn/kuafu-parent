@@ -44,14 +44,15 @@ public abstract class ShardingUtil {
 	private static final Object classShardingFieldLock = new Object();
 
 
+	private static Pattern PATTERN_AZ = Pattern.compile("[A-Z]");
+
 	/**
 	 * 驼峰转下划线
 	 * @param str
 	 * @return
 	 */
 	private static String toUnderline(String str) {
-		Pattern pattern = Pattern.compile("[A-Z]");
-		Matcher matcher = pattern.matcher(str);
+		Matcher matcher = PATTERN_AZ.matcher(str);
 		StringBuffer buf = new StringBuffer(str);
 		if (!matcher.find()) {
 			return buf.toString();
