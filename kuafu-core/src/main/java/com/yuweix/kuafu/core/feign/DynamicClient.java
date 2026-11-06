@@ -25,7 +25,10 @@ public class DynamicClient {
     private DynamicService getFeignClient(String feignName, String contextId, String url) {
         String cid = (contextId == null || contextId.isEmpty()) ? feignName : contextId;
         return dynamicServiceCache.computeIfAbsent(feignName + "#" + cid,
-                key -> this.feignClientBuilder.forType(DynamicService.class, feignName).contextId(cid).build());
+                key -> this.feignClientBuilder.forType(DynamicService.class, feignName)
+                        .contextId(cid)
+                        .url(url)
+                        .build());
     }
 
     public <T>T doGet(String feignName, String contextId, String url, String path, Object params) {
