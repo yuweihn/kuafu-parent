@@ -22,30 +22,30 @@ public class DynamicClient {
         this.feignClientBuilder = new FeignClientBuilder(appContext);
     }
 
-    private DynamicService getFeignClient(String feignName, String contextId) {
+    private DynamicService getFeignClient(String feignName, String contextId, String url) {
         String cid = (contextId == null || contextId.isEmpty()) ? feignName : contextId;
         return dynamicServiceCache.computeIfAbsent(feignName + "#" + cid,
                 key -> this.feignClientBuilder.forType(DynamicService.class, feignName).contextId(cid).build());
     }
 
-    public <T>T doGet(String feignName, String contextId, String url, Object params) {
+    public <T>T doGet(String feignName, String contextId, String url, String path, Object params) {
         try {
-            DynamicService dynamicService = getFeignClient(feignName, contextId);
-            return dynamicService.doGet(url, params);
+            DynamicService dynamicService = getFeignClient(feignName, contextId, url);
+            return dynamicService.doGet(path, params);
         } catch (Exception ex) {
-            log.error("【DynamicClient_GET请求】, feignName:{}, contextId:{}, url:{}, params:{}, error:{}"
-                    , feignName, contextId, url, JsonUtil.toJson(params), ex.getMessage(), ex);
+            log.error("【DynamicClient_GET请求】, feignName:{}, contextId:{}, path:{}, params:{}, error:{}"
+                    , feignName, contextId, path, JsonUtil.toJson(params), ex.getMessage(), ex);
             return null;
         }
     }
 
-    public <T>T doPost(String feignName, String contextId, String url, Object params) {
+    public <T>T doPost(String feignName, String contextId, String url, String path, Object params) {
         try {
-            DynamicService dynamicService = getFeignClient(feignName, contextId);
-            return dynamicService.doPost(url, params);
+            DynamicService dynamicService = getFeignClient(feignName, contextId, url);
+            return dynamicService.doPost(path, params);
         } catch (Exception ex) {
-            log.error("【DynamicClient_POST请求】, feignName:{}, contextId:{}, url:{}, params:{}, error:{}"
-                    , feignName, contextId, url, JsonUtil.toJson(params), ex.getMessage(), ex);
+            log.error("【DynamicClient_POST请求】, feignName:{}, contextId:{}, path:{}, params:{}, error:{}"
+                    , feignName, contextId, path, JsonUtil.toJson(params), ex.getMessage(), ex);
             return null;
         }
     }
