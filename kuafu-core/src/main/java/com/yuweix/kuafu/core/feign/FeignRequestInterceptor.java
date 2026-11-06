@@ -7,7 +7,7 @@ import feign.RequestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.SoftReference;
+import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,8 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FeignRequestInterceptor implements RequestInterceptor {
 	private static final Logger log = LoggerFactory.getLogger(FeignRequestInterceptor.class);
 
-	private static SoftReference<Map<Class<? extends PreHandler>, PreHandler>> PRE_HANDLER_REF;
-	private static final Object preHandlerLock = new Object();
+	private static final Map<Class<? extends PreHandler>, PreHandler> PRE_HANDLER_MAP = new ConcurrentHashMap<>();
+	private static final Map<Class<? extends PreHandler>, Constructor<? extends PreHandler>> CONSTRUCTOR_MAP = new ConcurrentHashMap<>();
 
 
 	@Override
@@ -30,29 +30,25 @@ public class FeignRequestInterceptor implements RequestInterceptor {
 			return;
 		}
 		Class<? extends PreHandler> preHandlerClz = preFeign.value();
-		Map<Class<? extends PreHandler>, PreHandler> map = getPreHandlerMap();
-		PreHandler preHandler = map.get(preHandlerClz);
-		if (preHandler == null) {
-			try {
-				preHandler = preHandlerClz.getDeclaredConstructor().newInstance();
-			} catch (Exception ex) {
-				log.error("PreHandler初始化失败: {}", ex.getMessage(), ex);
-				throw new RuntimeException(ex);
-			}
-			map.put(preHandlerClz, preHandler);
-		}
+		PreHandler preHandler = PRE_HANDLER_MAP.computeIfAbsent(preHandlerClz, this::createPreHandler);
 		preHandler.apply(template);
 	}
-	private Map<Class<? extends PreHandler>, PreHandler> getPreHandlerMap() {
-		Map<Class<? extends PreHandler>, PreHandler> map = null;
-		if (PRE_HANDLER_REF == null || (map = PRE_HANDLER_REF.get()) == null) {
-			synchronized (preHandlerLock) {
-				if (PRE_HANDLER_REF == null || (map = PRE_HANDLER_REF.get()) == null) {
-					map = new ConcurrentHashMap<>();
-					PRE_HANDLER_REF = new SoftReference<>(map);
+
+	private PreHandler createPreHandler(Class<? extends PreHandler> clz) {
+		try {
+			Constructor<? extends PreHandler> constructor = CONSTRUCTOR_MAP.computeIfAbsent(clz, c -> {
+				try {
+					return c.getDeclaredConstructor();
+				} catch (NoSuchMethodException ex) {
+					throw new RuntimeException("PreHandler缺少无参构造函数: " + c.getName(), ex);
 				}
-			}
+			});
+			return constructor.newInstance();
+		} catch (RuntimeException ex) {
+			throw ex;
+		} catch (Exception ex) {
+			log.error("PreHandler初始化失败: {}", ex.getMessage(), ex);
+			throw new RuntimeException("PreHandler初始化失败: " + clz.getName(), ex);
 		}
-		return map;
 	}
 }
