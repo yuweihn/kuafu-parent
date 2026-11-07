@@ -35,8 +35,8 @@ public class DynamicFeignConf {
 
 	@ConditionalOnMissingBean(FeignBuilderCustomizer.class)
 	@Bean
-	public FeignBuilderCustomizer feignBuilderCustomizer() {
-		return builder -> builder.decoder(feignDecoder());
+	public FeignBuilderCustomizer feignBuilderCustomizer(Decoder feignDecoder) {
+		return builder -> builder.decoder(feignDecoder);
 	}
 
 	@ConditionalOnMissingBean(DynamicClient.class)
