@@ -15,41 +15,38 @@ public class DynamicClient {
     private static final Logger log = LoggerFactory.getLogger(DynamicClient.class);
 
     private final FeignClientBuilder feignClientBuilder;
-
     private final Map<String, DynamicService> dynamicServiceCache = new ConcurrentHashMap<>();
 
     public DynamicClient(ApplicationContext appContext) {
         this.feignClientBuilder = new FeignClientBuilder(appContext);
     }
 
-    private DynamicService getFeignClient(String feignName, String contextId, String url) {
-        String cid = (contextId == null || contextId.isEmpty()) ? feignName : contextId;
-        String cacheKey = feignName + "#" + cid;
+    private DynamicService getFeignClient(String feignName, String url) {
+        String cacheKey = feignName + "#" + url;
         return dynamicServiceCache.computeIfAbsent(cacheKey,
                 key -> this.feignClientBuilder.forType(DynamicService.class, feignName)
-                        .contextId(cid)
                         .url(url)
                         .build());
     }
 
-    public <T>T doGet(String feignName, String contextId, String url, String path, Object params) {
+    public <T>T doGet(String feignName, String url, String path, Object params) {
         try {
-            DynamicService dynamicService = getFeignClient(feignName, contextId, url);
+            DynamicService dynamicService = getFeignClient(feignName, url);
             return dynamicService.doGet(path, params);
         } catch (Exception ex) {
-            log.error("【DynamicClient_GET请求】, feignName:{}, contextId:{}, path:{}, params:{}, error:{}"
-                    , feignName, contextId, path, JsonUtil.toJson(params), ex.getMessage(), ex);
+            log.error("【DynamicClient_GET请求】, feignName:{}, url:{}, path:{}, params:{}, error:{}"
+                    , feignName, url, path, JsonUtil.toJson(params), ex.getMessage(), ex);
             return null;
         }
     }
 
-    public <T>T doPost(String feignName, String contextId, String url, String path, Object params) {
+    public <T>T doPost(String feignName, String url, String path, Object params) {
         try {
-            DynamicService dynamicService = getFeignClient(feignName, contextId, url);
+            DynamicService dynamicService = getFeignClient(feignName, url);
             return dynamicService.doPost(path, params);
         } catch (Exception ex) {
-            log.error("【DynamicClient_POST请求】, feignName:{}, contextId:{}, path:{}, params:{}, error:{}"
-                    , feignName, contextId, path, JsonUtil.toJson(params), ex.getMessage(), ex);
+            log.error("【DynamicClient_POST请求】, feignName:{}, url:{}, path:{}, params:{}, error:{}"
+                    , feignName, url, path, JsonUtil.toJson(params), ex.getMessage(), ex);
             return null;
         }
     }
