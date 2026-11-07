@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface DynamicService {
     @GetMapping("{path}")
-    Object doGet(@PathVariable("path") String path, @SpringQueryMap Object params);
+    <T>T doGet(@PathVariable("path") String path, @SpringQueryMap Object params);
 
     @PostMapping("{path}")
-    Object doPost(@PathVariable("path") String path, @RequestBody Object params);
+    <T>T doPost(@PathVariable("path") String path, @RequestBody Object params);
 }

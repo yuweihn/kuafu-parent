@@ -15,6 +15,7 @@ import org.springframework.util.MimeTypeUtils;
 
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,8 +42,8 @@ public class DynamicClient {
                 return null;
             }
             byte[] bytes = Util.toByteArray(body.asInputStream());
-            if (byte[].class.equals(type)) {
-                return bytes;
+            if (bytes == null || bytes.length == 0) {
+                return null;
             }
             String bodys = new String(bytes, charset(response));
             return bodys;
@@ -55,12 +56,12 @@ public class DynamicClient {
             }
             try {
                 Charset charset = MimeTypeUtils.parseMimeType(entry.getValue().iterator().next()).getCharset();
-                return charset == null ? Util.UTF_8 : charset;
+                return charset == null ? StandardCharsets.UTF_8 : charset;
             } catch (InvalidMimeTypeException ignore) {
 
             }
         }
-        return Util.UTF_8;
+        return StandardCharsets.UTF_8;
     }
 
     private DynamicService getFeignClient(String feignName, String url) {
@@ -72,10 +73,10 @@ public class DynamicClient {
                         .build());
     }
 
-    public Object doGet(String feignName, String path, Object params) {
+    public String doGet(String feignName, String path, Object params) {
         return doGet(feignName, "", path, params);
     }
-    public Object doGet(String feignName, String url, String path, Object params) {
+    public String doGet(String feignName, String url, String path, Object params) {
         try {
             DynamicService dynamicService = getFeignClient(feignName, url);
             return dynamicService.doGet(path, params);
@@ -85,11 +86,32 @@ public class DynamicClient {
             return null;
         }
     }
+    public <T>T doGet(String feignName, String path, Object params, Class<T> type) {
+        return doGet(feignName, "", path, params, type);
+    }
+    public <T>T doGet(String feignName, String url, String path, Object params, Class<T> type) {
+        String str = doGet(feignName, url, path, params);
+        if (str == null || str.trim().equals("")) {
+            return null;
+        }
+        return parse(str, type);
+    }
+    public <T>T doGet(String feignName, String path, Object params, Type type) {
+        return doGet(feignName, "", path, params, type);
+    }
+    public <T>T doGet(String feignName, String url, String path, Object params, Type type) {
+        String str = doGet(feignName, url, path, params);
+        if (str == null || str.trim().equals("")) {
+            return null;
+        }
+        return JsonUtil.toObject(str, type);
+    }
 
-    public Object doPost(String feignName, String path, Object params) {
+
+    public String doPost(String feignName, String path, Object params) {
         return doPost(feignName, "", path, params);
     }
-    public Object doPost(String feignName, String url, String path, Object params) {
+    public String doPost(String feignName, String url, String path, Object params) {
         try {
             DynamicService dynamicService = getFeignClient(feignName, url);
             return dynamicService.doPost(path, params);
@@ -98,5 +120,38 @@ public class DynamicClient {
                     , feignName, url, path, JsonUtil.toJson(params), ex.getMessage(), ex);
             return null;
         }
+    }
+    public <T>T doPost(String feignName, String path, Object params, Class<T> type) {
+        return doPost(feignName, "", path, params, type);
+    }
+    public <T>T doPost(String feignName, String url, String path, Object params, Class<T> type) {
+        String str = doPost(feignName, url, path, params);
+        if (str == null || str.trim().equals("")) {
+            return null;
+        }
+        return parse(str, type);
+    }
+    public <T>T doPost(String feignName, String path, Object params, Type type) {
+        return doPost(feignName, "", path, params, type);
+    }
+    public <T>T doPost(String feignName, String url, String path, Object params, Type type) {
+        String str = doPost(feignName, url, path, params);
+        if (str == null || str.trim().equals("")) {
+            return null;
+        }
+        return JsonUtil.toObject(str, type);
+    }
+
+    private <T>T parse(String str, Class<T> type) {
+        if (str == null || str.trim().equals("")) {
+            return null;
+        }
+        str = str.trim();
+        if (type == null || String.class.isAssignableFrom(type)) {
+            return (T) str;
+        } else if (byte[].class.isAssignableFrom(type)) {
+            return (T) str.getBytes();
+        }
+        return JsonUtil.toObject(str, type);
     }
 }
