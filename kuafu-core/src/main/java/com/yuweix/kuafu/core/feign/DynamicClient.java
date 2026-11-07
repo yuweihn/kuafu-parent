@@ -29,6 +29,10 @@ public class DynamicClient {
                         .build());
     }
 
+
+    public Object doGet(String feignName, String path, Object params) {
+        return doGet(feignName, "", path, params);
+    }
     public Object doGet(String feignName, String url, String path, Object params) {
         try {
             DynamicService dynamicService = getFeignClient(feignName, url);
@@ -40,6 +44,9 @@ public class DynamicClient {
         }
     }
 
+    public Object doPost(String feignName, String path, Object params) {
+        return doPost(feignName, "", path, params);
+    }
     public Object doPost(String feignName, String url, String path, Object params) {
         try {
             DynamicService dynamicService = getFeignClient(feignName, url);
