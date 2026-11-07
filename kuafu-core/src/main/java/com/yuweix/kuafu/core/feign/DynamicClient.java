@@ -77,13 +77,19 @@ public class DynamicClient {
         return doGet(feignName, "", path, params);
     }
     public String doGet(String feignName, String url, String path, Object params) {
+        long startTimeMillis = System.currentTimeMillis();
         try {
+            log.info("DynamicClient_GET请求开始, feignName:{}, url:{}, path:{}, params:{}"
+                    , feignName, url, path, JsonUtil.toJson(params));
             DynamicService dynamicService = getFeignClient(feignName, url);
             return dynamicService.doGet(path, params);
         } catch (Exception ex) {
-            log.error("【DynamicClient_GET请求】, feignName:{}, url:{}, path:{}, params:{}, error:{}"
-                    , feignName, url, path, JsonUtil.toJson(params), ex.getMessage(), ex);
+            log.error("【DynamicClient_GET请求】, feignName:{}, url:{}, path:{}, error:{}"
+                    , feignName, url, path, ex.getMessage(), ex);
             return null;
+        } finally {
+            log.info("DynamicClient_GET请求结束, feignName:{}, url:{}, path:{}, cost: {}ms"
+                    , feignName, url, path, System.currentTimeMillis() - startTimeMillis);
         }
     }
     public <T>T doGet(String feignName, String path, Object params, Class<T> type) {
@@ -112,13 +118,19 @@ public class DynamicClient {
         return doPost(feignName, "", path, params);
     }
     public String doPost(String feignName, String url, String path, Object params) {
+        long startTimeMillis = System.currentTimeMillis();
         try {
+            log.info("DynamicClient_POST请求开始, feignName:{}, url:{}, path:{}, params:{}"
+                    , feignName, url, path, JsonUtil.toJson(params));
             DynamicService dynamicService = getFeignClient(feignName, url);
             return dynamicService.doPost(path, params);
         } catch (Exception ex) {
-            log.error("【DynamicClient_POST请求】, feignName:{}, url:{}, path:{}, params:{}, error:{}"
-                    , feignName, url, path, JsonUtil.toJson(params), ex.getMessage(), ex);
+            log.error("【DynamicClient_POST请求】, feignName:{}, url:{}, path:{}, error:{}"
+                    , feignName, url, path, ex.getMessage(), ex);
             return null;
+        } finally {
+            log.info("DynamicClient_POST请求结束, feignName:{}, url:{}, path:{}, cost: {}ms"
+                    , feignName, url, path, System.currentTimeMillis() - startTimeMillis);
         }
     }
     public <T>T doPost(String feignName, String path, Object params, Class<T> type) {
