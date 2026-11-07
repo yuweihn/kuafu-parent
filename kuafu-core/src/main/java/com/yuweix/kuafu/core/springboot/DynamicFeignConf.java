@@ -5,6 +5,7 @@ import com.yuweix.kuafu.core.feign.DynamicClient;
 import feign.codec.Decoder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.cloud.openfeign.FeignBuilderCustomizer;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -32,9 +33,15 @@ public class DynamicFeignConf {
 		return new SpringDecoder(() -> new HttpMessageConverters(converters));
 	}
 
+	@ConditionalOnMissingBean(FeignBuilderCustomizer.class)
+	@Bean
+	public FeignBuilderCustomizer feignBuilderCustomizer() {
+		return builder -> builder.decoder(feignDecoder());
+	}
+
 	@ConditionalOnMissingBean(DynamicClient.class)
 	@Bean
-	public DynamicClient dynamicClient(ApplicationContext context) {
-		return new DynamicClient(context);
+	public DynamicClient dynamicClient(ApplicationContext context, FeignBuilderCustomizer customizer) {
+		return new DynamicClient(context, customizer);
 	}
 }
