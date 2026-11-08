@@ -75,7 +75,7 @@ public class DynamicClient {
 
     public <T>T call(DynamicRequest request) {
         String feignName = request.getFeignName();
-        FeignMethod method = request.getMethod();
+        DynamicRequest.Method method = request.getMethod();
         String url = request.getUrl();
         String path = request.getPath();
         Object params = request.getParams();
@@ -88,9 +88,9 @@ public class DynamicClient {
                     , feignName, url, path, JsonUtil.toJson(params));
             DynamicService dynamicService = getFeignClient(feignName, url);
             String str = null;
-            if (FeignMethod.GET.equals(method)) {
+            if (DynamicRequest.Method.GET.equals(method)) {
                 str = dynamicService.doGet(path, params);
-            } else if (FeignMethod.POST.equals(method)) {
+            } else if (DynamicRequest.Method.POST.equals(method)) {
                 str = dynamicService.doPost(path, params);
             } else {
                 log.error("Unsupported method: {}", method);
@@ -107,7 +107,7 @@ public class DynamicClient {
             }
             return (T) str;
         } catch (Exception ex) {
-            log.error("【DynamicClient请求】, feignName:{}, url:{}, path:{}, error:{}"
+            log.error("DynamicClient请求失败, feignName:{}, url:{}, path:{}, error:{}"
                     , feignName, url, path, ex.getMessage(), ex);
             return null;
         } finally {
