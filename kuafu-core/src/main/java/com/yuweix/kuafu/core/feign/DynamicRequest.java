@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
 
 public class DynamicRequest {
     private String feignName;
-    private FeignMethod method;
+    private Method method;
     private String url;
     private String path;
     private Object params;
@@ -20,7 +20,7 @@ public class DynamicRequest {
     public String getFeignName() {
         return feignName;
     }
-    public FeignMethod getMethod() {
+    public Method getMethod() {
         return method;
     }
     public String getUrl() {
@@ -43,6 +43,10 @@ public class DynamicRequest {
         return new Builder();
     }
 
+    public enum Method {
+        GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE;
+    }
+
     public static final class Builder {
         private final DynamicRequest dynamicRequest;
 
@@ -53,7 +57,7 @@ public class DynamicRequest {
             dynamicRequest.feignName = feignName;
             return this;
         }
-        public Builder method(FeignMethod method) {
+        public Builder method(Method method) {
             dynamicRequest.method = method;
             return this;
         }
