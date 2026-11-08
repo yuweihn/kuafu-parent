@@ -73,88 +73,50 @@ public class DynamicClient {
                         .build());
     }
 
-    public String doGet(String feignName, String path, Object params) {
-        return doGet(feignName, "", path, params);
-    }
-    public String doGet(String feignName, String url, String path, Object params) {
+    public <T>T call(DynamicRequest request) {
+        String feignName = request.getFeignName();
+        FeignMethod method = request.getMethod();
+        String url = request.getUrl();
+        String path = request.getPath();
+        Object params = request.getParams();
+        Class<?> responseTypeClass = request.getResponseTypeClass();
+        Type type = request.getResponseType();
+
         long startTimeMillis = System.currentTimeMillis();
         try {
-            log.info("DynamicClient_GET请求开始, feignName:{}, url:{}, path:{}, params:{}"
+            log.info("DynamicClient请求开始, feignName:{}, url:{}, path:{}, params:{}"
                     , feignName, url, path, JsonUtil.toJson(params));
             DynamicService dynamicService = getFeignClient(feignName, url);
-            return dynamicService.doGet(path, params);
+            String str = null;
+            if (FeignMethod.GET.equals(method)) {
+                str = dynamicService.doGet(path, params);
+            } else if (FeignMethod.POST.equals(method)) {
+                str = dynamicService.doPost(path, params);
+            } else {
+                log.error("Unsupported method: {}", method);
+                throw new UnsupportedOperationException("Unsupported method: " + method);
+            }
+            if (str == null || str.trim().equals("")) {
+                return null;
+            }
+            if (type != null) {
+                return JsonUtil.toObject(str, type);
+            }
+            if (responseTypeClass != null) {
+                return parse(str, responseTypeClass);
+            }
+            return (T) str;
         } catch (Exception ex) {
-            log.error("【DynamicClient_GET请求】, feignName:{}, url:{}, path:{}, error:{}"
+            log.error("【DynamicClient请求】, feignName:{}, url:{}, path:{}, error:{}"
                     , feignName, url, path, ex.getMessage(), ex);
             return null;
         } finally {
-            log.info("DynamicClient_GET请求结束, feignName:{}, url:{}, path:{}, cost: {}ms"
+            log.info("DynamicClient请求结束, feignName:{}, url:{}, path:{}, cost: {}ms"
                     , feignName, url, path, System.currentTimeMillis() - startTimeMillis);
         }
     }
-    public <T>T doGet(String feignName, String path, Object params, Class<T> type) {
-        return doGet(feignName, "", path, params, type);
-    }
-    public <T>T doGet(String feignName, String url, String path, Object params, Class<T> type) {
-        String str = doGet(feignName, url, path, params);
-        if (str == null || str.trim().equals("")) {
-            return null;
-        }
-        return parse(str, type);
-    }
-    public <T>T doGet(String feignName, String path, Object params, Type type) {
-        return doGet(feignName, "", path, params, type);
-    }
-    public <T>T doGet(String feignName, String url, String path, Object params, Type type) {
-        String str = doGet(feignName, url, path, params);
-        if (str == null || str.trim().equals("")) {
-            return null;
-        }
-        return JsonUtil.toObject(str, type);
-    }
 
-
-    public String doPost(String feignName, String path, Object params) {
-        return doPost(feignName, "", path, params);
-    }
-    public String doPost(String feignName, String url, String path, Object params) {
-        long startTimeMillis = System.currentTimeMillis();
-        try {
-            log.info("DynamicClient_POST请求开始, feignName:{}, url:{}, path:{}, params:{}"
-                    , feignName, url, path, JsonUtil.toJson(params));
-            DynamicService dynamicService = getFeignClient(feignName, url);
-            return dynamicService.doPost(path, params);
-        } catch (Exception ex) {
-            log.error("【DynamicClient_POST请求】, feignName:{}, url:{}, path:{}, error:{}"
-                    , feignName, url, path, ex.getMessage(), ex);
-            return null;
-        } finally {
-            log.info("DynamicClient_POST请求结束, feignName:{}, url:{}, path:{}, cost: {}ms"
-                    , feignName, url, path, System.currentTimeMillis() - startTimeMillis);
-        }
-    }
-    public <T>T doPost(String feignName, String path, Object params, Class<T> type) {
-        return doPost(feignName, "", path, params, type);
-    }
-    public <T>T doPost(String feignName, String url, String path, Object params, Class<T> type) {
-        String str = doPost(feignName, url, path, params);
-        if (str == null || str.trim().equals("")) {
-            return null;
-        }
-        return parse(str, type);
-    }
-    public <T>T doPost(String feignName, String path, Object params, Type type) {
-        return doPost(feignName, "", path, params, type);
-    }
-    public <T>T doPost(String feignName, String url, String path, Object params, Type type) {
-        String str = doPost(feignName, url, path, params);
-        if (str == null || str.trim().equals("")) {
-            return null;
-        }
-        return JsonUtil.toObject(str, type);
-    }
-
-    private <T>T parse(String str, Class<T> type) {
+    private <T>T parse(String str, Class<?> type) {
         if (str == null || str.trim().equals("")) {
             return null;
         }
@@ -164,6 +126,6 @@ public class DynamicClient {
         } else if (byte[].class.isAssignableFrom(type)) {
             return (T) str.getBytes();
         }
-        return JsonUtil.toObject(str, type);
+        return (T) JsonUtil.toObject(str, type);
     }
 }
