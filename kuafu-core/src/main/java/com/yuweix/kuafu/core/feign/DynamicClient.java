@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -81,6 +82,10 @@ public class DynamicClient {
         String url = request.getUrl();
         String path = request.getPath();
         Object params = request.getParams();
+        Map<String, String> headers = request.getHeaders();
+        if (headers == null) {
+            headers = Collections.emptyMap();
+        }
         Class<?> responseTypeClass = request.getResponseTypeClass();
         Type type = request.getResponseType();
 
@@ -91,9 +96,13 @@ public class DynamicClient {
             DynamicService dynamicService = getFeignClient(feignName, url);
             String str = null;
             if (DynamicRequest.Method.GET.equals(method)) {
-                str = dynamicService.doGet(path, params);
+                str = dynamicService.doGet(path, params, headers);
             } else if (DynamicRequest.Method.POST.equals(method)) {
-                str = dynamicService.doPost(path, params);
+                str = dynamicService.doPost(path, params, headers);
+            } else if (DynamicRequest.Method.PUT.equals(method)) {
+                str = dynamicService.doPut(path, params, headers);
+            } else if (DynamicRequest.Method.DELETE.equals(method)) {
+                str = dynamicService.doDelete(path, params, headers);
             } else {
                 log.error("Unsupported method: {}", method);
                 throw new UnsupportedOperationException("Unsupported method: " + method);
