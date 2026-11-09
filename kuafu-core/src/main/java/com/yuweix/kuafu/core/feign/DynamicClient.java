@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 
 public class DynamicClient {
@@ -29,9 +30,10 @@ public class DynamicClient {
     private final Map<String, DynamicService> dynamicServiceCache = new ConcurrentHashMap<>();
 
 
-    public DynamicClient(ApplicationContext appContext) {
+    public DynamicClient(ApplicationContext appContext, long connectTimeout, long readTimeout) {
         this.feignClientBuilder = new FeignClientBuilder(appContext);
-        this.customizer = builder -> builder.decoder(feignDecoder());
+        this.customizer = builder -> builder.decoder(feignDecoder())
+                .options(new feign.Request.Options(connectTimeout, TimeUnit.MILLISECONDS, readTimeout, TimeUnit.MILLISECONDS, true));
     }
 
 
