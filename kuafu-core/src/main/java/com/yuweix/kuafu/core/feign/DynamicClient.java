@@ -99,8 +99,8 @@ public class DynamicClient {
 
         long startTimeMillis = System.currentTimeMillis();
         try {
-            log.info("DynamicClient请求开始, feignName:{}, url:{}, path:{}, params:{}"
-                    , feignName, url, path, JsonUtil.toJson(params));
+            log.info("DynamicClient请求开始, feignName:{}, url:{}, path:{}, method:{}, params:{}"
+                    , feignName, url, path, method, JsonUtil.toJson(params));
             DynamicService dynamicService = reqCustomizer != null
                     ? buildClient(feignName, url, reqCustomizer)
                     : getFeignClient(feignName, url);
@@ -128,12 +128,12 @@ public class DynamicClient {
             }
             return (T) str;
         } catch (Exception ex) {
-            log.error("DynamicClient请求失败, feignName:{}, url:{}, path:{}, error:{}"
-                    , feignName, url, path, ex.getMessage(), ex);
+            log.error("DynamicClient请求失败, feignName:{}, url:{}, path:{}, method:{}, error:{}"
+                    , feignName, url, path, method, ex.getMessage(), ex);
             return null;
         } finally {
-            log.info("DynamicClient请求结束, feignName:{}, url:{}, path:{}, cost: {}ms"
-                    , feignName, url, path, System.currentTimeMillis() - startTimeMillis);
+            log.info("DynamicClient请求结束, feignName:{}, url:{}, path:{}, method:{}, cost: {}ms"
+                    , feignName, url, path, method, System.currentTimeMillis() - startTimeMillis);
         }
     }
 
