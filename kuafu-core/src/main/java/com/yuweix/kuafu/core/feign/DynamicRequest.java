@@ -1,6 +1,8 @@
 package com.yuweix.kuafu.core.feign;
 
 
+import feign.RequestTemplate;
+import org.springframework.cloud.openfeign.FeignBuilderCustomizer;
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -14,7 +16,7 @@ public class DynamicRequest {
     private Map<String, String> headers;
     private Class<?> responseTypeClass;
     private Type responseType;
-
+    private FeignBuilderCustomizer customizer;
 
     private DynamicRequest() {
         this.responseTypeClass = String.class;
@@ -42,6 +44,10 @@ public class DynamicRequest {
     }
     public Type getResponseType() {
         return responseType;
+    }
+
+    public FeignBuilderCustomizer getCustomizer() {
+        return customizer;
     }
 
     public static Builder builder() {
@@ -80,6 +86,10 @@ public class DynamicRequest {
         }
         public Builder headers(Map<String, String> headers) {
             dynamicRequest.headers = headers;
+            return this;
+        }
+        public Builder customizer(FeignBuilderCustomizer customizer) {
+            dynamicRequest.customizer = customizer;
             return this;
         }
         public Builder responseType(Class<?> responseTypeClass) {

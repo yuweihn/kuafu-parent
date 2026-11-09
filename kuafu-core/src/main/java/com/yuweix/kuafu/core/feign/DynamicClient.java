@@ -38,6 +38,22 @@ public class DynamicClient {
     }
 
 
+    private DynamicService getFeignClient(String feignName, String url) {
+        String cacheKey = feignName + "#" + url;
+        return dynamicServiceCache.computeIfAbsent(cacheKey,
+                key -> this.feignClientBuilder.forType(DynamicService.class, feignName)
+                        .url(url)
+                        .customize(customizer)
+                        .build());
+    }
+
+    private DynamicService buildClient(String feignName, String url, FeignBuilderCustomizer customizer) {
+        return this.feignClientBuilder.forType(DynamicService.class, feignName)
+                .url(url)
+                .customize(customizer)
+                .build();
+    }
+
     private Decoder feignDecoder() {
         return (Response response, Type type) -> {
             Response.Body body = response.body();
@@ -67,15 +83,6 @@ public class DynamicClient {
         return StandardCharsets.UTF_8;
     }
 
-    private DynamicService getFeignClient(String feignName, String url) {
-        String cacheKey = feignName + "#" + url;
-        return dynamicServiceCache.computeIfAbsent(cacheKey,
-                key -> this.feignClientBuilder.forType(DynamicService.class, feignName)
-                        .url(url)
-                        .customize(customizer)
-                        .build());
-    }
-
     public <T>T call(DynamicRequest request) {
         String feignName = request.getFeignName();
         DynamicRequest.Method method = request.getMethod();
@@ -88,12 +95,15 @@ public class DynamicClient {
         }
         Class<?> responseTypeClass = request.getResponseTypeClass();
         Type type = request.getResponseType();
+        FeignBuilderCustomizer reqCustomizer = request.getCustomizer();
 
         long startTimeMillis = System.currentTimeMillis();
         try {
             log.info("DynamicClient请求开始, feignName:{}, url:{}, path:{}, params:{}"
                     , feignName, url, path, JsonUtil.toJson(params));
-            DynamicService dynamicService = getFeignClient(feignName, url);
+            DynamicService dynamicService = reqCustomizer != null
+                    ? buildClient(feignName, url, reqCustomizer)
+                    : getFeignClient(feignName, url);
             String str = null;
             if (DynamicRequest.Method.GET.equals(method)) {
                 str = dynamicService.doGet(path, params, headers);
