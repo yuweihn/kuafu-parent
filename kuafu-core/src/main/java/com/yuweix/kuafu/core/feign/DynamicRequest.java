@@ -2,6 +2,7 @@ package com.yuweix.kuafu.core.feign;
 
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
 
 public class DynamicRequest {
@@ -10,6 +11,7 @@ public class DynamicRequest {
     private String url;
     private String path;
     private Object params;
+    private Map<String, String> headers;
     private Class<?> responseTypeClass;
     private Type responseType;
 
@@ -31,6 +33,9 @@ public class DynamicRequest {
     }
     public Object getParams() {
         return params;
+    }
+    public Map<String, String> getHeaders() {
+        return headers;
     }
     public Class<?> getResponseTypeClass() {
         return responseTypeClass;
@@ -71,6 +76,10 @@ public class DynamicRequest {
         }
         public Builder params(Object params) {
             dynamicRequest.params = params;
+            return this;
+        }
+        public Builder headers(Map<String, String> headers) {
+            dynamicRequest.headers = headers;
             return this;
         }
         public Builder responseType(Class<?> responseTypeClass) {
