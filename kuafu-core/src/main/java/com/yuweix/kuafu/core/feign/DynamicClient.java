@@ -1,7 +1,10 @@
 package com.yuweix.kuafu.core.feign;
 
 
+import com.yuweix.kuafu.core.Constant;
+import com.yuweix.kuafu.core.MdcUtil;
 import com.yuweix.kuafu.core.serialize.JsonUtil;
+import feign.Request;
 import feign.Response;
 import feign.Util;
 import feign.codec.Decoder;
@@ -34,21 +37,19 @@ public class DynamicClient {
     public DynamicClient(ApplicationContext appContext, long connectTimeout, long readTimeout) {
         this.feignClientBuilder = new FeignClientBuilder(appContext);
         this.customizer = builder -> builder.decoder(feignDecoder())
-                .options(new feign.Request.Options(connectTimeout, TimeUnit.MILLISECONDS, readTimeout, TimeUnit.MILLISECONDS, true));
+                .options(new Request.Options(connectTimeout, TimeUnit.MILLISECONDS, readTimeout, TimeUnit.MILLISECONDS, true))
+                .requestInterceptor(template -> template.header(Constant.HEADER_X_TRACE_ID, MdcUtil.getTraceId()));
     }
 
 
-    private DynamicService getFeignClient(String feignName, String url) {
-        String cacheKey = feignName + "#" + url;
-        return dynamicServiceCache.computeIfAbsent(cacheKey,
-                key -> this.feignClientBuilder.forType(DynamicService.class, feignName)
-                        .url(url)
-                        .customize(customizer)
-                        .build());
+    private DynamicService getFeignClient(String feignName, String contextId, String url) {
+        String cacheKey = feignName + "#" + (contextId == null || contextId.isEmpty() ? feignName : contextId);
+        return dynamicServiceCache.computeIfAbsent(cacheKey, key -> buildClient(feignName, contextId, url, customizer));
     }
 
-    private DynamicService buildClient(String feignName, String url, FeignBuilderCustomizer customizer) {
+    private DynamicService buildClient(String feignName, String contextId, String url, FeignBuilderCustomizer customizer) {
         return this.feignClientBuilder.forType(DynamicService.class, feignName)
+                .contextId(contextId)
                 .url(url)
                 .customize(customizer)
                 .build();
@@ -85,6 +86,7 @@ public class DynamicClient {
 
     public <T>T call(DynamicRequest request) {
         String feignName = request.getFeignName();
+        String contextId = request.getContextId();
         DynamicRequest.Method method = request.getMethod();
         String url = request.getUrl();
         String path = request.getPath();
@@ -94,16 +96,16 @@ public class DynamicClient {
             headers = Collections.emptyMap();
         }
         Class<?> responseTypeClass = request.getResponseTypeClass();
-        Type type = request.getResponseType();
+        Type responseType = request.getResponseType();
         FeignBuilderCustomizer reqCustomizer = request.getCustomizer();
 
         long startTimeMillis = System.currentTimeMillis();
         try {
-            log.info("DynamicClient请求开始, feignName:{}, url:{}, path:{}, method:{}, params:{}"
-                    , feignName, url, path, method, JsonUtil.toJson(params));
+            log.info("DynamicClient请求开始, feignName: {}, contextId: {}, url: {}, path: {}, method: {}, params: {}"
+                    , feignName, contextId, url, path, method, JsonUtil.toJson(params));
             DynamicService dynamicService = reqCustomizer != null
-                    ? buildClient(feignName, url, reqCustomizer)
-                    : getFeignClient(feignName, url);
+                    ? buildClient(feignName, contextId, url, reqCustomizer)
+                    : getFeignClient(feignName, contextId, url);
             String str = null;
             if (DynamicRequest.Method.GET.equals(method)) {
                 str = dynamicService.doGet(path, params, headers);
@@ -120,20 +122,20 @@ public class DynamicClient {
             if (str == null || str.trim().equals("")) {
                 return null;
             }
-            if (type != null) {
-                return JsonUtil.toObject(str, type);
+            if (responseType != null) {
+                return JsonUtil.toObject(str, responseType);
             }
             if (responseTypeClass != null) {
                 return parse(str, responseTypeClass);
             }
             return (T) str;
         } catch (Exception ex) {
-            log.error("DynamicClient请求失败, feignName:{}, url:{}, path:{}, method:{}, error:{}"
-                    , feignName, url, path, method, ex.getMessage(), ex);
+            log.error("DynamicClient请求失败, feignName: {}, contextId: {}, url: {}, path: {}, method: {}, error: {}"
+                    , feignName, contextId, url, path, method, ex.getMessage(), ex);
             return null;
         } finally {
-            log.info("DynamicClient请求结束, feignName:{}, url:{}, path:{}, method:{}, cost: {}ms"
-                    , feignName, url, path, method, System.currentTimeMillis() - startTimeMillis);
+            log.info("DynamicClient请求结束, feignName: {}, contextId: {}, url: {}, path: {}, method: {}, cost: {}ms"
+                    , feignName, contextId, url, path, method, System.currentTimeMillis() - startTimeMillis);
         }
     }
 
