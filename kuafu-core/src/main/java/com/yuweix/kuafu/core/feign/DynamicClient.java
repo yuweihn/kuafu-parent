@@ -133,7 +133,7 @@ public class DynamicClient {
         } catch (Exception ex) {
             log.error("DynamicClient请求失败, feignName: {}, contextId: {}, url: {}, path: {}, method: {}, error: {}"
                     , feignName, contextId, url, path, method, ex.getMessage(), ex);
-            return null;
+            throw new RuntimeException("DynamicClient请求失败", ex);
         } finally {
             log.info("DynamicClient请求结束, feignName: {}, contextId: {}, url: {}, path: {}, method: {}, cost: {}ms"
                     , feignName, contextId, url, path, method, System.currentTimeMillis() - startTimeMillis);
