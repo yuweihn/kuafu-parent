@@ -1,14 +1,15 @@
 package com.yuweix.kuafu.core.feign;
 
 
-import feign.RequestTemplate;
 import org.springframework.cloud.openfeign.FeignBuilderCustomizer;
+
 import java.lang.reflect.Type;
 import java.util.Map;
 
 
 public class DynamicRequest {
     private String feignName;
+    private String contextId;
     private Method method;
     private String url;
     private String path;
@@ -23,6 +24,9 @@ public class DynamicRequest {
     }
     public String getFeignName() {
         return feignName;
+    }
+    public String getContextId() {
+        return contextId;
     }
     public Method getMethod() {
         return method;
@@ -66,6 +70,10 @@ public class DynamicRequest {
         }
         public Builder feignName(String feignName) {
             dynamicRequest.feignName = feignName;
+            return this;
+        }
+        public Builder contextId(String contextId) {
+            dynamicRequest.contextId = contextId;
             return this;
         }
         public Builder method(Method method) {
