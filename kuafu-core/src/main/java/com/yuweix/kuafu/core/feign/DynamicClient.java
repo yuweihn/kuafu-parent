@@ -99,6 +99,7 @@ public class DynamicClient {
         Class<?> responseTypeClass = request.getResponseTypeClass();
         Type responseType = request.getResponseType();
         FeignBuilderCustomizer reqCustomizer = request.getCustomizer();
+        boolean ignoreException = request.isIgnoreException();
 
         long startTimeMillis = System.currentTimeMillis();
         try {
@@ -133,6 +134,9 @@ public class DynamicClient {
         } catch (Exception ex) {
             log.error("DynamicClient请求失败, feignName: {}, contextId: {}, url: {}, path: {}, method: {}, error: {}"
                     , feignName, contextId, url, path, method, ex.getMessage(), ex);
+            if (ignoreException) {
+                return null;
+            }
             throw new RuntimeException("DynamicClient请求失败", ex);
         } finally {
             log.info("DynamicClient请求结束, feignName: {}, contextId: {}, url: {}, path: {}, method: {}, cost: {}ms"

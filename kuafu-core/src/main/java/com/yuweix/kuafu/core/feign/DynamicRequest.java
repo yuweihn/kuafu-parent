@@ -18,9 +18,11 @@ public class DynamicRequest {
     private Class<?> responseTypeClass;
     private Type responseType;
     private FeignBuilderCustomizer customizer;
+    private boolean ignoreException;
 
     private DynamicRequest() {
         this.responseTypeClass = String.class;
+        this.ignoreException = false;
     }
     public String getFeignName() {
         return feignName;
@@ -49,9 +51,11 @@ public class DynamicRequest {
     public Type getResponseType() {
         return responseType;
     }
-
     public FeignBuilderCustomizer getCustomizer() {
         return customizer;
+    }
+    public boolean isIgnoreException() {
+        return ignoreException;
     }
 
     public static Builder builder() {
@@ -106,6 +110,10 @@ public class DynamicRequest {
         }
         public Builder responseType(Type responseType) {
             dynamicRequest.responseType = responseType;
+            return this;
+        }
+        public Builder ignoreException(boolean ignoreException) {
+            dynamicRequest.ignoreException = ignoreException;
             return this;
         }
         public DynamicRequest build() {
