@@ -29,28 +29,32 @@ import java.util.concurrent.TimeUnit;
 public class DynamicClient {
     private static final Logger log = LoggerFactory.getLogger(DynamicClient.class);
 
-    private final FeignBuilderCustomizer customizer;
+    private final FeignBuilderCustomizer defaultCustomizer;
     private final FeignClientBuilder feignClientBuilder;
     private final Map<String, DynamicService> dynamicServiceCache = new ConcurrentHashMap<>();
 
 
     public DynamicClient(ApplicationContext appContext, long connectTimeout, long readTimeout) {
         this.feignClientBuilder = new FeignClientBuilder(appContext);
-        this.customizer = builder -> builder.decoder(feignDecoder())
+        this.defaultCustomizer = builder -> builder.decoder(feignDecoder())
                 .options(new Request.Options(connectTimeout, TimeUnit.MILLISECONDS, readTimeout, TimeUnit.MILLISECONDS, true))
                 .requestInterceptor(template -> template.header(Constant.HEADER_X_TRACE_ID, MdcUtil.getTraceId()));
     }
 
 
-    private DynamicService getFeignClient(String feignName, String contextId, String url) {
-        String cacheKey = feignName + "#" + (contextId == null || contextId.isEmpty() ? feignName : contextId);
-        return dynamicServiceCache.computeIfAbsent(cacheKey, key -> buildClient(feignName, contextId, url, customizer));
+    private DynamicService getFeignClient(String feignName, String contextId, String url, FeignBuilderCustomizer customizer) {
+        String cid = (contextId == null || contextId.isEmpty()) ? feignName : contextId;
+        if (customizer == null) {
+            String cacheKey = feignName + "#" + cid;
+            return dynamicServiceCache.computeIfAbsent(cacheKey, key -> buildClient(feignName, cid, url, defaultCustomizer));
+        } else {
+            return buildClient(feignName, cid, url, customizer);
+        }
     }
 
     private DynamicService buildClient(String feignName, String contextId, String url, FeignBuilderCustomizer customizer) {
-        String effectiveContextId = (contextId == null || contextId.isEmpty()) ? feignName : contextId;
         return this.feignClientBuilder.forType(DynamicService.class, feignName)
-                .contextId(effectiveContextId)
+                .contextId(contextId)
                 .url(url)
                 .customize(customizer)
                 .build();
@@ -105,9 +109,7 @@ public class DynamicClient {
         try {
             log.info("DynamicClient请求开始, feignName: {}, contextId: {}, url: {}, path: {}, method: {}, params: {}"
                     , feignName, contextId, url, path, method, JsonUtil.toJson(params));
-            DynamicService dynamicService = reqCustomizer != null
-                    ? buildClient(feignName, contextId, url, reqCustomizer)
-                    : getFeignClient(feignName, contextId, url);
+            DynamicService dynamicService = getFeignClient(feignName, contextId, url, reqCustomizer);
             String str = null;
             if (DynamicRequest.Method.GET.equals(method)) {
                 str = dynamicService.doGet(path, params, headers);
