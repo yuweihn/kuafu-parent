@@ -48,8 +48,9 @@ public class DynamicClient {
     }
 
     private DynamicService buildClient(String feignName, String contextId, String url, FeignBuilderCustomizer customizer) {
+        String effectiveContextId = (contextId == null || contextId.isEmpty()) ? feignName : contextId;
         return this.feignClientBuilder.forType(DynamicService.class, feignName)
-                .contextId(contextId)
+                .contextId(effectiveContextId)
                 .url(url)
                 .customize(customizer)
                 .build();
