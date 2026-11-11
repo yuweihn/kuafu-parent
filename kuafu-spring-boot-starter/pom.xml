@@ -239,6 +239,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>${maven.shade.plugin.version}</version>
+				<configuration>
+					<!--瘦身POM生成到target/下：不污染源码目录、随clean自动清理、不产生git噪音；
+					  仍需保留该文件，shade后发布的POM必须剔除已被合并的依赖-->
+					<dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+				</configuration>
 				<executions>
 					<execution>
 						<phase>package</phase>
