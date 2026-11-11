@@ -23,6 +23,9 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import java.util.stream.Collectors;
 
 
+/**
+ * @author yuwei
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
