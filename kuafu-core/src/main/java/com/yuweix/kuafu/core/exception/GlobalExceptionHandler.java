@@ -90,7 +90,7 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(RuntimeException.class)
-	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public Response<String, Void> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
 		log.error("RuntimeException | URI: {}, Error: {}", request.getRequestURI(), ex.getMessage(), ex);
 		String errorCode0 = errorCode == null || "".equals(errorCode) ? "500" : errorCode;
