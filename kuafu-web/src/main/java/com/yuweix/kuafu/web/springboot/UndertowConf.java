@@ -12,17 +12,17 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
  * @author yuwei
  */
 public class UndertowConf implements WebServerFactoryCustomizer<UndertowServletWebServerFactory> {
-	@Value("${kuafu.web.undertow.buffer-pool-direct:false}")
-	private boolean bufferPoolDirect;
-	@Value("${kuafu.web.undertow.buffer-pool-size:1024}")
-	private int bufferPoolSize;
+	@Value("${kuafu.web.undertow.buffer-direct:true}")
+	private boolean bufferDirect;
+	@Value("${kuafu.web.undertow.buffer-size:1024}")
+	private int bufferSize;
 
 
 	@Override
 	public void customize(UndertowServletWebServerFactory factory) {
 		factory.addDeploymentInfoCustomizers(deploymentInfo -> {
 			WebSocketDeploymentInfo deployInfo = new WebSocketDeploymentInfo();
-			deployInfo.setBuffers(new DefaultByteBufferPool(bufferPoolDirect, bufferPoolSize));
+			deployInfo.setBuffers(new DefaultByteBufferPool(bufferDirect, bufferSize));
 			deploymentInfo.addServletContextAttribute(WebSocketDeploymentInfo.class.getName(), deployInfo);
 		});
 	}
