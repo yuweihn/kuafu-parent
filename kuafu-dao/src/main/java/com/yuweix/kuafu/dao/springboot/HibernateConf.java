@@ -40,12 +40,12 @@ public class HibernateConf {
 			, @Value("${kuafu.datasource.default.password}") String password
 			, @Value("${kuafu.datasource.default.default-read-only:false}") boolean defaultReadOnly
 			, @Value("${kuafu.datasource.default.filters:stat}") String filters
-			, @Value("${kuafu.datasource.default.max-active:2}") int maxActive
-			, @Value("${kuafu.datasource.default.initial-size:1}") int initialSize
+			, @Value("${kuafu.datasource.default.initial-size:2}") int initialSize
+			, @Value("${kuafu.datasource.default.min-idle:2}") int minIdle
+			, @Value("${kuafu.datasource.default.max-active:8}") int maxActive
 			, @Value("${kuafu.datasource.default.max-wait-mills:60000}") long maxWaitMillis
 			, @Value("${kuafu.datasource.default.remove-abandoned:false}") boolean removeAbandoned
 			, @Value("${kuafu.datasource.default.remove-abandoned-timeout:1800}") int removeAbandonedTimeout
-			, @Value("${kuafu.datasource.default.min-idle:1}") int minIdle
 			, @Value("${kuafu.datasource.default.time-between-eviction-runs-millis:60000}") long timeBetweenEvictionRunsMillis
 			, @Value("${kuafu.datasource.default.min-evictable-idle-time-millis:300000}") long minEvictableIdleTimeMillis
 			, @Value("${kuafu.datasource.default.validation-query:select 'x'}") String validationQuery
@@ -62,12 +62,12 @@ public class HibernateConf {
 		dataSource.setPassword(password);
 		dataSource.setDefaultReadOnly(defaultReadOnly);
 		dataSource.setFilters(filters);
-		dataSource.setMaxActive(maxActive);
 		dataSource.setInitialSize(initialSize);
+		dataSource.setMinIdle(minIdle);
+		dataSource.setMaxActive(maxActive);
 		dataSource.setMaxWait(maxWaitMillis);
 		dataSource.setRemoveAbandoned(removeAbandoned);
 		dataSource.setRemoveAbandonedTimeout(removeAbandonedTimeout);
-		dataSource.setMinIdle(minIdle);
 		dataSource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
 		dataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
 		dataSource.setValidationQuery(validationQuery);
