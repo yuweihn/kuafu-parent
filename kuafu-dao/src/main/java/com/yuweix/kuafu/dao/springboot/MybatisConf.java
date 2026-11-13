@@ -62,6 +62,8 @@ public class MybatisConf {
 			, @Value("${kuafu.datasource.default.query-timeout:30}") int queryTimeout
 			, @Value("${kuafu.datasource.default.remove-abandoned:true}") boolean removeAbandoned
 			, @Value("${kuafu.datasource.default.remove-abandoned-timeout:300}") int removeAbandonedTimeout
+			, @Value("${kuafu.datasource.default.keep-alive:true}") boolean keepAlive
+			, @Value("${kuafu.datasource.default.keep-alive-between-time-millis:60000}") long keepAliveBetweenTimeMillis
 			, @Value("${kuafu.datasource.default.time-between-eviction-runs-millis:60000}") long timeBetweenEvictionRunsMillis
 			, @Value("${kuafu.datasource.default.min-evictable-idle-time-millis:600000}") long minEvictableIdleTimeMillis
 			, @Value("${kuafu.datasource.default.max-evictable-idle-time-millis:1800000}") long maxEvictableIdleTimeMillis
@@ -86,6 +88,8 @@ public class MybatisConf {
 		dataSource.setQueryTimeout(queryTimeout);
 		dataSource.setRemoveAbandoned(removeAbandoned);
 		dataSource.setRemoveAbandonedTimeout(removeAbandonedTimeout);
+		dataSource.setKeepAlive(keepAlive);
+		dataSource.setKeepAliveBetweenTimeMillis(keepAliveBetweenTimeMillis);
 		dataSource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
 		dataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
 		dataSource.setMaxEvictableIdleTimeMillis(maxEvictableIdleTimeMillis);
