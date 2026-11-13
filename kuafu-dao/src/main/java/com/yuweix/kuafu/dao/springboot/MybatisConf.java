@@ -59,15 +59,17 @@ public class MybatisConf {
 			, @Value("${kuafu.datasource.default.min-idle:2}") int minIdle
 			, @Value("${kuafu.datasource.default.max-active:8}") int maxActive
 			, @Value("${kuafu.datasource.default.max-wait-mills:60000}") long maxWaitMillis
-			, @Value("${kuafu.datasource.default.remove-abandoned:false}") boolean removeAbandoned
-			, @Value("${kuafu.datasource.default.remove-abandoned-timeout:1800}") int removeAbandonedTimeout
+			, @Value("${kuafu.datasource.default.query-timeout:30}") int queryTimeout
+			, @Value("${kuafu.datasource.default.remove-abandoned:true}") boolean removeAbandoned
+			, @Value("${kuafu.datasource.default.remove-abandoned-timeout:300}") int removeAbandonedTimeout
 			, @Value("${kuafu.datasource.default.time-between-eviction-runs-millis:60000}") long timeBetweenEvictionRunsMillis
-			, @Value("${kuafu.datasource.default.min-evictable-idle-time-millis:300000}") long minEvictableIdleTimeMillis
+			, @Value("${kuafu.datasource.default.min-evictable-idle-time-millis:600000}") long minEvictableIdleTimeMillis
+			, @Value("${kuafu.datasource.default.max-evictable-idle-time-millis:1800000}") long maxEvictableIdleTimeMillis
 			, @Value("${kuafu.datasource.default.validation-query:select 'x'}") String validationQuery
 			, @Value("${kuafu.datasource.default.test-while-idle:true}") boolean testWhileIdle
 			, @Value("${kuafu.datasource.default.test-on-borrow:false}") boolean testOnBorrow
 			, @Value("${kuafu.datasource.default.test-on-return:false}") boolean testOnReturn
-			, @Value("${kuafu.datasource.default.pool-prepared-statements:true}") boolean poolPreparedStatements
+			, @Value("${kuafu.datasource.default.pool-prepared-statements:false}") boolean poolPreparedStatements
 			, @Value("${kuafu.datasource.default.max-pool-prepared-statement-per-connection-size:50}") int maxPoolPreparedStatementPerConnectionSize
 			, @Value("${kuafu.datasource.default.max-open-prepared-statements:100}") int maxOpenPreparedStatements) throws SQLException {
 		DruidDataSource dataSource = new DruidDataSource();
@@ -81,10 +83,12 @@ public class MybatisConf {
 		dataSource.setMinIdle(minIdle);
 		dataSource.setMaxActive(maxActive);
 		dataSource.setMaxWait(maxWaitMillis);
+		dataSource.setQueryTimeout(queryTimeout);
 		dataSource.setRemoveAbandoned(removeAbandoned);
 		dataSource.setRemoveAbandonedTimeout(removeAbandonedTimeout);
 		dataSource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
 		dataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
+		dataSource.setMaxEvictableIdleTimeMillis(maxEvictableIdleTimeMillis);
 		dataSource.setValidationQuery(validationQuery);
 		dataSource.setTestWhileIdle(testWhileIdle);
 		dataSource.setTestOnBorrow(testOnBorrow);
