@@ -8,8 +8,8 @@
 		<!--<property name="log.pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%p][traceId=%X{X-B3-TraceId},spanId=%X{X-B3-SpanId}][%t]-[%l]: %m%n</property>-->
 		<property name="log.pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%p][traceId=%X{traceId},spanId=%X{spanId}][%t]-[%l]: %m%n</property>
 		<property name="every.file.size">10M</property><!--日志切割的最小单位-->
-		<property name="max.file.age">5d</property><!--文件最大存活时间(单位：天)-->
-		<property name="max.file.per.day">10</property><!--单日保留的最大文件个数-->
+		<property name="max.file.age">7d</property><!--文件最大存活时间(单位：天)-->
+		<property name="max.file.per.day">20</property><!--单日保留的最大文件个数-->
 	</properties>
 
 	<appenders>
@@ -25,7 +25,7 @@
 		<!--这个会打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
 		<!--按月生成归档日志，可以使用filePattern-->
 		<RollingFile name="InfoRollingFile" fileName="${log.dir}/${project.name}.log"
-						 filePattern="${log.dir}/${project.name}_info-%d{yyyy-MM-dd}-%i.log.gz">
+					 filePattern="${log.dir}/${project.name}_info-%d{yyyy-MM-dd}-%i.log.gz">
 			<Filters>
 				<!--<ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>-->
 				<ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
@@ -36,7 +36,7 @@
 				<SizeBasedTriggeringPolicy size="${every.file.size}"/>
 			</Policies>
 			<DefaultRolloverStrategy max="${max.file.per.day}">
-				<Delete basePath="${log.dir}" maxDepth="10000">
+				<Delete basePath="${log.dir}" maxDepth="5">
 					<IfFileName glob="*_info-*.log.gz" />
 					<IfLastModified age="${max.file.age}" />
 				</Delete>
@@ -44,7 +44,7 @@
 		</RollingFile>
 
 		<RollingFile name="ErrorRollingFile" fileName="${log.dir}/${project.name}_error.log"
-						 filePattern="${log.dir}/${project.name}_error-%d{yyyy-MM-dd}-%i.log.gz">
+					 filePattern="${log.dir}/${project.name}_error-%d{yyyy-MM-dd}-%i.log.gz">
 			<Filters>
 				<ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
 			</Filters>
@@ -54,22 +54,32 @@
 				<SizeBasedTriggeringPolicy size="${every.file.size}"/>
 			</Policies>
 			<DefaultRolloverStrategy max="${max.file.per.day}">
-				<Delete basePath="${log.dir}" maxDepth="10000">
+				<Delete basePath="${log.dir}" maxDepth="5">
 					<IfFileName glob="*_error-*.log.gz" />
 					<IfLastModified age="${max.file.age}" />
 				</Delete>
 			</DefaultRolloverStrategy>
 		</RollingFile>
+
+		<!--异步包装：业务线程只负责把日志事件入队，真正的磁盘写入由后台线程完成(默认ArrayBlockingQueue，无需额外依赖)-->
+		<!--includeLocation必须为true，否则日志格式中的%l(位置信息)在异步线程里取不到-->
+		<!--bufferSize:队列长度; blocking:true队列满时阻塞等待而不是丢弃; shutdownTimeout:关闭时等待队列排空的最大毫秒数-->
+		<Async name="AsyncRollingFile" bufferSize="2048" blocking="true" includeLocation="true" shutdownTimeout="5000">
+			<AppenderRef ref="InfoRollingFile"/>
+			<AppenderRef ref="ErrorRollingFile"/>
+		</Async>
 	</appenders>
 
 	<loggers>
 		<!--默认为root的logger-->
 		<root level="info">
+			<!--控制台保持同步，保证本地开发时输出顺序与异常即时可见(生产环境重定向到/dev/null)-->
 			<appender-ref ref="Console"/>
-			<appender-ref ref="InfoRollingFile"/>
-			<appender-ref ref="ErrorRollingFile"/>
+			<!--两个滚动文件统一走异步队列，避免同步IO拖慢业务线程-->
+			<appender-ref ref="AsyncRollingFile"/>
 		</root>
 
 		<logger name="com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver" level="error"/>
+		<logger name="com.yuweix.kuafu.schedule" level="warn"/>
 	</loggers>
 </configuration>
