@@ -22,22 +22,22 @@ import java.util.Map;
  */
 public interface DynamicService {
     @GetMapping("{path}")
-    <T> T doGet(@PathVariable("path") String path, @SpringQueryMap Object params
+    <T>T doGet(@PathVariable("path") String path, @SpringQueryMap Object params
             , @RequestHeader Map<String, String> headers);
 
     @PostMapping("{path}")
-    <T> T doPost(@PathVariable("path") String path, @RequestBody(required = false) Object params
+    <T>T doPost(@PathVariable("path") String path, @RequestBody(required = false) Object params
             , @RequestHeader Map<String, String> headers);
 
     @PutMapping("{path}")
-    <T> T doPut(@PathVariable("path") String path, @RequestBody(required = false) Object params
+    <T>T doPut(@PathVariable("path") String path, @RequestBody(required = false) Object params
             , @RequestHeader Map<String, String> headers);
 
     @PatchMapping("{path}")
-    <T> T doPatch(@PathVariable("path") String path, @RequestBody(required = false) Object params
+    <T>T doPatch(@PathVariable("path") String path, @RequestBody(required = false) Object params
             , @RequestHeader Map<String, String> headers);
 
     @DeleteMapping("{path}")
-    <T> T doDelete(@PathVariable("path") String path, @SpringQueryMap Object params
+    <T>T doDelete(@PathVariable("path") String path, @SpringQueryMap Object params
             , @RequestHeader Map<String, String> headers);
 }
