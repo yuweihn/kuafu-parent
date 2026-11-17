@@ -63,12 +63,18 @@ public class DynamicClient {
      */
     private DynamicService getFeignClient(String feignName, String contextId, String url, FeignBuilderCustomizer customizer) {
         String cid = (contextId == null || contextId.isEmpty()) ? feignName : contextId;
+        String cacheKey = feignName + "#" + cid + "#" + url;
         if (customizer == null) {
-            String cacheKey = feignName + "#" + cid + "#" + url;
             return dynamicServiceCache.computeIfAbsent(cacheKey, key -> buildClient(feignName, cid, url, defaultCustomizer));
-        } else {
-            return buildClient(feignName, cid, url, customizer);
         }
+        // 自定义 customizer 也走缓存：否则每次调用都新建 Feign 客户端（丢默认超时/解码器），构成资源耗尽
+        DynamicService cached = dynamicServiceCache.get(cacheKey + "@" + System.identityHashCode(customizer));
+        if (cached != null) {
+            return cached;
+        }
+        DynamicService created = buildClient(feignName, cid, url, customizer);
+        dynamicServiceCache.put(cacheKey + "@" + System.identityHashCode(customizer), created);
+        return created;
     }
 
     private DynamicService buildClient(String feignName, String contextId, String url, FeignBuilderCustomizer customizer) {
@@ -121,7 +127,10 @@ public class DynamicClient {
         FeignBuilderCustomizer reqCustomizer = request.getCustomizer();
         boolean ignoreException = request.isIgnoreException();
         if (method == null) {
-            throw new IllegalArgumentException("DynamicRequest.method 不能为空");
+            throw new IllegalArgumentException("DynamicRequest.method不能为空");
+        }
+        if (feignName == null || feignName.trim().isEmpty()) {
+            throw new IllegalArgumentException("DynamicRequest.feignName不能为空");
         }
 
         if (hasBody(method) && isForm(headers)) {
