@@ -10,11 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -60,7 +56,7 @@ public class TrustAllSslSocketFactory extends SSLConnectionSocketFactory {
 			return protocols;
 		}
 
-		List<String> filtered = new ArrayList<String>(protocols.length);
+		List<String> filtered = new ArrayList<>(protocols.length);
 		for (String protocol: protocols) {
 			if (protocol == null) {
 				continue;
