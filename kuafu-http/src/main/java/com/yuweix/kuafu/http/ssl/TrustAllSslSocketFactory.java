@@ -52,7 +52,7 @@ public class TrustAllSslSocketFactory extends SSLConnectionSocketFactory {
 			jvmSupported.addAll(Arrays.asList(sslContext.getSupportedSSLParameters().getProtocols()));
 		}
 		if (jvmSupported.isEmpty()) {
-			log.warn("无法获取 JVM 支持的 SSL 协议列表，跳过协议过滤");
+			log.warn("无法获取JVM支持的SSL协议列表，跳过协议过滤");
 			return protocols;
 		}
 
@@ -64,11 +64,11 @@ public class TrustAllSslSocketFactory extends SSLConnectionSocketFactory {
 			if (jvmSupported.contains(protocol)) {
 				filtered.add(protocol);
 			} else {
-				log.warn("当前 JVM 不支持 SSL 协议 {}, 已忽略", protocol);
+				log.warn("当前JVM不支持SSL协议 {}, 已忽略", protocol);
 			}
 		}
 		if (filtered.isEmpty()) {
-			log.warn("过滤后没有任何可用的 SSL 协议，回退到原始配置: {}", Arrays.toString(protocols));
+			log.warn("过滤后没有任何可用的SSL协议，回退到原始配置: {}", Arrays.toString(protocols));
 			return protocols;
 		}
 		return filtered.toArray(new String[filtered.size()]);
