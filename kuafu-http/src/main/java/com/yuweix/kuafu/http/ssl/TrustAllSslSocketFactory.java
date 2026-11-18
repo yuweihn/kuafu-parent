@@ -56,7 +56,7 @@ public class TrustAllSslSocketFactory extends SSLConnectionSocketFactory {
 			return protocols;
 		}
 
-		List<String> filtered = new ArrayList<String>(protocols.length);
+		List<String> filtered = new ArrayList<>(protocols.length);
 		for (String protocol: protocols) {
 			if (protocol == null) {
 				continue;
