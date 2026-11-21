@@ -16,6 +16,6 @@ do
 done
 sleep 1
 
-${jdk_path} -server -Xms300m -Xmx300m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:+UseG1GC -XX:InitiatingHeapOccupancyPercent=45 -XX:MaxGCPauseMillis=200 -Xlog:gc*,gc+heap=debug:file=gc.log:time,tags,level:filecount=5,filesize=100m -jar ${prj_name}.jar ${env} --server.restart='ngx.sh '${jdk_path} >/dev/null 2>&1&
+${jdk_path} -server -Xms300m -Xmx300m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -XX:+UseG1GC -XX:InitiatingHeapOccupancyPercent=45 -XX:MaxGCPauseMillis=200 -Xlog:gc*,gc+heap=debug:file=gc.log:time,tags,level:filecount=5,filesize=100m -jar ${prj_name}.jar ${env} --server.restart='ngx.sh '${jdk_path} >/dev/null 2>&1&
 sleep 1
 echo "ok......"
