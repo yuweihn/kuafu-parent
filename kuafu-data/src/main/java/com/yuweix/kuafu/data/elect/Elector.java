@@ -15,10 +15,10 @@ public interface Elector {
 	 * @return
 	 */
 	String acquire(String lock);
-	default R tryAcquire(String lock) {
+	default Result tryAcquire(String lock) {
 		String leader = acquire(lock);
 		String localNode = getLocalNode();
-		R r = new R();
+		Result r = new Result();
 		r.setSuccess(localNode.equals(leader));
 		r.setLeader(leader);
 		r.setLocal(localNode);
@@ -28,7 +28,7 @@ public interface Elector {
 	void release(String lock);
 	String getLocalNode();
 
-	class R implements Serializable {
+	class Result implements Serializable {
 		private static final long serialVersionUID = 1L;
 		private boolean success;
 		private String leader;
