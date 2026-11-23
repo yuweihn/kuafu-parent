@@ -56,7 +56,7 @@ public abstract class AbstractTask {
 
 		Elector elector = resolveElector(injected);
 		String lockName = getLockName(methodName);
-		Elector.R res = elector.tryAcquire(lockName);
+		Elector.Result res = elector.tryAcquire(lockName);
 		if (!res.isSuccess()) {
 			log.info("Not leader, job didn't execute! Job name: {}, Leader: {}", getClass().getName(), res.getLeader());
 			return null;
