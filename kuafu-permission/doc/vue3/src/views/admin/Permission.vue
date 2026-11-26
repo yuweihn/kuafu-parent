@@ -85,6 +85,19 @@
         <file-upload ref="importData" :title="'导入外部数据'" :fileLabel="'文件'" :fileTips="'只接受*.json格式，最大不要超过2MB'"
                   :accept="'.json'" :maxSize="2097152" :fileType="'text'"
                   :actionUrl="'/sys/permission/import'" v-on:change="onImportPost" />
+
+        <!--下载保存弹框-->
+        <el-dialog v-model="downloadDialogVisible" title="保存导出文件" width="420px" append-to-body draggable>
+            <el-form label-width="70px">
+                <el-form-item label="文件名">
+                    <el-input v-model="downloadFileName" placeholder="请输入文件名" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="downloadDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveDownloadFile">{{ supportDirPicker ? '选择目录并保存' : '下载' }}</el-button>
+            </template>
+        </el-dialog>
 	</section>
 </template>
 
@@ -111,6 +124,10 @@ const visibleList = ref([
 const permissionList = ref([]);
 const listLoading = ref(false);
 const sels = ref([]);
+const downloadDialogVisible = ref(false);
+const downloadFileName = ref('');
+const downloadBlob = ref(null);
+const supportDirPicker = typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function';
 
 function onSelsChanged(v) {
     sels.value = v;
@@ -149,36 +166,79 @@ function batchRemove() {
     }).catch((err) => {});
     sels.value = [];
 }
-function doExport() {
-    proxy.$modal.confirm('导出确认！', '提示', {type: 'warning'}).then(() => {
-        listLoading.value = true;
-        proxy.request.post('/sys/permission/export', null, {responseType: 'blob'}).then((res) => {
-            if (res.headers["content-type"].indexOf("application/octet-stream") === 0) {
-                const fileName = res.headers["_filename"];
-                if (fileName) {
-                    proxy.fileDownload(res.data, decodeURIComponent(fileName));
-                } else {
-                    proxy.$modal.msgError("Error");
-                }
-            } else if (res.headers["content-type"].indexOf("application/json") === 0) {
-                const reader = new FileReader();
-                reader.onload = function() {
-                    var dt = JSON.parse(reader.result);
-                    if (dt.code === proxy.errorCode.success.code) {
-                        proxy.$modal.msgSuccess(dt.msg);
-                    } else {
-                        proxy.$modal.msgError(dt.msg);
-                    }
-                }
-                reader.readAsText(res.data, 'utf-8');
-            } else {
-                proxy.$modal.msgError("Invalid Content Type!!");
+// 把下载的文件写入用户选择的目录（File System Access API）
+async function saveBlobToDir(dirHandle, blob, fileName) {
+    try {
+        const fileHandle = await dirHandle.getFileHandle(fileName, {create: true});
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        proxy.$modal.msgSuccess('下载成功');
+    } catch (err) {
+        proxy.$modal.msgError('保存失败：' + (err && err.message ? err.message : '未知错误'));
+    }
+}
+
+async function saveDownloadFile() {
+    const name = (downloadFileName.value || '').trim();
+    if (!name) {
+        proxy.$modal.msgWarning('请输入文件名');
+        return;
+    }
+    const blob = downloadBlob.value;
+    if (!blob) {
+        return;
+    }
+
+    if (supportDirPicker) {
+        let dirHandle;
+        try {
+            dirHandle = await window.showDirectoryPicker({mode: 'readwrite'});
+        } catch (err) {
+            if (err && err.name !== 'AbortError') {
+                proxy.$modal.msgError('选择目录失败：' + err.message);
             }
-            listLoading.value = false;
-        }).catch((err) => {
-            listLoading.value = false;
-        });
-    }).catch((err) => {});
+            return;
+        }
+        await saveBlobToDir(dirHandle, blob, name);
+    } else {
+        proxy.fileDownload(blob, name);
+    }
+
+    downloadDialogVisible.value = false;
+    downloadBlob.value = null;
+}
+
+function doExport() {
+    listLoading.value = true;
+    proxy.request.post('/sys/permission/export', null, {responseType: 'blob'}).then((res) => {
+        if (res.headers["content-type"].indexOf("application/octet-stream") === 0) {
+            const fileName = res.headers["_filename"];
+            if (fileName) {
+                downloadBlob.value = res.data;
+                downloadFileName.value = decodeURIComponent(fileName);
+                downloadDialogVisible.value = true;
+            } else {
+                proxy.$modal.msgError("Error");
+            }
+        } else if (res.headers["content-type"].indexOf("application/json") === 0) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                var dt = JSON.parse(reader.result);
+                if (dt.code === proxy.errorCode.success.code) {
+                    proxy.$modal.msgSuccess(dt.msg);
+                } else {
+                    proxy.$modal.msgError(dt.msg);
+                }
+            }
+            reader.readAsText(res.data, 'utf-8');
+        } else {
+            proxy.$modal.msgError("Invalid Content Type!!");
+        }
+        listLoading.value = false;
+    }).catch((err) => {
+        listLoading.value = false;
+    });
 }
 function doImport() {
     proxy.$refs.importData.show("hehe");
