@@ -89,6 +89,20 @@
         <file-upload ref="importData" :title="'导入外部数据'" :fileLabel="'文件'" :fileTips="'只接受*.json格式，最大不要超过2MB'"
                   :accept="'.json'" :maxSize="2097152" :fileType="'text'"
                   :actionUrl="this.$global.baseUrl + '/sys/permission/import'" v-on:change="onImportPost" />
+
+        <!--下载保存弹框-->
+        <el-dialog :visible.sync="downloadDialogVisible" title="保存导出文件" width="420px"
+                   append-to-body v-drag>
+            <el-form label-width="70px">
+                <el-form-item label="文件名">
+                    <el-input v-model="downloadFileName" placeholder="请输入文件名" />
+                </el-form-item>
+            </el-form>
+            <div slot="footer">
+                <el-button @click="downloadDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="saveDownloadFile">{{ supportDirPicker ? '选择目录并保存' : '下载' }}</el-button>
+            </div>
+        </el-dialog>
 	</section>
 </template>
 
@@ -124,7 +138,11 @@ export default {
 
             permissionList: [],
             listLoading: false,
-            sels: []    //列表选中列
+            sels: [],    //列表选中列
+            downloadDialogVisible: false,
+            downloadFileName: '',
+            downloadBlob: null,
+            supportDirPicker: typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function'
         }
     },
     methods: {
@@ -182,39 +200,78 @@ export default {
             this.sels = [];
         },
 
-        doExport() {
-            this.$confirm('导出确认！', '提示', {type: 'warning'}).then(() => {
-                var this0 = this;
-                this0.listLoading = true;
-                this0.$axios.post(this0.$global.baseUrl + '/sys/permission/export', null, {responseType: 'blob'}).then((res) => {
-                    if (res.data.type === 'application/octet-stream') {
-                        const fileName = res.headers["_filename"];
-                        if (fileName) {
-                            this0.$fileDownload(res.data, decodeURIComponent(fileName));
-                        } else {
-                            this0.$message.error("Error");
-                        }
-                    } else if (res.data.type === 'application/json') {
-                        const reader = new FileReader();
-                        reader.onload = function() {
-                            var dt = JSON.parse(reader.result);
-                            if (dt.code === '0000') {
-                                this0.$message({type: "success", message: dt.msg});
-                            } else {
-                                this0.$message.error(dt.msg);
-                            }
-                        }
-                        reader.readAsText(res.data, 'utf-8');
-                    } else {
-                        this0.$message.error("Invalid Content Type!!");
-                    }
-                    this0.listLoading = false;
-                }).catch((err) => {
-                    this0.listLoading = false;
-                    this0.$message.error(err.message);
-                });
-            }).catch(() => {
+        // 把下载的文件写入用户选择的目录（File System Access API）
+        saveBlobToDir(dirHandle, blob, fileName) {
+            return dirHandle.getFileHandle(fileName, {create: true}).then((fileHandle) => {
+                return fileHandle.createWritable();
+            }).then((writable) => {
+                return writable.write(blob).then(() => writable.close());
+            }).then(() => {
+                this.$message({type: 'success', message: '下载成功'});
+            }).catch((err) => {
+                this.$message.error('保存失败：' + (err && err.message ? err.message : '未知错误'));
+            });
+        },
 
+        saveDownloadFile() {
+            var name = (this.downloadFileName || '').trim();
+            if (!name) {
+                this.$message.warning('请输入文件名');
+                return;
+            }
+            var blob = this.downloadBlob;
+            if (!blob) {
+                return;
+            }
+
+            if (this.supportDirPicker) {
+                window.showDirectoryPicker({mode: 'readwrite'}).then((dirHandle) => {
+                    return this.saveBlobToDir(dirHandle, blob, name);
+                }).then(() => {
+                    this.downloadDialogVisible = false;
+                    this.downloadBlob = null;
+                }).catch((err) => {
+                    if (err && err.name !== 'AbortError') {
+                        this.$message.error('选择目录失败：' + err.message);
+                    }
+                });
+            } else {
+                this.$fileDownload(blob, name);
+                this.downloadDialogVisible = false;
+                this.downloadBlob = null;
+            }
+        },
+
+        doExport() {
+            this.listLoading = true;
+            this.$axios.post(this.$global.baseUrl + '/sys/permission/export', null, {responseType: 'blob'}).then((res) => {
+                if (res.data.type === 'application/octet-stream') {
+                    const fileName = res.headers["_filename"];
+                    if (fileName) {
+                        this.downloadBlob = res.data;
+                        this.downloadFileName = decodeURIComponent(fileName);
+                        this.downloadDialogVisible = true;
+                    } else {
+                        this.$message.error("Error");
+                    }
+                } else if (res.data.type === 'application/json') {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        var dt = JSON.parse(reader.result);
+                        if (dt.code === '0000') {
+                            this.$message({type: "success", message: dt.msg});
+                        } else {
+                            this.$message.error(dt.msg);
+                        }
+                    }
+                    reader.readAsText(res.data, 'utf-8');
+                } else {
+                    this.$message.error("Invalid Content Type!!");
+                }
+                this.listLoading = false;
+            }).catch((err) => {
+                this.listLoading = false;
+                this.$message.error(err.message);
             });
         },
 
