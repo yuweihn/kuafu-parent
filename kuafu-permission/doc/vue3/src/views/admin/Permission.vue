@@ -95,7 +95,7 @@
             </el-form>
             <template #footer>
                 <el-button @click="downloadDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveDownloadFile">{{ supportDirPicker ? '选择目录并保存' : '下载' }}</el-button>
+                <el-button type="primary" @click="saveDownloadFile">下载</el-button>
             </template>
         </el-dialog>
 	</section>
@@ -127,7 +127,7 @@ const sels = ref([]);
 const downloadDialogVisible = ref(false);
 const downloadFileName = ref('');
 const downloadBlob = ref(null);
-const supportDirPicker = typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function';
+const supportSavePicker = typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function';
 
 function onSelsChanged(v) {
     sels.value = v;
@@ -166,10 +166,9 @@ function batchRemove() {
     }).catch((err) => {});
     sels.value = [];
 }
-// 把下载的文件写入用户选择的目录（File System Access API）
-async function saveBlobToDir(dirHandle, blob, fileName) {
+// 把 blob 写入系统“另存为”对话框选中的文件（File System Access API）
+async function writeBlobToFileHandle(fileHandle, blob) {
     try {
-        const fileHandle = await dirHandle.getFileHandle(fileName, {create: true});
         const writable = await fileHandle.createWritable();
         await writable.write(blob);
         await writable.close();
@@ -179,7 +178,36 @@ async function saveBlobToDir(dirHandle, blob, fileName) {
     }
 }
 
-async function saveDownloadFile() {
+// 一步到位：一个系统“另存为”弹框同时完成“改文件名 + 选目录”
+// suggestedName 用后端返回的真实文件名，因此后缀/类型是准确的
+function saveBlobWithPicker(blob, suggestedName) {
+    const options = {suggestedName: suggestedName};
+    const dot = suggestedName.lastIndexOf('.');
+    const ext = dot >= 0 ? suggestedName.substring(dot).toLowerCase() : '';
+    if (ext && ext.length > 1) {
+        // 系统层锁定文件格式：只允许同名后缀
+        options.types = [{description: ext + ' 文件', accept: {'application/octet-stream': [ext]}}];
+    }
+    window.showSaveFilePicker(options).then((fileHandle) => {
+        // 代码层兜底：用户若强行改了后缀则中止
+        if (ext && !fileHandle.name.toLowerCase().endsWith(ext)) {
+            proxy.$modal.msgError('不能修改文件格式，请保留 ' + ext + ' 后缀');
+            return;
+        }
+        writeBlobToFileHandle(fileHandle, blob);
+    }).catch((err) => {
+        // 用户点“取消”直接结束；其它失败（如请求过慢导致用户激活过期）回退到自定义弹框
+        if (err && err.name === 'AbortError') {
+            return;
+        }
+        downloadBlob.value = blob;
+        downloadFileName.value = suggestedName;
+        downloadDialogVisible.value = true;
+    });
+}
+
+// 回退弹框的保存：只改文件名，使用浏览器默认下载
+function saveDownloadFile() {
     const name = (downloadFileName.value || '').trim();
     if (!name) {
         proxy.$modal.msgWarning('请输入文件名');
@@ -189,35 +217,31 @@ async function saveDownloadFile() {
     if (!blob) {
         return;
     }
-
-    if (supportDirPicker) {
-        let dirHandle;
-        try {
-            dirHandle = await window.showDirectoryPicker({mode: 'readwrite'});
-        } catch (err) {
-            if (err && err.name !== 'AbortError') {
-                proxy.$modal.msgError('选择目录失败：' + err.message);
-            }
-            return;
-        }
-        await saveBlobToDir(dirHandle, blob, name);
-    } else {
-        proxy.fileDownload(blob, name);
-    }
-
+    proxy.fileDownload(blob, name);
     downloadDialogVisible.value = false;
     downloadBlob.value = null;
 }
 
 function doExport() {
+    requestExport();
+}
+
+function requestExport() {
     listLoading.value = true;
     proxy.request.post('/sys/permission/export', null, {responseType: 'blob'}).then((res) => {
         if (res.headers["content-type"].indexOf("application/octet-stream") === 0) {
+            const blob = res.data;
             const fileName = res.headers["_filename"];
             if (fileName) {
-                downloadBlob.value = res.data;
-                downloadFileName.value = decodeURIComponent(fileName);
-                downloadDialogVisible.value = true;
+                const name = decodeURIComponent(fileName);
+                if (supportSavePicker) {
+                    // 拿到真实文件名后立即弹系统“另存为”，一步完成改名+选目录
+                    saveBlobWithPicker(blob, name);
+                } else {
+                    downloadBlob.value = blob;
+                    downloadFileName.value = name;
+                    downloadDialogVisible.value = true;
+                }
             } else {
                 proxy.$modal.msgError("Error");
             }
