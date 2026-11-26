@@ -100,7 +100,7 @@
             </el-form>
             <div slot="footer">
                 <el-button @click="downloadDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveDownloadFile">{{ supportDirPicker ? '选择目录并保存' : '下载' }}</el-button>
+                <el-button type="primary" @click="saveDownloadFile">下载</el-button>
             </div>
         </el-dialog>
 	</section>
@@ -142,7 +142,7 @@ export default {
             downloadDialogVisible: false,
             downloadFileName: '',
             downloadBlob: null,
-            supportDirPicker: typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function'
+            supportSavePicker: typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function'
         }
     },
     methods: {
@@ -200,11 +200,9 @@ export default {
             this.sels = [];
         },
 
-        // 把下载的文件写入用户选择的目录（File System Access API）
-        saveBlobToDir(dirHandle, blob, fileName) {
-            return dirHandle.getFileHandle(fileName, {create: true}).then((fileHandle) => {
-                return fileHandle.createWritable();
-            }).then((writable) => {
+        // 把 blob 写入系统“另存为”对话框选中的文件（File System Access API）
+        writeBlobToFileHandle(fileHandle, blob) {
+            return fileHandle.createWritable().then((writable) => {
                 return writable.write(blob).then(() => writable.close());
             }).then(() => {
                 this.$message({type: 'success', message: '下载成功'});
@@ -213,6 +211,35 @@ export default {
             });
         },
 
+        // 一步到位：一个系统“另存为”弹框同时完成“改文件名 + 选目录”
+        // suggestedName 用后端返回的真实文件名，因此后缀/类型是准确的
+        saveBlobWithPicker(blob, suggestedName) {
+            var options = {suggestedName: suggestedName};
+            var dot = suggestedName.lastIndexOf('.');
+            var ext = dot >= 0 ? suggestedName.substring(dot).toLowerCase() : '';
+            if (ext && ext.length > 1) {
+                // 系统层锁定文件格式：只允许同名后缀
+                options.types = [{description: ext + ' 文件', accept: {'application/octet-stream': [ext]}}];
+            }
+            window.showSaveFilePicker(options).then((fileHandle) => {
+                // 代码层兜底：用户若强行改了后缀则中止
+                if (ext && fileHandle.name.toLowerCase().endsWith(ext) === false) {
+                    this.$message.error('不能修改文件格式，请保留 ' + ext + ' 后缀');
+                    return;
+                }
+                return this.writeBlobToFileHandle(fileHandle, blob);
+            }).catch((err) => {
+                // 用户点“取消”直接结束；其它失败（如请求过慢导致用户激活过期）回退到自定义弹框
+                if (err && err.name === 'AbortError') {
+                    return;
+                }
+                this.downloadBlob = blob;
+                this.downloadFileName = suggestedName;
+                this.downloadDialogVisible = true;
+            });
+        },
+
+        // 回退弹框的保存：只改文件名，使用浏览器默认下载
         saveDownloadFile() {
             var name = (this.downloadFileName || '').trim();
             if (!name) {
@@ -223,23 +250,9 @@ export default {
             if (!blob) {
                 return;
             }
-
-            if (this.supportDirPicker) {
-                window.showDirectoryPicker({mode: 'readwrite'}).then((dirHandle) => {
-                    return this.saveBlobToDir(dirHandle, blob, name);
-                }).then(() => {
-                    this.downloadDialogVisible = false;
-                    this.downloadBlob = null;
-                }).catch((err) => {
-                    if (err && err.name !== 'AbortError') {
-                        this.$message.error('选择目录失败：' + err.message);
-                    }
-                });
-            } else {
-                this.$fileDownload(blob, name);
-                this.downloadDialogVisible = false;
-                this.downloadBlob = null;
-            }
+            this.$fileDownload(blob, name);
+            this.downloadDialogVisible = false;
+            this.downloadBlob = null;
         },
 
         doExport() {
@@ -248,9 +261,15 @@ export default {
                 if (res.data.type === 'application/octet-stream') {
                     const fileName = res.headers["_filename"];
                     if (fileName) {
-                        this.downloadBlob = res.data;
-                        this.downloadFileName = decodeURIComponent(fileName);
-                        this.downloadDialogVisible = true;
+                        var name = decodeURIComponent(fileName);
+                        if (this.supportSavePicker) {
+                            // 拿到真实文件名后立即弹系统“另存为”，一步完成改名+选目录
+                            this.saveBlobWithPicker(res.data, name);
+                        } else {
+                            this.downloadBlob = res.data;
+                            this.downloadFileName = name;
+                            this.downloadDialogVisible = true;
+                        }
                     } else {
                         this.$message.error("Error");
                     }
