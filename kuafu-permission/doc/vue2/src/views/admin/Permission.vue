@@ -90,19 +90,6 @@
                   :accept="'.json'" :maxSize="2097152" :fileType="'text'"
                   :actionUrl="this.$global.baseUrl + '/sys/permission/import'" v-on:change="onImportPost" />
 
-        <!--下载保存弹框-->
-        <el-dialog :visible.sync="downloadDialogVisible" title="保存导出文件" width="420px"
-                   append-to-body v-drag>
-            <el-form label-width="70px">
-                <el-form-item label="文件名">
-                    <el-input v-model="downloadFileName" placeholder="请输入文件名" />
-                </el-form-item>
-            </el-form>
-            <div slot="footer">
-                <el-button @click="downloadDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveDownloadFile">下载</el-button>
-            </div>
-        </el-dialog>
 	</section>
 </template>
 
@@ -139,9 +126,6 @@ export default {
             permissionList: [],
             listLoading: false,
             sels: [],    //列表选中列
-            downloadDialogVisible: false,
-            downloadFileName: '',
-            downloadBlob: null,
             supportSavePicker: typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function'
         }
     },
@@ -229,31 +213,14 @@ export default {
                 }
                 return this.writeBlobToFileHandle(fileHandle, blob);
             }).catch((err) => {
-                // 用户点“取消”直接结束；其它失败（如请求过慢导致用户激活过期）回退到自定义弹框
+                // 用户点“取消”直接结束；其它失败（如请求过慢导致用户激活过期）回退到浏览器默认下载
                 if (err && err.name === 'AbortError') {
                     return;
                 }
-                this.downloadBlob = blob;
-                this.downloadFileName = suggestedName;
-                this.downloadDialogVisible = true;
+                this.$fileDownload(blob, suggestedName);
             });
         },
 
-        // 回退弹框的保存：只改文件名，使用浏览器默认下载
-        saveDownloadFile() {
-            var name = (this.downloadFileName || '').trim();
-            if (!name) {
-                this.$message.warning('请输入文件名');
-                return;
-            }
-            var blob = this.downloadBlob;
-            if (!blob) {
-                return;
-            }
-            this.$fileDownload(blob, name);
-            this.downloadDialogVisible = false;
-            this.downloadBlob = null;
-        },
 
         doExport() {
             this.listLoading = true;
@@ -266,9 +233,7 @@ export default {
                             // 拿到真实文件名后立即弹系统“另存为”，一步完成改名+选目录
                             this.saveBlobWithPicker(res.data, name);
                         } else {
-                            this.downloadBlob = res.data;
-                            this.downloadFileName = name;
-                            this.downloadDialogVisible = true;
+                            this.$fileDownload(res.data, name);
                         }
                     } else {
                         this.$message.error("Error");

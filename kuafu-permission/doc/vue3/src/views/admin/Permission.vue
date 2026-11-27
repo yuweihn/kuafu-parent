@@ -86,18 +86,6 @@
                   :accept="'.json'" :maxSize="2097152" :fileType="'text'"
                   :actionUrl="'/sys/permission/import'" v-on:change="onImportPost" />
 
-        <!--下载保存弹框-->
-        <el-dialog v-model="downloadDialogVisible" title="保存导出文件" width="420px" append-to-body draggable>
-            <el-form label-width="70px">
-                <el-form-item label="文件名">
-                    <el-input v-model="downloadFileName" placeholder="请输入文件名" />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <el-button @click="downloadDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveDownloadFile">下载</el-button>
-            </template>
-        </el-dialog>
 	</section>
 </template>
 
@@ -124,9 +112,6 @@ const visibleList = ref([
 const permissionList = ref([]);
 const listLoading = ref(false);
 const sels = ref([]);
-const downloadDialogVisible = ref(false);
-const downloadFileName = ref('');
-const downloadBlob = ref(null);
 const supportSavePicker = typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function';
 
 function onSelsChanged(v) {
@@ -196,31 +181,14 @@ function saveBlobWithPicker(blob, suggestedName) {
         }
         writeBlobToFileHandle(fileHandle, blob);
     }).catch((err) => {
-        // 用户点“取消”直接结束；其它失败（如请求过慢导致用户激活过期）回退到自定义弹框
+        // 用户点“取消”直接结束；其它失败（如请求过慢导致用户激活过期）回退到浏览器默认下载
         if (err && err.name === 'AbortError') {
             return;
         }
-        downloadBlob.value = blob;
-        downloadFileName.value = suggestedName;
-        downloadDialogVisible.value = true;
+        proxy.fileDownload(blob, suggestedName);
     });
 }
 
-// 回退弹框的保存：只改文件名，使用浏览器默认下载
-function saveDownloadFile() {
-    const name = (downloadFileName.value || '').trim();
-    if (!name) {
-        proxy.$modal.msgWarning('请输入文件名');
-        return;
-    }
-    const blob = downloadBlob.value;
-    if (!blob) {
-        return;
-    }
-    proxy.fileDownload(blob, name);
-    downloadDialogVisible.value = false;
-    downloadBlob.value = null;
-}
 
 function doExport() {
     requestExport();
@@ -238,9 +206,7 @@ function requestExport() {
                     // 拿到真实文件名后立即弹系统“另存为”，一步完成改名+选目录
                     saveBlobWithPicker(blob, name);
                 } else {
-                    downloadBlob.value = blob;
-                    downloadFileName.value = name;
-                    downloadDialogVisible.value = true;
+                    proxy.fileDownload(blob, name);
                 }
             } else {
                 proxy.$modal.msgError("Error");
