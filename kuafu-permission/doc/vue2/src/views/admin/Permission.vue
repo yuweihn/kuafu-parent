@@ -126,7 +126,8 @@ export default {
             permissionList: [],
             listLoading: false,
             sels: [],    //列表选中列
-            supportSavePicker: typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function'
+            supportSavePicker: typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function',
+            pendingSave: null
         }
     },
     methods: {
@@ -195,9 +196,8 @@ export default {
             });
         },
 
-        // 一步到位：一个系统“另存为”弹框同时完成“改文件名 + 选目录”
-        // suggestedName 用后端返回的真实文件名，因此后缀/类型是准确的
-        saveBlobWithPicker(blob, suggestedName) {
+        // 在用户手势内同步调用系统“另存为”，保证弹框不受请求耗时影响
+        openSavePicker(blob, suggestedName) {
             var options = {suggestedName: suggestedName};
             var dot = suggestedName.lastIndexOf('.');
             var ext = dot >= 0 ? suggestedName.substring(dot).toLowerCase() : '';
@@ -205,27 +205,56 @@ export default {
                 // 系统层锁定文件格式：只允许同名后缀
                 options.types = [{description: ext + ' 文件', accept: {'application/octet-stream': [ext]}}];
             }
+            var this0 = this;
             window.showSaveFilePicker(options).then((fileHandle) => {
                 // 代码层兜底：用户若强行改了后缀则中止
                 if (ext && fileHandle.name.toLowerCase().endsWith(ext) === false) {
-                    this.$message.error('不能修改文件格式，请保留 ' + ext + ' 后缀');
+                    this0.$message.error('不能修改文件格式，请保留 ' + ext + ' 后缀');
                     return;
                 }
-                return this.writeBlobToFileHandle(fileHandle, blob);
+                return this0.writeBlobToFileHandle(fileHandle, blob);
             }).catch((err) => {
-                // 用户点“取消”直接结束；其它失败（如请求过慢导致用户激活过期）回退到浏览器默认下载
                 if (err && err.name === 'AbortError') {
+                    return; // 用户取消
+                }
+                if (err && err.name === 'SecurityError') {
+                    this0.pendingSave = {blob: blob, name: suggestedName};
+                    this0.$message.warning('文件已准备好，请再点一次下载以选择保存位置');
                     return;
                 }
-                this.$fileDownload(blob, suggestedName);
+                this0.$fileDownload(blob, suggestedName);
             });
+        },
+
+        // 请求返回后调用：激活仍有效则直接弹；已过期则暂存并提示，不再静默下载
+        saveBlobWithPicker(blob, suggestedName) {
+            if (typeof navigator !== 'undefined' && navigator.userActivation && !navigator.userActivation.isActive) {
+                this.pendingSave = {blob: blob, name: suggestedName};
+                this.$message.warning('文件已准备好，请再点一次下载以选择保存位置');
+                return;
+            }
+            this.openSavePicker(blob, suggestedName);
+        },
+
+        // 二次点击时调用：若存在暂存结果，在此次手势内同步弹 picker 并返回 true
+        consumePendingSave() {
+            if (!this.pendingSave) {
+                return false;
+            }
+            var p = this.pendingSave;
+            this.pendingSave = null;
+            this.openSavePicker(p.blob, p.name);
+            return true;
         },
 
 
         doExport() {
+            if (this.consumePendingSave()) {
+                return;
+            }
             this.listLoading = true;
             this.$axios.post(this.$global.baseUrl + '/sys/permission/export', null, {responseType: 'blob'}).then((res) => {
-                if (res.data.type === 'application/octet-stream') {
+                if (res.headers["_filename"] || (res.headers["content-type"] && res.headers["content-type"].indexOf("application/octet-stream") === 0)) {
                     const fileName = res.headers["_filename"];
                     if (fileName) {
                         var name = decodeURIComponent(fileName);
@@ -238,7 +267,7 @@ export default {
                     } else {
                         this.$message.error("Error");
                     }
-                } else if (res.data.type === 'application/json') {
+                } else if (res.headers["content-type"] && res.headers["content-type"].indexOf("application/json") === 0) {
                     const reader = new FileReader();
                     reader.onload = () => {
                         var dt = JSON.parse(reader.result);

@@ -163,9 +163,11 @@ async function writeBlobToFileHandle(fileHandle, blob) {
     }
 }
 
-// 一步到位：一个系统“另存为”弹框同时完成“改文件名 + 选目录”
-// suggestedName 用后端返回的真实文件名，因此后缀/类型是准确的
-function saveBlobWithPicker(blob, suggestedName) {
+// “激活已过期”时暂存下载结果，等用户再次点击时在手势内同步弹系统另存为
+const pendingSave = ref(null);
+
+// 在用户手势内同步调用系统“另存为”，保证弹框不受请求耗时影响
+function openSavePicker(blob, suggestedName) {
     const options = {suggestedName: suggestedName};
     const dot = suggestedName.lastIndexOf('.');
     const ext = dot >= 0 ? suggestedName.substring(dot).toLowerCase() : '';
@@ -181,23 +183,51 @@ function saveBlobWithPicker(blob, suggestedName) {
         }
         writeBlobToFileHandle(fileHandle, blob);
     }).catch((err) => {
-        // 用户点“取消”直接结束；其它失败（如请求过慢导致用户激活过期）回退到浏览器默认下载
         if (err && err.name === 'AbortError') {
+            return; // 用户取消
+        }
+        if (err && err.name === 'SecurityError') {
+            pendingSave.value = {blob: blob, name: suggestedName};
+            proxy.$modal.msgWarning('文件已准备好，请再点一次下载以选择保存位置');
             return;
         }
         proxy.fileDownload(blob, suggestedName);
     });
 }
 
+// 请求返回后调用：激活仍有效则直接弹；已过期则暂存并提示，不再静默下载
+function saveBlobWithPicker(blob, suggestedName) {
+    if (typeof navigator !== 'undefined' && navigator.userActivation && !navigator.userActivation.isActive) {
+        pendingSave.value = {blob: blob, name: suggestedName};
+        proxy.$modal.msgWarning('文件已准备好，请再点一次下载以选择保存位置');
+        return;
+    }
+    openSavePicker(blob, suggestedName);
+}
+
+// 二次点击时调用：若存在暂存结果，在此次手势内同步弹 picker 并返回 true
+function consumePendingSave() {
+    if (!pendingSave.value) {
+        return false;
+    }
+    const p = pendingSave.value;
+    pendingSave.value = null;
+    openSavePicker(p.blob, p.name);
+    return true;
+}
+
 
 function doExport() {
+    if (consumePendingSave()) {
+        return;
+    }
     requestExport();
 }
 
 function requestExport() {
     listLoading.value = true;
     proxy.request.post('/sys/permission/export', null, {responseType: 'blob'}).then((res) => {
-        if (res.headers["content-type"].indexOf("application/octet-stream") === 0) {
+        if (res.headers["_filename"] || (res.headers["content-type"] && res.headers["content-type"].indexOf("application/octet-stream") === 0)) {
             const blob = res.data;
             const fileName = res.headers["_filename"];
             if (fileName) {
@@ -211,7 +241,7 @@ function requestExport() {
             } else {
                 proxy.$modal.msgError("Error");
             }
-        } else if (res.headers["content-type"].indexOf("application/json") === 0) {
+        } else if (res.headers["content-type"] && res.headers["content-type"].indexOf("application/json") === 0) {
             const reader = new FileReader();
             reader.onload = function() {
                 var dt = JSON.parse(reader.result);
