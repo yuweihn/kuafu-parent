@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 /**
- * 1、在main.js中导入：import './components/js/dialog.drag';
+ * 1、在main.js中导入：import './assets/js/dialog.drag';
  * 2、给el-dialog增加v-drag指令。如：<el-dialog title="..." width="..." v-drag>
  **/
 // v-drag: 弹窗拖拽+水平方向伸缩

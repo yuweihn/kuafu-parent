@@ -81,7 +81,7 @@
 <script>
 import TreeSelect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
-import IconSelect from "@/components/svg/select";
+import IconSelect from "@/assets/svg/select";
 
 export default {
     components: {

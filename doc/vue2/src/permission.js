@@ -1,9 +1,9 @@
 import axios from 'axios';
 import store from '@/vuex/store';
 import {Message} from 'element-ui';
-import session from '@/components/js/session';
+import session from '@/assets/js/session';
 import {router} from '@/basic.routes';
-import global from '@/components/js/global';
+import global from '@/assets/js/global';
 import NProgress from 'nprogress';
 
 const defaultTitle = document.title;

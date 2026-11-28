@@ -134,8 +134,8 @@
 </template>
 
 <script>
-    import logoImg from '@/components/img/logo.png';
-    import avatarImg from '@/components/img/avatar.png';
+    import logoImg from '@/assets/img/logo.png';
+    import avatarImg from '@/assets/img/avatar.png';
 
     export default {
 		data() {

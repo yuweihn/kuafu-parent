@@ -1,8 +1,8 @@
 import axios from 'axios';
 import md5 from 'js-md5';
 import { Message } from 'element-ui';
-import global from './components/js/global';
-import session from './components/js/session';
+import global from './assets/js/global';
+import session from './assets/js/session';
 
 // ==================== 请求拦截器 ====================
 axios.interceptors.request.use(

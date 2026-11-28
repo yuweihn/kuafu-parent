@@ -1,5 +1,5 @@
 /**
- * 1、在main.js中导入：import './components/js/has.permission';
+ * 1、在main.js中导入：import './assets/js/has.permission';
  * 2、给组件增加v-hasPerm指令。如：<el-input title="..." width="..." v-hasPerm="['user.delete']">
  **/
 

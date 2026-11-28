@@ -1,6 +1,6 @@
 import {Message} from 'element-ui';
 import axios from 'axios';
-import global from '@/components/js/global';
+import global from '@/assets/js/global';
 
 
 const dynamicButtons = {

@@ -2,7 +2,7 @@ import Layout from '@/views/Layout.vue';
 import {Message} from 'element-ui';
 import {basicRoutes} from '@/basic.routes';
 import axios from 'axios';
-import global from '@/components/js/global';
+import global from '@/assets/js/global';
 
 
 const dynamicRoutes = {

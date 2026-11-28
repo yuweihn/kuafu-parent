@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
             vue(),
             vueJsx(),
             createSvgIconsPlugin({
-                iconDirs: [path.resolve(process.cwd(), 'src/components/svg/icon')],
+                iconDirs: [path.resolve(process.cwd(), 'src/assets/svg/icon')],
                 symbolId: 'icon-[name]',
             }),
         ],
@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
             preprocessorOptions: {
                 scss: {
                     api: 'modern-compiler',
-                    additionalData:  `@use "@/components/css/vars.scss" as *;`
+                    additionalData:  `@use "@/assets/css/vars.scss" as *;`
                 }
             }
         },
