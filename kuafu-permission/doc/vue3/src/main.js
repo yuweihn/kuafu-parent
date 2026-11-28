@@ -39,6 +39,7 @@ import './permission';
 import Editor from "@/components/Editor";
 import FileUpload from '@/components/FileUpload';
 import SingleFileUpload from '@/components/SingleFileUpload';
+import SaveAsDialog from '@/components/SaveAsDialog';
 
 const app = createApp(App);
 
@@ -63,6 +64,7 @@ app.config.globalProperties.removeDynamicLoaded = () => {
 app.component('rt-editor', Editor);
 app.component('file-upload', SingleFileUpload);
 app.component('files-upload', FileUpload);
+app.component('save-as-dialog', SaveAsDialog);
 
 app.use(router);
 app.use(store);
