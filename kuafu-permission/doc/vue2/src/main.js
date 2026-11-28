@@ -26,11 +26,13 @@ import settings from './settings';
 import './permission';
 import './interceptor';
 import fileDownload from "js-file-download";
+import SaveAsDialog from './views/components/SaveAsDialog';
 
 
 //Vue.use(ElementUI);
 Vue.use(ElementUI, {size: 'small', zIndex: 1005});
 Vue.use(Vuex);
+Vue.component('save-as-dialog', SaveAsDialog);
 Vue.prototype.settings = settings;
 Vue.prototype.$axios = axios;
 Vue.prototype.$global = global;
@@ -50,11 +52,11 @@ axios.defaults.withCredentials = true;
 
 
 new Vue({
-	//el: '#app',
-	//template: '<App/>',
-	router,
-	store,
-	//components: { App }
-	render: h => h(App)
+    //el: '#app',
+    //template: '<App/>',
+    router,
+    store,
+    //components: { App }
+    render: h => h(App)
 }).$mount('#app');
 

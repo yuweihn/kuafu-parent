@@ -86,6 +86,9 @@
                   :accept="'.json'" :maxSize="2097152" :fileType="'text'"
                   :actionUrl="'/sys/permission/import'" v-on:change="onImportPost" />
 
+        <!--自定义“另存为”弹框（通用组件）：系统另存为不可用时的兼容方案-->
+        <save-as-dialog ref="saveAsDialogRef" />
+
 	</section>
 </template>
 
@@ -113,6 +116,14 @@ const permissionList = ref([]);
 const listLoading = ref(false);
 const sels = ref([]);
 const supportSavePicker = typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function';
+// Safari（含 iOS）没有 File System Access API，且自带下载授权/保存弹框；
+// 若再弹自定义弹框会出现“自定义框 → 系统框”两段式，故 Safari 直接走默认下载
+const isSafari = typeof navigator !== 'undefined' && /^((?!chrome|crios|fxios|edg|android).)*safari/i.test(navigator.userAgent);
+// Firefox 桌面版默认开启“每次下载都询问保存位置”，同样会自带系统保存弹框，与 Safari 同理直接走默认下载
+const isFirefoxDesktop = typeof navigator !== 'undefined' && /firefox/i.test(navigator.userAgent) && !/android|mobile/i.test(navigator.userAgent);
+
+// 自定义“另存为”弹框（通用组件，见 src/components/SaveAsDialog）
+const saveAsDialogRef = ref(null);
 
 function onSelsChanged(v) {
     sels.value = v;
@@ -191,7 +202,8 @@ function openSavePicker(blob, suggestedName) {
             proxy.$modal.msgWarning('文件已准备好，请再点一次下载以选择保存位置');
             return;
         }
-        proxy.fileDownload(blob, suggestedName);
+        // 系统弹框调用异常（非取消/非激活过期）→ 回退到自定义“另存为”兼容框
+        saveAsDialogRef.value.open(blob, suggestedName);
     });
 }
 
@@ -232,11 +244,15 @@ function requestExport() {
             const fileName = res.headers["_filename"];
             if (fileName) {
                 const name = decodeURIComponent(fileName);
+                // HTTPS + Chromium（含 Safari 18.4+）走系统“另存为”；
+                // Safari / 桌面 Firefox 自带下载保存弹框，直接默认下载避免双弹框；
+                // 其余（HTTP + Chrome/Firefox 移动端等）用自定义兼容弹框
                 if (supportSavePicker) {
-                    // 拿到真实文件名后立即弹系统“另存为”，一步完成改名+选目录
                     saveBlobWithPicker(blob, name);
-                } else {
+                } else if (isSafari || isFirefoxDesktop) {
                     proxy.fileDownload(blob, name);
+                } else {
+                    saveAsDialogRef.value.open(blob, name);
                 }
             } else {
                 proxy.$modal.msgError("Error");
@@ -275,6 +291,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 </style>
 

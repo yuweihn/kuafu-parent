@@ -90,6 +90,9 @@
                   :accept="'.json'" :maxSize="2097152" :fileType="'text'"
                   :actionUrl="this.$global.baseUrl + '/sys/permission/import'" v-on:change="onImportPost" />
 
+        <!--自定义“另存为”弹框（通用组件）：系统另存为不可用时的兼容方案-->
+        <save-as-dialog ref="saveAsDialog" />
+
 	</section>
 </template>
 
@@ -127,7 +130,12 @@ export default {
             listLoading: false,
             sels: [],    //列表选中列
             supportSavePicker: typeof window !== 'undefined' && typeof window.showSaveFilePicker === 'function',
-            pendingSave: null
+            pendingSave: null,
+            // Safari（含 iOS）没有 File System Access API，且自带下载授权/保存弹框；
+            // 若再弹自定义弹框会出现“自定义框 → 系统框”两段式，故 Safari 直接走默认下载
+            isSafari: typeof navigator !== 'undefined' && /^((?!chrome|crios|fxios|edg|android).)*safari/i.test(navigator.userAgent),
+            // Firefox 桌面版默认开启“每次下载都询问保存位置”，同样会自带系统保存弹框，与 Safari 同理直接走默认下载
+            isFirefoxDesktop: typeof navigator !== 'undefined' && /firefox/i.test(navigator.userAgent) && !/android|mobile/i.test(navigator.userAgent)
         }
     },
     methods: {
@@ -222,7 +230,7 @@ export default {
                     this0.$message.warning('文件已准备好，请再点一次下载以选择保存位置');
                     return;
                 }
-                this0.$fileDownload(blob, suggestedName);
+                this0.$refs.saveAsDialog.open(blob, suggestedName);
             });
         },
 
@@ -247,7 +255,6 @@ export default {
             return true;
         },
 
-
         doExport() {
             if (this.consumePendingSave()) {
                 return;
@@ -261,8 +268,12 @@ export default {
                         if (this.supportSavePicker) {
                             // 拿到真实文件名后立即弹系统“另存为”，一步完成改名+选目录
                             this.saveBlobWithPicker(res.data, name);
-                        } else {
+                        } else if (this.isSafari || this.isFirefoxDesktop) {
+                            // Safari / 桌面 Firefox 自带下载保存弹框，直接默认下载避免双弹框
                             this.$fileDownload(res.data, name);
+                        } else {
+                            // 其余（HTTP + Chrome/Firefox 移动端等）用自定义兼容弹框
+                            this.$refs.saveAsDialog.open(res.data, name);
                         }
                     } else {
                         this.$message.error("Error");
